@@ -1,6 +1,3 @@
-# ── Stažená data (velké binární soubory) ─────────────────────────────────────
-downloads/
-
 # ── Go build artefakty ────────────────────────────────────────────────────────
 downloader/philosophy-downloader
 downloader/*.exe

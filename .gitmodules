@@ -1,0 +1,6 @@
+[submodule "downloads/greek_latin/perseus/greek"]
+	path = downloads/greek_latin/perseus/greek
+	url = https://github.com/PerseusDL/canonical-greekLit
+[submodule "downloads/greek_latin/perseus/latin"]
+	path = downloads/greek_latin/perseus/latin
+	url = https://github.com/PerseusDL/canonical-latinLit
