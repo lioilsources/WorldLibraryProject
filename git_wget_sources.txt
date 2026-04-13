@@ -1,0 +1,61 @@
+# git_wget_sources.txt
+# Formát záznamů:
+#
+#   type=git
+#   url=<repo URL>
+#   dir=<cílový adresář (relativní od BASE_DIR)>
+#   [branch=<větev, default: výchozí větev>]
+#   [depth=<--depth N, default: plný klon>]
+#
+#   type=wget
+#   url=<URL nebo http://host/path/ pro rekurzivní stahování>
+#   dir=<cílový adresář>
+#   [args=<dodatečné argumenty pro wget>]
+#   [accept=<přípony souborů oddělené čárkou, default: vše>]
+#
+# Prázdný řádek nebo řádek začínající # ukončuje záznam.
+
+# === ŘECKO-ŘÍMSKÝ KORPUS (Perseus Digital Library) ===
+type=git
+url=https://github.com/PerseusDL/canonical-greekLit
+dir=greek_latin/perseus/greek
+depth=1
+
+type=git
+url=https://github.com/PerseusDL/canonical-latinLit
+dir=greek_latin/perseus/latin
+depth=1
+
+# === BEOWULF (staroangličtina) ===
+type=wget
+url=https://sacred-texts.com/neu/beowulf/
+dir=european/beowulf
+accept=htm,txt,pdf
+args=--recursive --no-parent --level=2 --wait=1 --random-wait
+
+# === EDDA (staroseverština) ===
+type=wget
+url=https://sacred-texts.com/neu/poe/
+dir=european/edda/poetic
+accept=htm,txt,pdf
+args=--recursive --no-parent --level=2 --wait=1 --random-wait
+
+type=wget
+url=https://sacred-texts.com/neu/pre/
+dir=european/edda/prose
+accept=htm,txt,pdf
+args=--recursive --no-parent --level=2 --wait=1 --random-wait
+
+# === AVESTA (avestánština, sacred-texts) ===
+type=wget
+url=https://sacred-texts.com/zor/
+dir=avesta/sacred_texts
+accept=htm,txt,pdf
+args=--recursive --no-parent --level=2 --wait=1 --random-wait
+
+# === RIGVEDA (sacred-texts) ===
+type=wget
+url=https://sacred-texts.com/hin/rigveda/
+dir=sanskrit/vedy/rigveda_sacred_texts
+accept=htm,txt
+args=--recursive --no-parent --level=2 --wait=1 --random-wait

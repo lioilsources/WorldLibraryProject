@@ -1,0 +1,21 @@
+# ── Stažená data (velké binární soubory) ─────────────────────────────────────
+downloads/
+
+# ── Go build artefakty ────────────────────────────────────────────────────────
+downloader/philosophy-downloader
+downloader/*.exe
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Editory ───────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logy a dočasné soubory ────────────────────────────────────────────────────
+*.log
+*.tmp
+aria2c.log

@@ -1,0 +1,182 @@
+# === 1. INDIE – SANSKRT (Mahábhárata BORI critical edition – všechny parvy + full) ===
+# BORI Mahabharata ZIP – původní identifier smazán z archive.org, hledej "mahabharata bori critical edition" na archive.org
+# https://archive.org/search?query=mahabharata+bori+critical
+
+https://sacred-texts.com/hin/maha/mahatxt.zip
+  dir=/ancient_origins_1TB/sanskrit/mahabharata
+  out=tokunaga_mahabharata_txt.zip
+
+# Mahabharata svazky z DLI – identifikátory 485484/485485 již neexistují
+# Hledej náhradu: https://archive.org/search?query=mahabharata+adi+parva+bori
+# https://archive.org/search?query=mahabharata+sabha+parva+critical
+# https://archive.org/search?query=mahabharata+virata+parva+bori
+# https://archive.org/search?query=mahabharata+shanti+parva+sukthankar
+
+# (přidej další parvy z archive.org: Vana, Virata, Udyoga, Bhishma, Drona, Karna, Shalya, Sauptika, Stri, Shanti, Anushasana, Ashvamedhika, Ashramavasika, Mausala, Mahaprasthanika, Svargarohana – hledej "mahabharata vol-X bori" na archive.org)
+
+# === 2. RÁMÁJANA – Baroda Critical Edition (všechny svazky) ===
+https://archive.org/download/RmyaaCriticalEdition1EDGHBhatt1960/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%201%20ED%20GH%20Bhatt%20(1960).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol1_balakananda.pdf
+
+https://archive.org/download/RmyaaCriticalEdition2EDPLVaidya1962/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%202%20ED%20PL%20Vaidya%20(1962).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol2_ayodhyakanda.pdf
+
+https://archive.org/download/RmyaaCriticalEdition3EDPCDivanji1963/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%203%20ED%20PC%20Divanji%20(1963).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol3_aranyakanda.pdf
+
+https://archive.org/download/RmyaaCriticalEdition4EDDRMankad1965/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%204%20ED%20DR%20Mankad%20(1965).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol4_kishkindhakanda.pdf
+
+https://archive.org/download/RmyaaCriticalEdition5EDGCJhala1966/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%205%20ED%20GC%20Jhala%20(1966).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol5_sundarakanda.pdf
+
+https://archive.org/download/RmyaaCriticalEdition7EDUPShah1975/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%207%20ED%20UP%20Shah%20(1975).pdf
+  dir=/ancient_origins_1TB/sanskrit/ramayana
+  out=ramayana_vol7_uttarakanda.pdf
+
+# další fascikuly a varianty z archive.org (hledat "Valmiki Ramayana Critical Edition")
+
+# === 3. VÉDY + UPANIŠADY ===
+https://archive.org/download/rigvedacomplete/Rig%20Veda%20Complete%20%28Sakala%20Shakha%29.pdf
+  dir=/ancient_origins_1TB/sanskrit/vedy
+  out=rigveda_complete_sanskrit.pdf
+
+# sacred-texts.com neposkytuje ZIP – použij wget pro stažení celé sekce:
+# wget -r --no-parent -A txt,htm https://sacred-texts.com/hin/rigveda/
+
+# === 4. ČÍNA (klasická čínština) – přímé plaintexty + scrape ctext.org ===
+https://ctext.org/dao-de-jing/plaintext
+  dir=/ancient_origins_1TB/chinese/laozi
+  out=dao_de_jing.txt
+
+https://ctext.org/analects/plaintext
+  dir=/ancient_origins_1TB/chinese/konfucius
+  out=analects.txt
+
+https://ctext.org/mengzi/plaintext
+  dir=/ancient_origins_1TB/chinese/mengzi
+  out=mengzi.txt
+
+https://ctext.org/zhuangzi/plaintext
+  dir=/ancient_origins_1TB/chinese/zhuangzi
+  out=zhuangzi.txt
+
+# (pro více: použij wget -r https://ctext.org nebo Python loop přes seznam textů)
+
+# === 5. ŘECKO-ŘÍM + PRE-SOKRATIKOVÉ ===
+# Perseus přesunul korpus na GitHub – stáhni přes git:
+# git clone https://github.com/PerseusDL/canonical-greekLit greek_latin/perseus/greek
+# git clone https://github.com/PerseusDL/canonical-latinLit greek_latin/perseus/latin
+
+# === 6. EGYPT (hieroglyfy) ===
+https://archive.org/download/the-ancient-egyptian-pyramid-texts_202103/The%20Ancient%20Egyptian%20Pyramid%20Texts.pdf
+  dir=/ancient_origins_1TB/egypt
+  out=pyramid_texts_allen.pdf
+
+# další varianty Pyramid Texts a Coffin Texts z archive.org / Chicago Oriental Institute
+
+# === 7. MAYOVÉ (hieroglyfy – všechny kodexy) ===
+http://www.famsi.org/mayawriting/codices/pdf/dresden_fors_schele_all.pdf
+  dir=/ancient_origins_1TB/maya
+  out=dresden_codex_full.pdf
+
+http://www.famsi.org/mayawriting/codices/pdf/kings.pdf
+  dir=/ancient_origins_1TB/maya
+  out=dresden_kingsborough.pdf
+
+https://archive.org/download/Ancient-Books-All-Rare-Collections_Of_CODICES/Codex%20Madrid.pdf
+  dir=/ancient_origins_1TB/maya
+  out=madrid_codex.pdf
+
+https://archive.org/download/Ancient-Books-All-Rare-Collections_Of_CODICES/Codex%20Paris.pdf
+  dir=/ancient_origins_1TB/maya
+  out=paris_codex.pdf
+
+http://www.mayavase.com/grol/grolier.pdf
+  dir=/ancient_origins_1TB/maya
+  out=grolier_codex.pdf
+
+# === 8. AVESTA (avestánština) ===
+# avesta_geldner_critical – DLI identifikátor neexistuje, hledej:
+# https://archive.org/search?query=avesta+geldner
+# sacred-texts.com neposkytuje ZIP – použij wget:
+# wget -r --no-parent -A txt,htm https://sacred-texts.com/zor/
+
+# === 9. PÁLI TIPITAKA (romanizovaný originál) ===
+https://tipitaka.org/pdf/romn/Tipi%E1%B9%ADaka_(M%C5%ABla).zip
+  dir=/ancient_origins_1TB/pali/tipitaka
+  out=tipitaka_mula_full.zip
+
+https://tipitaka.org/pdf/romn/Vinayapi%E1%B9%ADaka.zip
+  dir=/ancient_origins_1TB/pali/tipitaka
+  out=vinaya_pitaka.zip
+
+https://tipitaka.org/pdf/romn/Suttapi%E1%B9%ADaka.zip
+  dir=/ancient_origins_1TB/pali/tipitaka
+  out=sutta_pitaka.zip
+
+https://tipitaka.org/pdf/romn/Abhidhammapi%E1%B9%ADaka.zip
+  dir=/ancient_origins_1TB/pali/tipitaka
+  out=abhidhamma_pitaka.zip
+
+# + aṭṭhakathā ZIPy z tipitaka.org (celkem přes 300 MB)
+
+# === 10. BIBLE (hebrejština + řečtina) ===
+https://archive.org/download/westminsterleningradcodexhebrew/Westminster%20Leningrad%20Codex%20%28Hebrew%29.pdf
+  dir=/ancient_origins_1TB/bible/hebrew
+  out=westminster_leningrad_codex.pdf
+
+https://archive.org/download/Leningrad_Codex/Leningrad.pdf
+  dir=/ancient_origins_1TB/bible/hebrew
+  out=full_leningrad_codex.pdf
+
+# === 11. SUMER (klínové – ETCSL) ===
+https://archive.org/download/etcslsumerianliterature/etcslsumerianliterature.zip
+  dir=/ancient_origins_1TB/sumer
+  out=etcsL_sumerian_full.zip
+
+# === 12. EVROPSKÁ FILOZOFIE (originály) ===
+# Kant – všechny svazky Gesammelte Schriften
+https://archive.org/download/kantsgesammeltes01imma/kantsgesammeltes01imma.pdf
+  dir=/ancient_origins_1TB/european_philosophy/kant
+  out=kant_vol1.pdf
+
+https://archive.org/download/kantsgesammeltes03imma/kantsgesammeltes03imma.pdf
+  dir=/ancient_origins_1TB/european_philosophy/kant
+  out=kant_vol3.pdf
+
+# (opakuj pro vol 2,4,5,6,8,...27 – archive.org má desítky svazků)
+
+# Hegel Werke
+# hegel_collected_works – identifikátor neexistuje, hledej:
+# https://archive.org/search?query=hegel+collected+works
+
+https://archive.org/download/bub_gb_NisIkvbH70cC/bub_gb_NisIkvbH70cC.pdf
+  dir=/ancient_origins_1TB/european_philosophy/hegel
+  out=hegel_werke_vol1.pdf
+
+# další svazky Hegela, Fichta, Schellinga, Schopenhauera, Kierkegaarda atd. z archive.org
+
+# === 13. DALŠÍ PERLY (holistic Earth) ===
+# sacred-texts.com neposkytuje ZIP – použij wget:
+# wget -r --no-parent -A txt,htm https://sacred-texts.com/neu/beowulf/
+# wget -r --no-parent -A txt,htm https://sacred-texts.com/neu/poe/
+
+# tanzil.net změnil URL – správná adresa:
+https://tanzil.net/pub/download/data/quran-uthmani.zip
+  dir=/ancient_origins_1TB/islam/quran
+  out=quran_arabic_uthmani.zip
+
+# sacred-texts celý mirror – wget (nedá se stáhnout jako jeden soubor):
+# wget -r --no-parent -l 3 -A pdf,txt,htm https://sacred-texts.com/
+
+# Tibetské Kangyur/Tengyur fragmenty, Quechua texty, africké eposy (Sundiata), Kojiki, Šáhnáme atd. – hledej na archive.org a sacred-texts.com
+
+# === 14. EXTRA BULK KOLEKCE (pro dosažení 1 TB+) ===
+# wget -r --no-parent -A pdf,zip,txt https://sacred-texts.com (celý mirror)
+# archive.org philosophy + classics kolekce (bulk download přes ia tool nebo parallel)
