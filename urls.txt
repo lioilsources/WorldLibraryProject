@@ -1,20 +1,100 @@
-# === 1. INDIE – SANSKRT (Mahábhárata BORI critical edition – všechny parvy + full) ===
-# BORI Mahabharata ZIP – původní identifier smazán z archive.org, hledej "mahabharata bori critical edition" na archive.org
-# https://archive.org/search?query=mahabharata+bori+critical
+# === 1. INDIE – SANSKRT ===
+
+# Mahábhárata BORI critical edition – 18 svazků (ZIP byl smazán, PDFs existují)
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-01.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-01.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-02.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-02.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-03.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-03.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-04.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-04.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-05.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-05.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-06.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-06.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-07.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-07.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-08.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-08.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-09.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-09.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-10.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-10.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-11.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-11.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-12.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-12.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-13.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-13.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-14.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-14.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-15.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-15.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-16.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-16.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-17.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-17.pdf
+
+https://archive.org/download/mahabharat-bori-critical-edition-sanskrit-only/mbh-18.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/bori_full
+  out=mbh-18.pdf
+
+# Mahabharata – jednotlivé parvy (BORI kritická edice)
+https://archive.org/download/Ggro_the-mahabharata-adi-parv-critically-edited-by-vishnu-s-sukhthankar-1927-bhandark/The%20Mahabharata%20Adi%20Parv%20Critically%20Edited%20By%20Vishnu%20S%20Sukhthankar%2C%201927%20-%20Bhandarkar%20Oriental%20Research%20Institute%2C%20Poona.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/volumes
+  out=mahabharata_vol1_adi_parva.pdf
+
+https://archive.org/download/in.ernet.dli.2015.485485/2015.485485.The-Mahabharata.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/volumes
+  out=mahabharata_vol2_sabha_parva.pdf
+
+https://archive.org/download/mahabharata-virata-parva-narayan-bapuji-utgikar-1923-bori/Mahabharata%20Virata%20Parva%20-%20Narayan%20Bapuji%20Utgikar%201923%20%28BORI%29.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/volumes
+  out=mahabharata_virata_parva.pdf
+
+https://archive.org/download/UCsc_the-mahabharata-shanti-parv-critically-edited-by-vishnu-s-sukthankar-1953-bhanda/The%20Mahabharata%20Shanti%20Parv%20Critically%20Edited%20By%20Vishnu%20S%20Sukthankar%2C%201953%20-%20Bhandarkar%20Oriental%20Research%20Institute%2C%20Poona.pdf
+  dir=/ancient_origins_1TB/sanskrit/mahabharata/volumes
+  out=mahabharata_shanti_parva.pdf
 
 https://sacred-texts.com/hin/maha/mahatxt.zip
   dir=/ancient_origins_1TB/sanskrit/mahabharata
   out=tokunaga_mahabharata_txt.zip
 
-# Mahabharata svazky z DLI – identifikátory 485484/485485 již neexistují
-# Hledej náhradu: https://archive.org/search?query=mahabharata+adi+parva+bori
-# https://archive.org/search?query=mahabharata+sabha+parva+critical
-# https://archive.org/search?query=mahabharata+virata+parva+bori
-# https://archive.org/search?query=mahabharata+shanti+parva+sukthankar
-
-# (přidej další parvy z archive.org: Vana, Virata, Udyoga, Bhishma, Drona, Karna, Shalya, Sauptika, Stri, Shanti, Anushasana, Ashvamedhika, Ashramavasika, Mausala, Mahaprasthanika, Svargarohana – hledej "mahabharata vol-X bori" na archive.org)
-
-# === 2. RÁMÁJANA – Baroda Critical Edition (všechny svazky) ===
+# === 2. RÁMÁJANA – Baroda Critical Edition ===
 https://archive.org/download/RmyaaCriticalEdition1EDGHBhatt1960/R%C4%81m%C4%81ya%E1%B9%87a%20Critical%20Edition%201%20ED%20GH%20Bhatt%20(1960).pdf
   dir=/ancient_origins_1TB/sanskrit/ramayana
   out=ramayana_vol1_balakananda.pdf
@@ -39,17 +119,12 @@ https://archive.org/download/RmyaaCriticalEdition7EDUPShah1975/R%C4%81m%C4%81ya%
   dir=/ancient_origins_1TB/sanskrit/ramayana
   out=ramayana_vol7_uttarakanda.pdf
 
-# další fascikuly a varianty z archive.org (hledat "Valmiki Ramayana Critical Edition")
-
-# === 3. VÉDY + UPANIŠADY ===
+# === 3. VÉDY ===
 https://archive.org/download/rigvedacomplete/Rig%20Veda%20Complete%20%28Sakala%20Shakha%29.pdf
   dir=/ancient_origins_1TB/sanskrit/vedy
   out=rigveda_complete_sanskrit.pdf
 
-# sacred-texts.com neposkytuje ZIP – použij wget pro stažení celé sekce:
-# wget -r --no-parent -A txt,htm https://sacred-texts.com/hin/rigveda/
-
-# === 4. ČÍNA (klasická čínština) – přímé plaintexty + scrape ctext.org ===
+# === 4. ČÍNA ===
 https://ctext.org/dao-de-jing/plaintext
   dir=/ancient_origins_1TB/chinese/laozi
   out=dao_de_jing.txt
@@ -66,21 +141,15 @@ https://ctext.org/zhuangzi/plaintext
   dir=/ancient_origins_1TB/chinese/zhuangzi
   out=zhuangzi.txt
 
-# (pro více: použij wget -r https://ctext.org nebo Python loop přes seznam textů)
+# === 5. ŘECKO-ŘÍM ===
+# Perseus je v git_wget_sources.txt (git clone z GitHub)
 
-# === 5. ŘECKO-ŘÍM + PRE-SOKRATIKOVÉ ===
-# Perseus přesunul korpus na GitHub – stáhni přes git:
-# git clone https://github.com/PerseusDL/canonical-greekLit greek_latin/perseus/greek
-# git clone https://github.com/PerseusDL/canonical-latinLit greek_latin/perseus/latin
-
-# === 6. EGYPT (hieroglyfy) ===
+# === 6. EGYPT ===
 https://archive.org/download/the-ancient-egyptian-pyramid-texts_202103/The%20Ancient%20Egyptian%20Pyramid%20Texts.pdf
   dir=/ancient_origins_1TB/egypt
   out=pyramid_texts_allen.pdf
 
-# další varianty Pyramid Texts a Coffin Texts z archive.org / Chicago Oriental Institute
-
-# === 7. MAYOVÉ (hieroglyfy – všechny kodexy) ===
+# === 7. MAYOVÉ ===
 http://www.famsi.org/mayawriting/codices/pdf/dresden_fors_schele_all.pdf
   dir=/ancient_origins_1TB/maya
   out=dresden_codex_full.pdf
@@ -101,13 +170,16 @@ http://www.mayavase.com/grol/grolier.pdf
   dir=/ancient_origins_1TB/maya
   out=grolier_codex.pdf
 
-# === 8. AVESTA (avestánština) ===
-# avesta_geldner_critical – DLI identifikátor neexistuje, hledej:
-# https://archive.org/search?query=avesta+geldner
-# sacred-texts.com neposkytuje ZIP – použij wget:
-# wget -r --no-parent -A txt,htm https://sacred-texts.com/zor/
+# === 8. AVESTA ===
+https://archive.org/download/in.ernet.dli.2015.217560/2015.217560.Avesta-The.pdf
+  dir=/ancient_origins_1TB/avesta
+  out=avesta_geldner_critical.pdf
 
-# === 9. PÁLI TIPITAKA (romanizovaný originál) ===
+https://archive.org/download/complete-SBE-avesta-three-volumes-in-one/The%20Zend%20Avesta%20-%20translated%20by%20James%20Darmesteter.pdf
+  dir=/ancient_origins_1TB/avesta
+  out=avesta_darmesteter_complete.pdf
+
+# === 9. PÁLI TIPITAKA ===
 https://tipitaka.org/pdf/romn/Tipi%E1%B9%ADaka_(M%C5%ABla).zip
   dir=/ancient_origins_1TB/pali/tipitaka
   out=tipitaka_mula_full.zip
@@ -124,9 +196,7 @@ https://tipitaka.org/pdf/romn/Abhidhammapi%E1%B9%ADaka.zip
   dir=/ancient_origins_1TB/pali/tipitaka
   out=abhidhamma_pitaka.zip
 
-# + aṭṭhakathā ZIPy z tipitaka.org (celkem přes 300 MB)
-
-# === 10. BIBLE (hebrejština + řečtina) ===
+# === 10. BIBLE ===
 https://archive.org/download/westminsterleningradcodexhebrew/Westminster%20Leningrad%20Codex%20%28Hebrew%29.pdf
   dir=/ancient_origins_1TB/bible/hebrew
   out=westminster_leningrad_codex.pdf
@@ -135,13 +205,14 @@ https://archive.org/download/Leningrad_Codex/Leningrad.pdf
   dir=/ancient_origins_1TB/bible/hebrew
   out=full_leningrad_codex.pdf
 
-# === 11. SUMER (klínové – ETCSL) ===
+# === 11. SUMER (ETCSL) ===
+# Poznámka: archive.org občas vrací 503 – při chybě zkus znovu
 https://archive.org/download/etcslsumerianliterature/etcslsumerianliterature.zip
   dir=/ancient_origins_1TB/sumer
   out=etcsL_sumerian_full.zip
 
-# === 12. EVROPSKÁ FILOZOFIE (originály) ===
-# Kant – všechny svazky Gesammelte Schriften
+# === 12. EVROPSKÁ FILOZOFIE ===
+# Kant – Gesammelte Schriften
 https://archive.org/download/kantsgesammeltes01imma/kantsgesammeltes01imma.pdf
   dir=/ancient_origins_1TB/european_philosophy/kant
   out=kant_vol1.pdf
@@ -150,33 +221,184 @@ https://archive.org/download/kantsgesammeltes03imma/kantsgesammeltes03imma.pdf
   dir=/ancient_origins_1TB/european_philosophy/kant
   out=kant_vol3.pdf
 
-# (opakuj pro vol 2,4,5,6,8,...27 – archive.org má desítky svazků)
+# Hegel – Werke in 20 Bänden
+https://archive.org/download/G.W.FHegelWerkeBand01FrheSchriftenBookZZ.org/%5BG.W.F_Hegel%5D_Werke%2C_Band_01_-_Fr%C3%BChe_Schriften%28BookZZ.org%29.pdf
+  dir=/ancient_origins_1TB/european_philosophy/hegel
+  out=hegel_werke_band01_fruehe_schriften.pdf
 
-# Hegel Werke
-# hegel_collected_works – identifikátor neexistuje, hledej:
-# https://archive.org/search?query=hegel+collected+works
+https://archive.org/download/G.W.FHegelWerkeBand01FrheSchriftenBookZZ.org/%5BG.W.F_Hegel%5D_Werke%2C_Band_03_-_Ph%C3%A4nomenologie_des%28BookZZ.org%29.pdf
+  dir=/ancient_origins_1TB/european_philosophy/hegel
+  out=hegel_werke_band03_phaenomenologie.pdf
+
+https://archive.org/download/G.W.FHegelWerkeBand01FrheSchriftenBookZZ.org/%5BG.W.F_Hegel%5D_Werke%2C_Band_05_-_Wissenschaft_der_Lo%28BookZZ.org%29.pdf
+  dir=/ancient_origins_1TB/european_philosophy/hegel
+  out=hegel_werke_band05_wissenschaft_logik.pdf
 
 https://archive.org/download/bub_gb_NisIkvbH70cC/bub_gb_NisIkvbH70cC.pdf
   dir=/ancient_origins_1TB/european_philosophy/hegel
   out=hegel_werke_vol1.pdf
 
-# další svazky Hegela, Fichta, Schellinga, Schopenhauera, Kierkegaarda atd. z archive.org
+# === 13. ISLÁM ===
+# Quran – tanzil.net má form-based download; stáhni přes git_wget_sources.txt
+# nebo manuálně z https://tanzil.net/download/
 
-# === 13. DALŠÍ PERLY (holistic Earth) ===
-# sacred-texts.com neposkytuje ZIP – použij wget:
-# wget -r --no-parent -A txt,htm https://sacred-texts.com/neu/beowulf/
-# wget -r --no-parent -A txt,htm https://sacred-texts.com/neu/poe/
-
-# tanzil.net změnil URL – správná adresa:
-https://tanzil.net/pub/download/data/quran-uthmani.zip
+# Korán – arabský text s morfologickými anotacemi (269 MB ZIP)
+https://archive.org/download/quranicarabiccorpus/quranicarabiccorpus.zip
   dir=/ancient_origins_1TB/islam/quran
-  out=quran_arabic_uthmani.zip
+  out=quran_arabic_corpus.zip
 
-# sacred-texts celý mirror – wget (nedá se stáhnout jako jeden soubor):
-# wget -r --no-parent -l 3 -A pdf,txt,htm https://sacred-texts.com/
+# Sahíh al-Buchárí – arabský originál (10 svazků)
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-1.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol1.pdf
 
-# Tibetské Kangyur/Tengyur fragmenty, Quechua texty, africké eposy (Sundiata), Kojiki, Šáhnáme atd. – hledej na archive.org a sacred-texts.com
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-2.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol2.pdf
 
-# === 14. EXTRA BULK KOLEKCE (pro dosažení 1 TB+) ===
-# wget -r --no-parent -A pdf,zip,txt https://sacred-texts.com (celý mirror)
-# archive.org philosophy + classics kolekce (bulk download přes ia tool nebo parallel)
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-3.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol3.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-4.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol4.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-5.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol5.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-6.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol6.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-7.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol7.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-8.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol8.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-9.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol9.pdf
+
+https://archive.org/download/sahih-al-bukhari-arabic-full/sahih-al-bukhari-arabic-vol-10.pdf
+  dir=/ancient_origins_1TB/islam/hadith
+  out=sahih_bukhari_arabic_vol10.pdf
+
+# Al-Ghazálí – arabská kolekce (ZIP archivy)
+https://archive.org/download/imamal-ghazaliarabic/Imam%20Al-Ghazali%20-%20arabic.zip
+  dir=/ancient_origins_1TB/islam/ghazali
+  out=ghazali_arabic_collection.zip
+
+https://archive.org/download/imamal-ghazaliarabic/Imam%20Al-Ghazali%20-Ihya%20Ulumiddin%20Arabic.zip
+  dir=/ancient_origins_1TB/islam/ghazali
+  out=ghazali_ihya_ulumiddin_arabic.zip
+
+# OpenITI (40 000+ arabských/perských textů) – v git_wget_sources.txt
+
+# === 14. EVROPA (Beowulf, Edda) ===
+# Stahováno přes git_wget_sources.txt (wget ze sacred-texts.com)
+
+# === 15. PERŠTINA – originály ===
+https://archive.org/download/ShahnamaEFirdausiAzNazmBaNasrFarsi/119607267-Shahnama-e-Firdausi-Az-Nazm-Ba-Nasr.pdf
+  dir=/ancient_origins_1TB/persian/ferdousi
+  out=shahnameh_farsi.pdf
+
+https://archive.org/download/MasnaviEManavi-MaulanaJalaluddinMuhammadBalkhiRumiFarsi/Masnavi%20e%20Ma'navi%20-%20Maulana%20Jalaluddin%20Muhammad%20Balkhi%20Rumi%20(Farsi).pdf
+  dir=/ancient_origins_1TB/persian/rumi
+  out=masnavi_farsi.pdf
+
+https://archive.org/download/DivanEHafizFarsi/Divan%20e%20Hafiz%20(Farsi).pdf
+  dir=/ancient_origins_1TB/persian/hafez
+  out=divan_hafez_farsi.pdf
+
+https://archive.org/download/divan-e-shams-e-tabrizi-volume-1/Divan-e%20Shams-e%20Tabrizi%20Volume1.pdf
+  dir=/ancient_origins_1TB/persian/rumi
+  out=divan_shams_farsi_vol1.pdf
+
+# Ibn Síná – al-Qānūn fī al-ṭibb (arabský originál, 1645, Yale)
+https://archive.org/download/11419069.med.yale.edu/11419069.pdf
+  dir=/ancient_origins_1TB/persian/avicenna
+  out=ibn_sina_qanun_arabic_1645.pdf
+
+# === 16. ÁJURVÉDA – sanskrt ===
+# Charaka Samhita (SK + komentář Čakrapáni Datta, 1922)
+https://archive.org/download/LXpJ_charaka-samhita-sanskrit-with-ayurveda-dipika-commentary-of-chakra-pani-dutta-by/Charaka%20Samhita%20(Sanskrit)%20With%20Ayurveda%20Dipika%20Commentary%20of%20Chakra%20Pani%20Dutta%20By%20Agni%20Vesha%20Edited%20By%20Vaman%20Kesheo%20Datar%2C%201922%2C%20Bombay%20-%20Nirnaya%20Sagar%20Press%2C%20Bombay.pdf
+  dir=/ancient_origins_1TB/sanskrit/ayurveda
+  out=charaka_samhita_sanskrit_1922.pdf
+
+# Ashtanga Hridayam (SK + komentáře, Vágbhata)
+https://archive.org/download/Ashtanga.Hridaya.of.Vagbhata/Ashtanga.Hridaya.of.Vagbhata.pdf
+  dir=/ancient_origins_1TB/sanskrit/ayurveda
+  out=ashtanga_hridayam_sanskrit.pdf
+
+# GRETIL mirror (kompletní sanskrtský korpus) – v git_wget_sources.txt
+
+# === 17. ŘECKO-ŘÍM – doplnění PDF mimo Perseus ===
+# Aristotelés – Politica (Immisch 1909, řečtina)
+https://archive.org/download/aristotelis-politica-ed-immisch-1909/Aristotelis%20Politica%20-%20ed%20Immisch%201909.pdf
+  dir=/ancient_origins_1TB/greek_latin/aristotle
+  out=aristotle_politica_immisch_1909.pdf
+
+# Poznámka: Platón, Aristotelés, Xenofón, Seneca jsou plně pokryti
+# v Perseus XML/TEI repozitářích (downloads/greek_latin/perseus/)
+
+# === 18. TOMÁŠ AKVINSKÝ (latina) ===
+https://archive.org/download/summacontragenti0000thom/summacontragenti0000thom.pdf
+  dir=/ancient_origins_1TB/european_philosophy/aquinas
+  out=aquinas_summa_contra_gentiles.pdf
+
+https://archive.org/download/quaestionesdispu01thom/quaestionesdispu01thom.pdf
+  dir=/ancient_origins_1TB/european_philosophy/aquinas
+  out=aquinas_quaestiones_disputatae_vol1.pdf
+
+# === 19. JAN AMOS KOMENSKÝ (latina) ===
+https://archive.org/download/orbispictusofjoh00comeiala/orbispictusofjoh00comeiala.pdf
+  dir=/ancient_origins_1TB/european_philosophy/comenius
+  out=comenius_orbis_pictus.pdf
+
+https://archive.org/download/JOHANNISAMOSCOMENIUSWORKSOPERADIDACTICAOMNIA120418/JOHANNIS%20AMOS%20COMENIUS%20WORKS%20OPERA%20DIDACTICA%20OMNIA%20120418.pdf
+  dir=/ancient_origins_1TB/european_philosophy/comenius
+  out=comenius_opera_didactica_omnia.pdf
+
+# === 20. NĚMECKÁ KLASICKÁ FILOZOFIE – doplnění ===
+# Hegel – Phänomenologie des Geistes 1807
+https://archive.org/download/GWFHegel1807PhanomenologieDesGeistesPhenomenologyOfSpirit/GWFHegel-1807-Ph%C3%A4nomenologie-des-Geistes%3DPhenomenology-of-Spirit.pdf
+  dir=/ancient_origins_1TB/european_philosophy/hegel
+  out=hegel_phaenomenologie_1807.pdf
+
+# Husserl – Logische Untersuchungen (DE originál)
+https://archive.org/download/logischeuntersu01hussgoog/logischeuntersu01hussgoog.pdf
+  dir=/ancient_origins_1TB/european_philosophy/husserl
+  out=husserl_logische_untersuchungen.pdf
+
+# Heidegger – Sein und Zeit (DE originál)
+https://archive.org/download/HeideggerMartinSeinUndZeit/Heidegger%20Martin%20-%20Sein%20und%20Zeit.pdf
+  dir=/ancient_origins_1TB/european_philosophy/heidegger
+  out=heidegger_sein_und_zeit.pdf
+
+# Nietzsche – Also Sprach Zarathustra 1893 (DE originál)
+https://archive.org/download/NietzscheAlsoSprachZarathustra1893/Nietzsche_Also_sprach_Zarathustra_1893.pdf
+  dir=/ancient_origins_1TB/european_philosophy/nietzsche
+  out=nietzsche_zarathustra_1893.pdf
+
+# Spinoza – Ethica (latinský originál)
+https://archive.org/download/ethica00unkngoog/ethica00unkngoog.pdf
+  dir=/ancient_origins_1TB/european_philosophy/spinoza
+  out=spinoza_ethica_latin.pdf
+
+# Leibniz – Die philosophischen Schriften, sv. 7 (LA/FR/DE)
+https://archive.org/download/diephilosophisc07gerhgoog/diephilosophisc07gerhgoog.pdf
+  dir=/ancient_origins_1TB/european_philosophy/leibniz
+  out=leibniz_philosophische_schriften_vol7.pdf
+
+# === 21. SUMER – doplnění ===
+# Gilgameš – Thompson 1928 (klínopisné tabulky + transliterace)
+https://archive.org/download/thompson-1928-gilgamesh/Thompson_1928_Gilgamesh.pdf
+  dir=/ancient_origins_1TB/sumer/gilgamesh
+  out=gilgamesh_thompson_1928.pdf
+
+# CDLI (390 000+ klínopisných artefaktů) – v git_wget_sources.txt

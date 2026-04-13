@@ -8,10 +8,11 @@
 #   [depth=<--depth N, default: plný klon>]
 #
 #   type=wget
-#   url=<URL nebo http://host/path/ pro rekurzivní stahování>
+#   url=<URL>
 #   dir=<cílový adresář>
-#   [args=<dodatečné argumenty pro wget>]
-#   [accept=<přípony souborů oddělené čárkou, default: vše>]
+#   [accept=<přípony souborů oddělené čárkou>]
+#   [args=<přepínače bez hodnot s mezerami: --recursive --no-parent …>]
+#   [user_agent=<celý UA string – předá se jako --user-agent=…>]
 #
 # Prázdný řádek nebo řádek začínající # ukončuje záznam.
 
@@ -26,36 +27,69 @@ url=https://github.com/PerseusDL/canonical-latinLit
 dir=greek_latin/perseus/latin
 depth=1
 
-# === BEOWULF (staroangličtina) ===
+# === BEOWULF (staroangličtina) – Project Gutenberg ===
+# sacred-texts.com blokuje přes Cloudflare; Gutenberg je otevřený
 type=wget
-url=https://sacred-texts.com/neu/beowulf/
+url=https://www.gutenberg.org/cache/epub/16328/pg16328.txt
 dir=european/beowulf
-accept=htm,txt,pdf
-args=--recursive --no-parent --level=2 --wait=1 --random-wait
+args=--no-directories
 
-# === EDDA (staroseverština) ===
 type=wget
-url=https://sacred-texts.com/neu/poe/
+url=https://www.gutenberg.org/cache/epub/981/pg981.txt
+dir=european/beowulf
+args=--no-directories
+
+# === EDDA (staroseverština) – Project Gutenberg ===
+# Poetická Edda (Bellows překlad)
+type=wget
+url=https://www.gutenberg.org/cache/epub/1220/pg1220.txt
 dir=european/edda/poetic
-accept=htm,txt,pdf
-args=--recursive --no-parent --level=2 --wait=1 --random-wait
+args=--no-directories
 
+# Prozaická Edda (Young překlad)
 type=wget
-url=https://sacred-texts.com/neu/pre/
+url=https://www.gutenberg.org/cache/epub/43627/pg43627.txt
 dir=european/edda/prose
-accept=htm,txt,pdf
-args=--recursive --no-parent --level=2 --wait=1 --random-wait
+args=--no-directories
 
-# === AVESTA (avestánština, sacred-texts) ===
+# === AVESTA (avestánština) – Project Gutenberg ===
+# Vendidad (Darmesteter)
 type=wget
-url=https://sacred-texts.com/zor/
+url=https://www.gutenberg.org/cache/epub/2131/pg2131.txt
 dir=avesta/sacred_texts
-accept=htm,txt,pdf
-args=--recursive --no-parent --level=2 --wait=1 --random-wait
+args=--no-directories
 
-# === RIGVEDA (sacred-texts) ===
+# Yasna (Bleeck překlad)
 type=wget
-url=https://sacred-texts.com/hin/rigveda/
+url=https://www.gutenberg.org/cache/epub/18997/pg18997.txt
+dir=avesta/sacred_texts
+args=--no-directories
+
+# === RIGVEDA (sacred-texts zrcadlo na archive.org) ===
+# Griffith překlad – kompletní ASCII text
+type=wget
+url=https://archive.org/download/rigvedaeng00griffuoft/rigvedaeng00griffuoft_djvu.txt
 dir=sanskrit/vedy/rigveda_sacred_texts
-accept=htm,txt
-args=--recursive --no-parent --level=2 --wait=1 --random-wait
+args=--no-directories
+
+# === ISLÁM – OpenITI (40 000+ arabských/perských textů, 2+ mld slov) ===
+type=git
+url=https://github.com/OpenITI/RELEASE
+dir=islam/openiti
+depth=1
+
+# === ÁJURVÉDA / SANSKRT – GRETIL (kompletní sanskrtský/pálijský/prakrtský korpus) ===
+type=git
+url=https://github.com/INDOLOGY/GRETIL-mirror
+dir=sanskrit/gretil
+depth=1
+
+# === SUMER – CDLI (390 000+ klínopisných artefaktů, ATF transliterace) ===
+type=git
+url=https://github.com/cdli-gh/data
+dir=sumer/cdli
+depth=1
+
+# === ISLÁM – Korán (arabský text Uthmani) ===
+# tanzil.net poskytuje text přes form na https://tanzil.net/download/
+# Stáhni manuálně a ulož do downloads/islam/quran/

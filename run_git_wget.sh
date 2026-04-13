@@ -75,14 +75,21 @@ handle_git() {
 }
 
 handle_wget() {
-  local url="$1" dir="$2" accept="$3" extra_args="$4"
+  local url="$1" dir="$2" accept="$3" extra_args="$4" user_agent="$5"
   local dest="$BASE_DIR/$dir"
 
-  local accept_flag=""
-  [ -n "$accept" ] && accept_flag="--accept=$accept"
+  # Sestav args jako array — bezpečné pro hodnoty s mezerami
+  local wget_args=()
+  [ -n "$accept"     ] && wget_args+=("--accept=$accept")
+  [ -n "$user_agent" ] && wget_args+=("--user-agent=$user_agent")
+  # extra_args: jednoduchá přepínače bez hodnot (--recursive, --no-parent…)
+  # Rozdělení je bezpečné — neobsahují hodnoty s mezerami
+  # shellcheck disable=SC2206
+  [ -n "$extra_args" ] && wget_args+=($extra_args)
+  wget_args+=(--no-host-directories --cut-dirs=10 --directory-prefix="$dest")
 
   if [ "$DRY_RUN" = true ]; then
-    echo "[DRY] wget $extra_args $accept_flag -P $dest $url"
+    echo "[DRY] wget ${wget_args[*]} $url"
     return
   fi
 
@@ -90,20 +97,14 @@ handle_wget() {
   echo "  → wget: $url"
   echo "          → $dest"
 
-  # shellcheck disable=SC2086
-  wget $extra_args \
-    ${accept_flag} \
-    --no-host-directories \
-    --cut-dirs=10 \
-    --directory-prefix="$dest" \
-    "$url" || {
-      echo "  WARN: wget skončil s chybou (ignoruji)"
-    }
+  wget "${wget_args[@]}" "$url" || {
+    echo "  WARN: wget skončil s chybou (ignoruji)"
+  }
 }
 
 # ── Hlavní smyčka ──────────────────────────────────────────────────────────────
 parse_and_run() {
-  local type="" url="" dir="" branch="" depth="" accept="" args=""
+  local type="" url="" dir="" branch="" depth="" accept="" args="" user_agent=""
   local total=0 ok=0 failed=0
 
   flush() {
@@ -121,7 +122,7 @@ parse_and_run() {
         fi
         ;;
       wget)
-        if handle_wget "$url" "$dir" "$accept" "$args"; then
+        if handle_wget "$url" "$dir" "$accept" "$args" "$user_agent"; then
           ok=$((ok + 1))
         else
           echo "  CHYBA: selhalo"
@@ -134,7 +135,7 @@ parse_and_run() {
         ;;
     esac
     # reset
-    type=""; url=""; dir=""; branch=""; depth=""; accept=""; args=""
+    type=""; url=""; dir=""; branch=""; depth=""; accept=""; args=""; user_agent=""
   }
 
   while IFS= read -r raw || [ -n "$raw" ]; do
@@ -157,8 +158,9 @@ parse_and_run() {
       dir)    dir="$val" ;;
       branch) branch="$val" ;;
       depth)  depth="$val" ;;
-      accept) accept="$val" ;;
-      args)   args="$val" ;;
+      accept)     accept="$val" ;;
+      args)       args="$val" ;;
+      user_agent) user_agent="$val" ;;
     esac
   done < "$SOURCES_FILE"
 
