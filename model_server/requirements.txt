@@ -1,0 +1,5 @@
+# Runs only on the SPARK / DGX (GPU). Not needed by the Go pipeline.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+vllm>=0.6.3

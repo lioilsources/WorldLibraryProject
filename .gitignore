@@ -1,6 +1,15 @@
 # ── Go build artefakty ────────────────────────────────────────────────────────
 downloader/philosophy-downloader
 downloader/*.exe
+pipeline/summarize
+pipeline/*.exe
+
+# ── Pipeline: tajemství, cache, side-load ─────────────────────────────────────
+.env
+.cache/
+manual_drop/
+*.part
+model_server/.venv/
 
 # ── macOS ─────────────────────────────────────────────────────────────────────
 .DS_Store

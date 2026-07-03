@@ -66,9 +66,29 @@ https://example.com/soubor.pdf
 - aria2c automaticky resumuje přerušená stahování (`--continue=true`)
 - Max 5 pokusů na soubor s 5s pauzou mezi nimi
 
+## Stage 2 – České shrnutí (`pipeline/` + `model_server/`)
+
+Dvě služby propojené přes Tailscale mesh:
+
+- **Go pipeline** (`pipeline/`, stroj A): získá obsah (git-LFS, fallback URL,
+  `manual_drop/`), normalizuje, chunkuje, řídí map-reduce, sestaví výstupy.
+- **Python model-server** (`model_server/`, SPARK): OpenAI-compatible
+  inference (Qwen2.5-72B-Instruct přes vLLM). Viz `model_server/README.md`.
+
+```bash
+cp .env.example .env        # vyplň MODEL_BASE_URL (Tailscale) a MODEL_API_KEY
+./run_summaries.sh --dry-run --only dao   # plán, bez sítě
+./run_summaries.sh --only dao             # jedno dílo (smoke test)
+./run_summaries.sh                        # všech 10 plaintext děl kola 1
+```
+
+Výstupy: `summaries/<slug>.md`, agregovaný `OBSAH_CESKY.md` a
+`data/final/dataset.jsonl`. Ruční katalog metadat `KATALOG_KNIH.md` se nemění.
+Kolo 1 = 28 plaintext souborů (10 děl); PDF/OCR korpus je kolo 2.
+
 ## Po stažení
 
-Přesuň `dataset.jsonl` (výstup Go Q&A generátoru) na DGX Spark:
+Přesuň `dataset.jsonl` (výstup `pipeline/`) na DGX Spark:
 
 ```bash
 rsync -avz --progress data/final/dataset.jsonl spark:/home/user/finetune/
