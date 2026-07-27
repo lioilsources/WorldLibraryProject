@@ -17,6 +17,7 @@ Použití (na SPARK):
 """
 
 import argparse
+import os
 import re
 import uuid
 from collections import deque
@@ -59,7 +60,19 @@ class RAGServer:
         self.embedder = make_embedder(
             args.embed_model, device=args.device, url=args.embed_url
         )
-        self.llm = OpenAI(base_url=args.llm_url, api_key=args.llm_api_key)
+        # Cloudflare Access service token — nutný, když --llm-url míří na
+        # https://llm.ol1n.com místo na SPARK localhost
+        cf_id = os.getenv("CF_ACCESS_CLIENT_ID")
+        cf_secret = os.getenv("CF_ACCESS_CLIENT_SECRET")
+        headers = None
+        if cf_id and cf_secret:
+            headers = {
+                "CF-Access-Client-Id": cf_id,
+                "CF-Access-Client-Secret": cf_secret,
+            }
+        self.llm = OpenAI(
+            base_url=args.llm_url, api_key=args.llm_api_key, default_headers=headers
+        )
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
 
@@ -184,8 +197,9 @@ def main():
     p.add_argument("--chroma-url", default="http://192.168.88.88:8006",
                    help="Chroma na JODA (AiStack swarm.nas)")
     p.add_argument("--collection", default="books")
-    p.add_argument("--llm-url", default="http://localhost:4000/v1",
-                   help="AiStack LiteLLM gateway")
+    p.add_argument("--llm-url", default=os.getenv("LLM_URL", "http://localhost:4000/v1"),
+                   help="AiStack LiteLLM (na SPARKu localhost:4000/v1, "
+                        "odjinud https://llm.ol1n.com/v1 + CF Access token v env)")
     p.add_argument("--llm-model", default="translate",
                    help="role v LiteLLM: translate|swarm-director|lab|dev")
     p.add_argument("--llm-api-key", default="dummy")

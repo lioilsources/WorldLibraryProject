@@ -45,6 +45,24 @@ překlady). Alternativně AiStack `swarm-embed` (e5-mistral-7b) přes
 — ale indexovat a dotazovat se musí stejným modelem, takže volbu udělej
 před `make embed`.
 
+## Kde může chatbot běžet
+
+AiStack je vystavený přes Cloudflare tunel na **https://llm.ol1n.com**
+(→ Go gateway :8080 → LiteLLM :4000), takže `server.py` nemusí běžet na
+SPARKu:
+
+- **Na SPARKu** (výchozí): `--llm-url http://localhost:4000/v1` — přímo
+  na LiteLLM, bez auth.
+- **Na M2 / jinde**: `LLM_URL=https://llm.ol1n.com/v1 make serve` +
+  Cloudflare Access service token v env:
+  `CF_ACCESS_CLIENT_ID` a `CF_ACCESS_CLIENT_SECRET` (server je pošle
+  jako `CF-Access-Client-Id/Secret` hlavičky).
+
+Pozor: ChromaDB na JODA (`192.168.88.88:8006`) je jen v LAN — retrieval
+tedy vyžaduje, aby server běžel v domácí síti (M2 stačí; embedding
+jednoho dotazu zvládne i MPS/CPU). Přes internet by musel i Chroma port
+do tunelu.
+
 ## Zprovoznění
 
 ### 0. Data (M2)

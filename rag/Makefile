@@ -27,6 +27,8 @@ ingest-txt:
 	python3 ingest_books.py --input-dir $(INPUT_DIR) --output $(JSONL) --no-pdf
 
 # --- SPARK (GPU; předpokládá běžící AiStack) ---
+# Mimo SPARK: make serve LLM_URL=https://llm.ol1n.com/v1
+#   (+ export CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET)
 embed:
 	python3 embed_books.py --input $(JSONL) --chroma-url $(CHROMA_URL) \
 		--collection $(COLLECTION) $(EMBED_FLAGS)
