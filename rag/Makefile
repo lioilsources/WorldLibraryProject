@@ -1,15 +1,20 @@
 # RAG chatbot — cíle pro jednotlivé stroje.
-# Přepiš CHROMA_URL / LLM_MODEL podle svého prostředí, např.:
-#   make embed CHROMA_URL=http://192.168.1.20:8000
+# LLM a Chroma zajišťuje AiStack (https://github.com/lioilsources/AiStack):
+#   - JODA:  docker compose -f deploy/docker-compose.swarm.nas.yaml up -d  → Chroma :8006
+#   - SPARK: make up-llm + make up-translate                               → LiteLLM :4000
+# Přepiš proměnné podle prostředí, např.: make embed CHROMA_URL=http://192.168.88.88:8006
 
-CHROMA_URL ?= http://joda:8000
-LLM_URL    ?= http://localhost:8000/v1
-LLM_MODEL  ?= Qwen/Qwen3-32B
+CHROMA_URL ?= http://192.168.88.88:8006
+LLM_URL    ?= http://localhost:4000/v1
+LLM_MODEL  ?= translate
+EMBED_URL  ?=
 INPUT_DIR  ?= ../downloads
 JSONL      ?= books.jsonl
 COLLECTION ?= books
 
-.PHONY: deps ingest embed serve chroma-up chroma-down
+EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
+
+.PHONY: deps ingest ingest-txt embed serve
 
 deps:
 	pip install -r requirements.txt
@@ -21,22 +26,11 @@ ingest:
 ingest-txt:
 	python3 ingest_books.py --input-dir $(INPUT_DIR) --output $(JSONL) --no-pdf
 
-# --- JODA (NAS, Docker) ---
-chroma-up:
-	cd deploy/joda && docker compose up -d
-
-chroma-down:
-	cd deploy/joda && docker compose down
-
-# --- SPARK (GPU) ---
+# --- SPARK (GPU; předpokládá běžící AiStack) ---
 embed:
 	python3 embed_books.py --input $(JSONL) --chroma-url $(CHROMA_URL) \
-		--collection $(COLLECTION)
+		--collection $(COLLECTION) $(EMBED_FLAGS)
 
 serve:
 	python3 server.py --chroma-url $(CHROMA_URL) --collection $(COLLECTION) \
-		--llm-url $(LLM_URL) --llm-model $(LLM_MODEL) --no-think
-
-# vLLM na SPARK (spustit zvlášť, běží dlouho):
-vllm:
-	vllm serve $(LLM_MODEL) --port 8000 --max-model-len 16384
+		--llm-url $(LLM_URL) --llm-model $(LLM_MODEL) $(EMBED_FLAGS)

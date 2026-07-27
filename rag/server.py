@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""RAG chatbot server. Běží na SPARK, mluví na vLLM (localhost) a
-ChromaDB na JODA.
+"""RAG chatbot server. Běží na SPARK vedle AiStacku.
 
-Oproti EduRAG server.py:
-  - vLLM přes OpenAI-kompatibilní API místo Ollamy
-  - Chroma HttpClient (server na NAS) místo embedded PersistentClient
-  - konverzační paměť per session_id (multi-turn povídání)
-  - systémový prompt z externího souboru (--prompt-file)
+LLM volá přes AiStack LiteLLM gateway (localhost:4000) — výchozí model
+je role `translate` (Qwen3-32B-AWQ, nejlepší čeština v parku), pro
+hluboké rozbory jde přepnout na `swarm-director` (Nemotron Super 120B,
+`make up-swarm-director` v AiStacku). Thinking mód vypíná už LiteLLM
+config (`enable_thinking: false`), flag --no-think je pro přímé vLLM.
+
+Vektory čte z ChromaDB na JODA (AiStack swarm.nas compose, port 8006).
+
+Oproti EduRAG server.py navíc: konverzační paměť per session_id,
+systémový prompt ze souboru, volitelný vzdálený embedding backend.
 
 Použití (na SPARK):
-    python3 server.py --chroma-url http://joda:8000 \
-        --llm-url http://localhost:8000/v1 --llm-model Qwen/Qwen3-32B
+    python3 server.py   # výchozí: LiteLLM :4000, model translate, Chroma JODA :8006
 """
 
 import argparse
@@ -26,9 +29,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
 
-DEFAULT_EMBED_MODEL = "intfloat/multilingual-e5-large"
+from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
+from embeddings import format_query, make_embedder
+
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
@@ -36,22 +40,11 @@ class ChatRequest(BaseModel):
     message: str
     session_id: str | None = None
     top_k: int = 5
+    model: str | None = None  # per-request přepnutí (translate/swarm-director/lab)
 
 
 class ResetRequest(BaseModel):
     session_id: str
-
-
-def pick_device(requested: str) -> str:
-    if requested != "auto":
-        return requested
-    import torch
-
-    if torch.cuda.is_available():
-        return "cuda"
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
 
 
 class RAGServer:
@@ -63,19 +56,18 @@ class RAGServer:
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
         self.collection = client.get_collection(args.collection)
 
-        device = pick_device(args.device)
-        print(f"Načítám {args.embed_model} (device={device})...")
-        self.embedder = SentenceTransformer(args.embed_model, device=device)
-
+        self.embedder = make_embedder(
+            args.embed_model, device=args.device, url=args.embed_url
+        )
         self.llm = OpenAI(base_url=args.llm_url, api_key=args.llm_api_key)
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
 
     def retrieve(self, query: str, top_k: int):
-        text = f"query: {query}" if "e5" in self.args.embed_model.lower() else query
-        embedding = self.embedder.encode([text], normalize_embeddings=True)[0]
+        text = format_query(query, self.args.embed_model)
+        embedding = self.embedder.encode([text])[0]
         result = self.collection.query(
-            query_embeddings=[embedding.tolist()],
+            query_embeddings=[embedding],
             n_results=top_k,
             include=["documents", "metadatas", "distances"],
         )
@@ -119,10 +111,11 @@ class RAGServer:
 
         extra = {}
         if self.args.no_think:
-            # Qwen3: vypnout thinking mód přes chat template
+            # jen pro přímé vLLM — přes LiteLLM to řeší config gatewaye
             extra["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
+        model = req.model or self.args.llm_model
         completion = self.llm.chat.completions.create(
-            model=self.args.llm_model,
+            model=model,
             messages=messages,
             temperature=self.args.temperature,
             max_tokens=self.args.max_tokens,
@@ -146,7 +139,8 @@ class RAGServer:
             }
             for h in hits
         ]
-        return {"answer": answer, "sources": sources, "session_id": session_id}
+        return {"answer": answer, "sources": sources, "session_id": session_id,
+                "model": model}
 
 
 def create_app(args) -> FastAPI:
@@ -173,6 +167,7 @@ def create_app(args) -> FastAPI:
             "collection": args.collection,
             "documents": server.collection.count(),
             "llm_model": args.llm_model,
+            "llm_url": args.llm_url,
             "embed_model": args.embed_model,
             "active_sessions": len(server.sessions),
         }
@@ -186,20 +181,28 @@ def create_app(args) -> FastAPI:
 
 def main():
     p = argparse.ArgumentParser(description="RAG chatbot server")
-    p.add_argument("--chroma-url", default="http://localhost:8000", help="Chroma na JODA")
+    p.add_argument("--chroma-url", default="http://192.168.88.88:8006",
+                   help="Chroma na JODA (AiStack swarm.nas)")
     p.add_argument("--collection", default="books")
-    p.add_argument("--llm-url", default="http://localhost:8000/v1", help="vLLM endpoint")
-    p.add_argument("--llm-model", default="Qwen/Qwen3-32B")
-    p.add_argument("--llm-api-key", default="none", help="vLLM klíč (typicky netřeba)")
+    p.add_argument("--llm-url", default="http://localhost:4000/v1",
+                   help="AiStack LiteLLM gateway")
+    p.add_argument("--llm-model", default="translate",
+                   help="role v LiteLLM: translate|swarm-director|lab|dev")
+    p.add_argument("--llm-api-key", default="dummy")
     p.add_argument("--embed-model", default=DEFAULT_EMBED_MODEL)
+    p.add_argument("--embed-url", default=None,
+                   help="OpenAI-kompatibilní embeddings API (např. swarm-embed "
+                        "http://localhost:8005/v1); prázdné = lokální model")
     p.add_argument("--device", default="auto", help="auto|cuda|mps|cpu")
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
     p.add_argument("--history-turns", type=int, default=10, help="párů otázka+odpověď v paměti")
     p.add_argument("--temperature", type=float, default=0.4)
     p.add_argument("--max-tokens", type=int, default=1024)
-    p.add_argument("--no-think", action="store_true", help="vypnout Qwen3 thinking mód")
+    p.add_argument("--no-think", action="store_true",
+                   help="poslat enable_thinking=false přímo (jen mimo LiteLLM)")
     p.add_argument("--host", default="0.0.0.0")
-    p.add_argument("--port", type=int, default=8080)
+    p.add_argument("--port", type=int, default=8090,
+                   help="8090 — port 8080 má na SPARKu AiStack Go gateway")
     args = p.parse_args()
 
     app = create_app(args)

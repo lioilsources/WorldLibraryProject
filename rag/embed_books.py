@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Embedding books.jsonl do ChromaDB na JODA. Běží na SPARK (GPU).
 
-Čte JSONL z ingest_books.py, embeduje multilingual-e5-large a zapisuje
-přes HTTP do Chroma serveru (Docker na NAS) — žádné SQLite přes síťový
-mount. Idempotentní: už vložená ID přeskakuje, takže jde spouštět
-opakovaně / navázat po přerušení.
+Čte JSONL z ingest_books.py, embeduje a zapisuje přes HTTP do Chroma
+serveru na NAS (AiStack: deploy/docker-compose.swarm.nas.yaml, port
+8006) — žádné SQLite přes síťový mount. Idempotentní: už vložená ID
+přeskakuje, takže jde spouštět opakovaně / navázat po přerušení.
+
+Embedding buď lokálně (sentence-transformers, výchozí
+multilingual-e5-large), nebo přes AiStack swarm-embed API:
+    --embed-url http://localhost:8005/v1 --model intfloat/e5-mistral-7b-instruct
 
 Použití (na SPARK):
-    python3 embed_books.py --input books.jsonl --chroma-url http://joda:8000
+    python3 embed_books.py --input books.jsonl --chroma-url http://192.168.88.88:8006
 """
 
 import argparse
@@ -16,30 +20,15 @@ import sys
 from urllib.parse import urlparse
 
 import chromadb
-from sentence_transformers import SentenceTransformer
 
-DEFAULT_MODEL = "intfloat/multilingual-e5-large"
+from embeddings import DEFAULT_MODEL, format_passage, make_embedder
+
 METADATA_KEYS = ("source", "lang", "group", "title", "work", "path", "chunk_index")
 
 
-def pick_device(requested: str) -> str:
-    if requested != "auto":
-        return requested
-    import torch
-
-    if torch.cuda.is_available():
-        return "cuda"
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
-
-
 def prepare_text(doc: dict, model_name: str) -> str:
-    # E5 modely vyžadují prefix "passage: " pro dokumenty
     text = f"{doc.get('title', '')}\n{doc['text']}".strip()
-    if "e5" in model_name.lower():
-        return f"passage: {text}"
-    return text
+    return format_passage(text, model_name)
 
 
 def read_jsonl(path: str):
@@ -57,9 +46,13 @@ def read_jsonl(path: str):
 def main() -> int:
     p = argparse.ArgumentParser(description="Embedding knih do ChromaDB")
     p.add_argument("--input", default="books.jsonl")
-    p.add_argument("--chroma-url", default="http://localhost:8000", help="Chroma server na JODA")
+    p.add_argument("--chroma-url", default="http://192.168.88.88:8006",
+                   help="Chroma server na JODA (AiStack swarm.nas)")
     p.add_argument("--collection", default="books")
     p.add_argument("--model", default=DEFAULT_MODEL)
+    p.add_argument("--embed-url", default=None,
+                   help="OpenAI-kompatibilní embeddings API (např. swarm-embed); "
+                        "prázdné = lokální sentence-transformers")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--device", default="auto", help="auto|cuda|mps|cpu")
     p.add_argument("--reset", action="store_true", help="smazat a znovu vytvořit kolekci")
@@ -78,9 +71,7 @@ def main() -> int:
     )
     print(f"Kolekce {args.collection}: {collection.count()} existujících dokumentů")
 
-    device = pick_device(args.device)
-    print(f"Načítám {args.model} (device={device})...")
-    model = SentenceTransformer(args.model, device=device)
+    embedder = make_embedder(args.model, device=args.device, url=args.embed_url)
 
     added = skipped = 0
     batch = []
@@ -95,13 +86,10 @@ def main() -> int:
         skipped += len(batch) - len(fresh)
         if fresh:
             texts = [prepare_text(d, args.model) for d in fresh]
-            embeddings = model.encode(
-                texts, batch_size=args.batch_size, normalize_embeddings=True,
-                show_progress_bar=False,
-            )
+            embeddings = embedder.encode(texts, batch_size=args.batch_size)
             collection.upsert(
                 ids=[d["id"] for d in fresh],
-                embeddings=embeddings.tolist(),
+                embeddings=embeddings,
                 documents=[d["text"] for d in fresh],
                 metadatas=[
                     {k: d[k] for k in METADATA_KEYS if k in d} for d in fresh

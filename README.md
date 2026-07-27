@@ -16,8 +16,9 @@ Stahování a příprava multijazyčného filozofického korpusu na Mac Mini M2.
 ## Chatbot
 
 Nad staženým korpusem běží personalizovaný RAG chatbot rozložený na tři
-stroje: ingest na M2, ChromaDB v Dockeru na NAS (JODA), embedding + vLLM
-+ chat API na DGX Spark. Kompletní návod v [rag/README.md](rag/README.md).
+stroje: ingest na M2, ChromaDB na NAS (JODA, nasazuje AiStack), LLM přes
+AiStack LiteLLM gateway + chat API na DGX Spark. Kompletní návod v
+[rag/README.md](rag/README.md).
 
 ## Prerekvizity
 
