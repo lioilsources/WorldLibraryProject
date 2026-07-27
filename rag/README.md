@@ -8,19 +8,20 @@ JSONL kontrakt a embedding model), LLM a vektorovou DB zajišťuje
 ## Architektura
 
 ```
-M2 (orchestrátor)         JODA (NAS)                     SPARK (AiStack)
-─────────────────         ──────────                     ───────────────
+M2 (orchestrátor)         JODA (Ubuntu + Docker)         SPARK (AiStack)
+─────────────────         ──────────────────────         ───────────────
 run_pipeline.sh           ChromaDB :8006                 LiteLLM gateway :4000
-ingest_books.py      ──▶  (AiStack swarm.nas)      ◀──  ├─ translate (Qwen3-32B-AWQ)
-  → books.jsonl                                         ├─ swarm-director (on-demand)
-                                                        └─ ...
-                                                        embed_books.py ──▶ Chroma
-                                                        server.py :8090  ◀── klient
+ingest_books.py           (AiStack swarm.nas)      ◀──   ├─ translate (Qwen3-32B-AWQ)
+  → books.jsonl ──rsync──────────────────────────▶      ├─ swarm-director (on-demand)
+                                                         └─ ...
+                                                         embed_books.py ──▶ Chroma (JODA)
+                                                         server.py :8090 ◀── klient
 ```
 
-- **M2**: stáhne korpus, vytáhne text z TXT/PDF, rozseká na chunky,
-  zapíše `books.jsonl` na NAS mount.
-- **JODA**: Chroma v server režimu — nasazuje AiStack
+- **M2**: stáhne korpus, vytáhne text z TXT/PDF, rozseká na chunky a
+  `books.jsonl` pošle rsyncem na SPARK.
+- **JODA**: samostatný Ubuntu server s Dockerem (žádné sdílené disky) —
+  jediná role je Chroma v server režimu, nasazuje AiStack
   (`deploy/docker-compose.swarm.nas.yaml`, port **8006**). Knihy jdou do
   vlastní kolekce `books`, se SwarmBattle daty se nemíchají.
 - **SPARK**: AiStack drží LLM park za LiteLLM (:4000); tady běží i
@@ -73,7 +74,7 @@ Korpus je v gitu jako Git LFS pointery — nejdřív `git lfs pull`, nebo
 ### 1. JODA — Chroma (přes AiStack)
 
 ```bash
-# na NASu, z AiStack repa:
+# na JODA (ubuntu server), z AiStack repa:
 docker compose -f deploy/docker-compose.swarm.nas.yaml up -d   # :8006
 ```
 
@@ -83,6 +84,7 @@ docker compose -f deploy/docker-compose.swarm.nas.yaml up -d   # :8006
 cd rag && pip install pymupdf
 make ingest            # TXT + PDF → books.jsonl
 make ingest-txt        # jen TXT (rychlý start, čistá data)
+rsync -avz --progress books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
 ```
 
 Skript hlásí LFS pointery bez obsahu a PDF bez textové vrstvy (skeny

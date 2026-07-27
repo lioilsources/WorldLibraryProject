@@ -11,9 +11,10 @@ https://chat.ol1n.com, s LLM z AiStack parku a vektory na JODA.
 | WorldLibraryProject | `claude/personalized-chatbot-edurag-5x5hoz` | `rag/`: ingest → JSONL → embed → chatbot (`server.py`, port **8090**) |
 | AiStack | `claude/chat-tunnel-ingress` | `cloudflared/config.yml`: ingress `chat.ol1n.com` → `host.docker.internal:8090` |
 
-Architektura: M2 dělá ingest (`books.jsonl`), JODA (192.168.88.88) drží
+Architektura: M2 dělá ingest (`books.jsonl`), JODA (192.168.88.88) je
+samostatný Ubuntu server s Dockerem — žádný síťový mount — a drží jen
 ChromaDB :8006 (AiStack `deploy/docker-compose.swarm.nas.yaml`), SPARK
-embeduje a servíruje chatbot. LLM: LiteLLM role **`translate`**
+embeduje a servíruje chatbot. Data mezi stroji tečou přes ssh/rsync. LLM: LiteLLM role **`translate`**
 (Qwen3-32B-AWQ, ~20 GB); eskalace `swarm-director` (on-demand, +60 GB).
 
 Pravidla AiStacku platí (viz `SKILL.md`): pracovat z
@@ -61,7 +62,10 @@ pořadí dodržet, případně restart cloudflared odložit až za tento krok.
 ```bash
 # 3a. Chroma na JODA běží?
 curl -sf http://192.168.88.88:8006/api/v2/heartbeat
-# [ČLOVĚK, pokud spadne] na NASu: docker compose -f docker-compose.swarm.nas.yaml up -d
+# Pokud spadne — JODA je ubuntu server s Dockerem; při nastaveném ssh klíči jde i ze SPARKu:
+#   scp deploy/docker-compose.swarm.nas.yaml joda:~/chromadb/ && \
+#   ssh joda 'cd ~/chromadb && docker compose -f docker-compose.swarm.nas.yaml up -d'
+# [ČLOVĚK, pokud ssh na JODA není] spustit totéž na JODA ručně
 
 # 3b. translate běží? (LiteLLM přes gateway)
 curl -sf http://localhost:8080/v1/models | grep -q translate || make up-translate
@@ -82,14 +86,17 @@ Pokud ne, použít NGC PyTorch kontejner nebo pip index NVIDIA.
 
 ## Fáze 4 — data + embedding
 
-`books.jsonl` vzniká na M2 (`make ingest-txt`, případně `make ingest`
-s PDF). Na SPARK se dostane přes NAS mount nebo `scp` — cestu doplnit:
+`books.jsonl` vzniká na M2 a na SPARK se pošle přes rsync (stejná cesta
+jako pro `dataset.jsonl` v kořenovém README; přes LAN nebo Tailscale):
 
 ```bash
-# [ČLOVĚK/M2] na M2: cd WorldLibraryProject/rag && make ingest-txt
+# [ČLOVĚK/M2] na M2:
+cd WorldLibraryProject/rag && make ingest-txt
+rsync -avz --progress books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
+
 # pak na SPARKu:
 cd /home/ol1n/deploy/WorldLibraryProject/rag
-make embed JSONL=<cesta-k-books.jsonl>   # CHROMA_URL default http://192.168.88.88:8006
+make embed   # JSONL default ./books.jsonl, CHROMA_URL default http://192.168.88.88:8006
 # ověřit: výpis "Kolekce má N dokumentů", N > 0
 ```
 
