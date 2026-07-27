@@ -8,9 +8,16 @@ Stahování a příprava multijazyčného filozofického korpusu na Mac Mini M2.
 .
 ├── urls.txt              ← tvůj seznam URL (sem patří)
 ├── run_pipeline.sh       ← hlavní vstupní bod
-└── downloader/
-    └── main.go           ← Go orchestrátor (parser + aria2c runner)
+├── downloader/
+│   └── main.go           ← Go orchestrátor (parser + aria2c runner)
+└── rag/                  ← RAG chatbot nad korpusem (viz rag/README.md)
 ```
+
+## Chatbot
+
+Nad staženým korpusem běží personalizovaný RAG chatbot rozložený na tři
+stroje: ingest na M2, ChromaDB v Dockeru na NAS (JODA), embedding + vLLM
++ chat API na DGX Spark. Kompletní návod v [rag/README.md](rag/README.md).
 
 ## Prerekvizity
 

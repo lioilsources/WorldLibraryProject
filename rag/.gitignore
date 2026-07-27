@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+books.jsonl
+deploy/joda/chroma-data/
