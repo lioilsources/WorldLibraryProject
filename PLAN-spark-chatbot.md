@@ -62,10 +62,8 @@ pořadí dodržet, případně restart cloudflared odložit až za tento krok.
 ```bash
 # 3a. Chroma na JODA běží?
 curl -sf http://192.168.88.88:8006/api/v2/heartbeat
-# Pokud spadne — JODA je ubuntu server s Dockerem; při nastaveném ssh klíči jde i ze SPARKu:
-#   scp deploy/docker-compose.swarm.nas.yaml joda:~/chromadb/ && \
-#   ssh joda 'cd ~/chromadb && docker compose -f docker-compose.swarm.nas.yaml up -d'
-# [ČLOVĚK, pokud ssh na JODA není] spustit totéž na JODA ručně
+# [ČLOVĚK/JODA, pokud spadne] SPARK nemá ssh klíč na JODA — na JODA
+# provést PLAN-joda-chroma.md (v kořeni tohoto repa) a pak pokračovat zde.
 
 # 3b. translate běží? (LiteLLM přes gateway)
 curl -sf http://localhost:8080/v1/models | grep -q translate || make up-translate
