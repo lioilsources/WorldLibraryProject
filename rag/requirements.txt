@@ -2,7 +2,9 @@
 pymupdf>=1.24
 
 # Embedding + server (SPARK)
-chromadb>=0.6,<0.7
+# klient musí verzí ladit s Chroma serverem na JODA (chromadb/chroma:latest, 1.x)
+# — 0.6.x klient padá na KeyError '_type' proti 1.x serveru
+chromadb>=1.4,<2
 sentence-transformers>=3.0
 fastapi>=0.115
 uvicorn>=0.30
