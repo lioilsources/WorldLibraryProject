@@ -42,28 +42,21 @@ args=--no-directories
 # === EDDA (staroseverština) – Project Gutenberg ===
 # Poetická Edda (Bellows překlad)
 type=wget
-url=https://www.gutenberg.org/cache/epub/1220/pg1220.txt
+url=https://www.gutenberg.org/cache/epub/73533/pg73533.txt
+# pozn.: původně pg1220 (omylem Balzac); #73533 = The poetic Edda
 dir=european/edda/poetic
 args=--no-directories
 
 # Prozaická Edda (Young překlad)
 type=wget
-url=https://www.gutenberg.org/cache/epub/43627/pg43627.txt
+url=https://www.gutenberg.org/cache/epub/18947/pg18947.txt
+# pozn.: původně pg43627 (omylem Pu Sung-ling); #18947 = The Younger Edda
 dir=european/edda/prose
 args=--no-directories
 
-# === AVESTA (avestánština) – Project Gutenberg ===
-# Vendidad (Darmesteter)
-type=wget
-url=https://www.gutenberg.org/cache/epub/2131/pg2131.txt
-dir=avesta/sacred_texts
-args=--no-directories
-
-# Yasna (Bleeck překlad)
-type=wget
-url=https://www.gutenberg.org/cache/epub/18997/pg18997.txt
-dir=avesta/sacred_texts
-args=--no-directories
+# === AVESTA (avestánština) ===
+# PG nemá čistou Avestu (pg2131=Hérodotos, pg18997=Dumas — chybná ID,
+# vyřazeno 2. 8. 2026). Texty čekají na OCR PDF z urls.txt (Darmesteter).
 
 # === RIGVEDA (sacred-texts zrcadlo na archive.org) ===
 # Griffith překlad – kompletní ASCII text

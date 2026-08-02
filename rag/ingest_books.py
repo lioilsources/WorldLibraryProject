@@ -15,6 +15,7 @@ Použití (na M2):
 import argparse
 import hashlib
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -44,6 +45,22 @@ LANG_BY_GROUP = {
 GUTENBERG_START = "*** START OF"
 GUTENBERG_END = "*** END OF"
 
+# "Title:" řádek v Gutenberg hlavičce — zdroj čitelného názvu díla
+# (stem souboru typu pg16328 nic neříká)
+PG_TITLE_RE = re.compile(r"^Title:\s*(.+?)\s*$", re.MULTILINE)
+
+# Servisní soubory, které nejsou knihy — do korpusu nepatří
+EXCLUDE_NAMES = {"manifest.txt"}
+
+# Mahábhárata: maha01–maha18 → názvy parv (Ganguliho členění)
+MAHA_PARVY = {
+    1: "Ádiparva", 2: "Sabháparva", 3: "Vanaparva", 4: "Virátaparva",
+    5: "Udjógaparva", 6: "Bhíšmaparva", 7: "Drónaparva", 8: "Karnaparva",
+    9: "Šaljaparva", 10: "Sauptikaparva", 11: "Stríparva", 12: "Šántiparva",
+    13: "Anušásanaparva", 14: "Ášvamédhikaparva", 15: "Ášramavásikaparva",
+    16: "Mausalaparva", 17: "Maháprasthánikaparva", 18: "Svargáróhanaparva",
+}
+
 # PDF, ze kterého vypadne méně textu, je nejspíš sken bez OCR vrstvy.
 MIN_PDF_CHARS = 1000
 
@@ -68,11 +85,6 @@ def strip_gutenberg_boilerplate(text: str) -> str:
     return text
 
 
-def extract_txt(path: Path) -> str:
-    text = path.read_text(encoding="utf-8", errors="replace")
-    return strip_gutenberg_boilerplate(text)
-
-
 def extract_pdf(path: Path) -> str:
     import fitz  # PyMuPDF — lazy import, ať TXT-only běh nepotřebuje závislost
 
@@ -83,11 +95,20 @@ def extract_pdf(path: Path) -> str:
     return "\n".join(parts)
 
 
-def work_title(path: Path) -> str:
+def work_title(path: Path, raw_text: str = "") -> str:
+    maha = re.fullmatch(r"maha(\d{2})", path.stem)
+    if maha:
+        n = int(maha.group(1))
+        return f"Mahábhárata {n:02d} — {MAHA_PARVY[n]}"
+    if path.stem.startswith("pg") and raw_text:
+        # Gutenberg hlavička je před "*** START OF" — hledat jen v úvodu
+        m = PG_TITLE_RE.search(raw_text[:2000])
+        if m:
+            return m.group(1)
     return path.stem.replace("_", " ").replace("-", " ").strip()
 
 
-def make_records(path: Path, rel: Path, text: str, args) -> list[dict]:
+def make_records(path: Path, rel: Path, text: str, args, work: str) -> list[dict]:
     chunks = chunk_text(
         text,
         chunk_size=args.chunk_size,
@@ -98,7 +119,6 @@ def make_records(path: Path, rel: Path, text: str, args) -> list[dict]:
         return []
     group = rel.parts[0] if len(rel.parts) > 1 else "misc"
     lang = LANG_BY_GROUP.get(group, "en")
-    work = work_title(path)
     doc_key = hashlib.sha256(str(rel).encode("utf-8")).hexdigest()[:12]
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     records = []
@@ -154,15 +174,20 @@ def main() -> int:
             rel = path.relative_to(root)
             if groups and (len(rel.parts) < 2 or rel.parts[0] not in groups):
                 continue
+            if path.name in EXCLUDE_NAMES:
+                continue
             if is_lfs_pointer(path):
                 stats["lfs_skipped"] += 1
                 continue
             try:
                 if path.suffix.lower() == ".txt":
-                    text = extract_txt(path)
+                    raw = path.read_text(encoding="utf-8", errors="replace")
+                    work = work_title(path, raw)
+                    text = strip_gutenberg_boilerplate(raw)
                     kind = "txt"
                 else:
                     text = extract_pdf(path)
+                    work = work_title(path)
                     kind = "pdf"
                     if len(text.strip()) < MIN_PDF_CHARS:
                         stats["ocr_needed"] += 1
@@ -173,7 +198,7 @@ def main() -> int:
                 print(f"CHYBA {rel}: {e}", file=sys.stderr)
                 continue
 
-            records = make_records(path, rel, text, args)
+            records = make_records(path, rel, text, args, work)
             if not records:
                 continue
             for r in records:
