@@ -58,6 +58,16 @@ EXCLUDE_NAMES = {"manifest.txt"}
 # duplikát samostatných piṭaka adresářů (každá kniha by byla 2×)
 SKIP_DIR_MARKERS = ("__MACOSX", "Tipiṭaka_(Mūla)")
 
+# Nepoužitelné PDF: frakturové OCR, vadná font kódování a obrazová
+# faksimile — ověřeno ručně 2. 8. 2026; čekají na pořádné OCR
+EXCLUDE_PATH_MARKERS = (
+    "mahabharata/bori_full",     # dévanágarí přes PUA fonty (mojibake); obsah kryje TXT překlad
+    "mahabharata/volumes",       # text. vrstvu mají jen předmluvy, zbytek sken
+    "european_philosophy/kant",  # frakturové OCR — nečitelné
+    "hegel_werke_vol1",          # frakturové OCR; Suhrkamp bandy (band01/03/05) jsou čisté
+    "madrid_codex", "grolier_codex", "dresden_kingsborough",  # obrazová faksimile, text jen popisky
+)
+
 # Mahábhárata: maha01–maha18 → názvy parv (Ganguliho členění)
 MAHA_PARVY = {
     1: "Ádiparva", 2: "Sabháparva", 3: "Vanaparva", 4: "Virátaparva",
@@ -69,6 +79,17 @@ MAHA_PARVY = {
 
 # PDF, ze kterého vypadne méně textu, je nejspíš sken bez OCR vrstvy.
 MIN_PDF_CHARS = 1000
+
+
+def pdf_text_quality_ok(text: str) -> bool:
+    """Brána proti OCR šumu a vadnému kódování: málo písmen = šum
+    (interpunkční rozsypaný čaj), PUA znaky = custom font bez unicode mapy."""
+    sample = text[:20000]
+    if not sample:
+        return False
+    letters = sum(ch.isalpha() or ch.isspace() for ch in sample) / len(sample)
+    pua = sum(0xE000 <= ord(ch) <= 0xF8FF for ch in sample) / len(sample)
+    return letters >= 0.6 and pua < 0.02
 
 
 def is_lfs_pointer(path: Path) -> bool:
@@ -182,7 +203,8 @@ def main() -> int:
                 continue
             if path.name in EXCLUDE_NAMES or path.name.startswith("._"):
                 continue
-            if any(m in unicodedata.normalize("NFC", str(rel)) for m in SKIP_DIR_MARKERS):
+            norm_rel = unicodedata.normalize("NFC", str(rel))
+            if any(m in norm_rel for m in SKIP_DIR_MARKERS + EXCLUDE_PATH_MARKERS):
                 continue
             if is_lfs_pointer(path):
                 stats["lfs_skipped"] += 1
@@ -200,6 +222,10 @@ def main() -> int:
                     if len(text.strip()) < MIN_PDF_CHARS:
                         stats["ocr_needed"] += 1
                         needs_ocr.append(str(rel))
+                        continue
+                    if not pdf_text_quality_ok(text):
+                        stats["ocr_needed"] += 1
+                        needs_ocr.append(f"{rel} (vadné OCR/kódování)")
                         continue
             except Exception as e:
                 stats["errors"] += 1
