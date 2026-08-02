@@ -17,6 +17,7 @@ Použití (na SPARK):
 """
 
 import argparse
+import json
 import os
 import re
 import uuid
@@ -28,6 +29,7 @@ import chromadb
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -57,6 +59,11 @@ class RAGServer:
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
         self.collection = client.get_collection(args.collection)
 
+        # katalog děl z metadat kolekce — jednorázově při startu; po změně
+        # korpusu (make embed) je potřeba server restartovat
+        self.catalog = self._build_catalog()
+        self.system_prompt += self._catalog_prompt()
+
         self.embedder = make_embedder(
             args.embed_model, device=args.device, url=args.embed_url
         )
@@ -75,6 +82,58 @@ class RAGServer:
         )
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
+
+    def _build_catalog(self) -> dict:
+        """work -> {group, lang, path, chunk_count} ze stránkovaného průchodu metadat."""
+        catalog: dict[str, dict] = {}
+        limit, offset = 1000, 0
+        while True:
+            page = self.collection.get(include=["metadatas"], limit=limit, offset=offset)
+            metas = page["metadatas"] or []
+            for m in metas:
+                work = (m or {}).get("work")
+                if not work:
+                    continue
+                entry = catalog.setdefault(
+                    work,
+                    {"group": m.get("group"), "lang": m.get("lang"),
+                     "path": m.get("path"), "chunk_count": 0},
+                )
+                entry["chunk_count"] += 1
+            if len(metas) < limit:
+                break
+            offset += limit
+        return catalog
+
+    def _catalog_prompt(self) -> str:
+        """Sekce se seznamem děl pro systémový prompt — ať na „jaké knihy znáš?"
+        odpovídá ze skutečného katalogu, ne z pěti náhodných úryvků."""
+        by_group: dict[str, list[str]] = {}
+        for work, info in sorted(self.catalog.items()):
+            by_group.setdefault(info["group"] or "misc", []).append(work)
+        lines = "\n".join(
+            f"- {group}: {', '.join(works)}" for group, works in sorted(by_group.items())
+        )
+        return (
+            "\n\nKnihovna právě obsahuje tato díla (podle tradice):\n"
+            f"{lines}\n"
+            "Na otázky, jaké knihy znáš nebo co je v knihovně, odpovídej z tohoto "
+            "seznamu. Obsah děl mimo dodané úryvky neznáš — nepředstírej opak."
+        )
+
+    def _sources(self, hits) -> list[dict]:
+        return [
+            {
+                "work": h["meta"].get("work"),
+                "title": h["meta"].get("title"),
+                "group": h["meta"].get("group"),
+                "lang": h["meta"].get("lang"),
+                "path": h["meta"].get("path"),
+                "distance": h["distance"],
+                "excerpt": h["text"][:200],
+            }
+            for h in hits
+        ]
 
     def retrieve(self, query: str, top_k: int):
         text = format_query(query, self.args.embed_model)
@@ -140,20 +199,49 @@ class RAGServer:
         history.append(("user", req.message))
         history.append(("assistant", answer))
 
-        sources = [
-            {
-                "work": h["meta"].get("work"),
-                "title": h["meta"].get("title"),
-                "group": h["meta"].get("group"),
-                "lang": h["meta"].get("lang"),
-                "path": h["meta"].get("path"),
-                "distance": h["distance"],
-                "excerpt": h["text"][:200],
-            }
-            for h in hits
-        ]
-        return {"answer": answer, "sources": sources, "session_id": session_id,
-                "model": model}
+        return {"answer": answer, "sources": self._sources(hits),
+                "session_id": session_id, "model": model}
+
+    def chat_stream(self, req: ChatRequest):
+        """SSE generátor: eventy {"delta": ...} po tokenech, na závěr
+        {"done": true, sources, session_id, model} — pro Ol1nLLM streaming UX."""
+        session_id = req.session_id or str(uuid.uuid4())
+        history = self.sessions.setdefault(
+            session_id, deque(maxlen=2 * self.args.history_turns)
+        )
+
+        hits = self.retrieve(req.message, req.top_k)
+        messages = self.build_messages(req.message, hits, history)
+
+        extra = {}
+        if self.args.no_think:
+            extra["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
+        model = req.model or self.args.llm_model
+        stream = self.llm.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=self.args.temperature,
+            max_tokens=self.args.max_tokens,
+            stream=True,
+            **extra,
+        )
+        parts = []
+        for chunk in stream:
+            if not chunk.choices:
+                continue  # závěrečný usage chunk apod.
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                parts.append(delta)
+                yield "data: " + json.dumps({"delta": delta}, ensure_ascii=False) + "\n\n"
+
+        # <think> bloky řeší LiteLLM config; regex je pojistka pro přímé vLLM
+        answer = THINK_RE.sub("", "".join(parts)).strip()
+        history.append(("user", req.message))
+        history.append(("assistant", answer))
+
+        final = {"done": True, "sources": self._sources(hits),
+                 "session_id": session_id, "model": model}
+        yield "data: " + json.dumps(final, ensure_ascii=False) + "\n\n"
 
 
 def create_app(args) -> FastAPI:
@@ -169,6 +257,24 @@ def create_app(args) -> FastAPI:
             raise HTTPException(status_code=400, detail="prázdná zpráva")
         return server.chat(req)
 
+    @app.post("/chat/stream")
+    def chat_stream(req: ChatRequest):
+        if not req.message.strip():
+            raise HTTPException(status_code=400, detail="prázdná zpráva")
+        return StreamingResponse(
+            server.chat_stream(req), media_type="text/event-stream"
+        )
+
+    @app.get("/works")
+    def works():
+        items = [
+            {"work": work, **info}
+            for work, info in sorted(
+                server.catalog.items(), key=lambda kv: (kv[1]["group"] or "", kv[0])
+            )
+        ]
+        return {"works": items, "count": len(items)}
+
     @app.post("/reset")
     def reset(req: ResetRequest):
         server.sessions.pop(req.session_id, None)
@@ -179,6 +285,7 @@ def create_app(args) -> FastAPI:
         return {
             "collection": args.collection,
             "documents": server.collection.count(),
+            "works": len(server.catalog),
             "llm_model": args.llm_model,
             "llm_url": args.llm_url,
             "embed_model": args.embed_model,
