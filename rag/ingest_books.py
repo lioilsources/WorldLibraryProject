@@ -17,6 +17,7 @@ import hashlib
 import json
 import re
 import sys
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -51,6 +52,11 @@ PG_TITLE_RE = re.compile(r"^Title:\s*(.+?)\s*$", re.MULTILINE)
 
 # Servisní soubory, které nejsou knihy — do korpusu nepatří
 EXCLUDE_NAMES = {"manifest.txt"}
+
+# Adresáře k přeskočení (porovnává se po NFC normalizaci — macOS ukládá
+# jména v NFD): __MACOSX = balast ze ZIPů, Tipiṭaka_(Mūla) = kompletní
+# duplikát samostatných piṭaka adresářů (každá kniha by byla 2×)
+SKIP_DIR_MARKERS = ("__MACOSX", "Tipiṭaka_(Mūla)")
 
 # Mahábhárata: maha01–maha18 → názvy parv (Ganguliho členění)
 MAHA_PARVY = {
@@ -174,7 +180,9 @@ def main() -> int:
             rel = path.relative_to(root)
             if groups and (len(rel.parts) < 2 or rel.parts[0] not in groups):
                 continue
-            if path.name in EXCLUDE_NAMES:
+            if path.name in EXCLUDE_NAMES or path.name.startswith("._"):
+                continue
+            if any(m in unicodedata.normalize("NFC", str(rel)) for m in SKIP_DIR_MARKERS):
                 continue
             if is_lfs_pointer(path):
                 stats["lfs_skipped"] += 1

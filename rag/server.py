@@ -119,14 +119,23 @@ class RAGServer:
     def _catalog_prompt(self) -> str:
         """Sekce se seznamem děl pro systémový prompt — ať na „jaké knihy znáš?"
         odpovídá ze skutečného katalogu, ne z pěti náhodných úryvků."""
-        by_group: dict[str, list[str]] = {}
+        by_group: dict[str, list[tuple[str, str | None]]] = {}
         for work, info in sorted(self.catalog.items()):
-            label = work + (f" — {info['summary']}" if info.get("summary") else "")
-            by_group.setdefault(info["group"] or "misc", []).append(label)
-        lines = "\n".join(
-            f"### {group}\n" + "\n".join(f"- {w}" for w in works)
-            for group, works in sorted(by_group.items())
-        )
+            by_group.setdefault(info["group"] or "misc", []).append(
+                (work, info.get("summary"))
+            )
+        # u velkých skupin (Tipitaka ~60 knih) jen názvy — anotace by prompt
+        # nafoukly o tisíce tokenů; plné anotace zůstávají v GET /works
+        max_anotovanych = 25
+        blocks = []
+        for group, works in sorted(by_group.items()):
+            if len(works) > max_anotovanych:
+                blocks.append(f"### {group}\n" + ", ".join(w for w, _ in works))
+            else:
+                blocks.append(f"### {group}\n" + "\n".join(
+                    f"- {w}" + (f" — {s}" if s else "") for w, s in works
+                ))
+        lines = "\n".join(blocks)
         return (
             "\n\nKnihovna právě obsahuje tato díla (podle tradice):\n"
             f"{lines}\n"
