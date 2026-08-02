@@ -200,3 +200,15 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
 5. Zhuangzi je v korpusu anglicky (Giles 1889), metadata `lang: zh` —
    kosmetická nepřesnost z per-group mapování jazyků (`LANG_BY_GROUP`);
    případná oprava = per-file výjimka v ingestu.
+6. **Go gateway (:8080) mrší requesty nad ~13k znaků** — tiše je pošle
+   na fallback model (nesmyslné odpovědi, žádná chyba). Server proto
+   běží přímo na translate `127.0.0.1:8004` s `--no-think`. Nalezeno
+   2. 8. 2026; oprava limitu patří do AiStack (ai-gateway).
+7. translate potřebuje `--max_seq_len` i `--max_num_tokens` ≥ 16384
+   (AiStack `docker-compose.translate.yaml`, commit 3b3aa2e) — RAG
+   prompt s katalogem a top-5 chunky má 9–12k tokenů; pálí diakritika
+   tokenizuje ~1 token/znak.
+8. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+   katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
+   tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
+   chunky v kontextu.
