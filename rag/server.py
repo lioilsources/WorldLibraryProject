@@ -62,6 +62,17 @@ class RAGServer:
         # katalog děl z metadat kolekce — jednorázově při startu; po změně
         # korpusu (make embed) je potřeba server restartovat
         self.catalog = self._build_catalog()
+
+        # volitelné anotace děl (gen_summaries.py) — obohatí /works i prompt
+        summaries_path = Path(args.summaries_file)
+        summaries = (
+            json.loads(summaries_path.read_text(encoding="utf-8"))
+            if summaries_path.exists()
+            else {}
+        )
+        for work, info in self.catalog.items():
+            info["summary"] = summaries.get(work)
+
         self.system_prompt += self._catalog_prompt()
 
         self.embedder = make_embedder(
@@ -110,9 +121,11 @@ class RAGServer:
         odpovídá ze skutečného katalogu, ne z pěti náhodných úryvků."""
         by_group: dict[str, list[str]] = {}
         for work, info in sorted(self.catalog.items()):
-            by_group.setdefault(info["group"] or "misc", []).append(work)
+            label = work + (f" — {info['summary']}" if info.get("summary") else "")
+            by_group.setdefault(info["group"] or "misc", []).append(label)
         lines = "\n".join(
-            f"- {group}: {', '.join(works)}" for group, works in sorted(by_group.items())
+            f"### {group}\n" + "\n".join(f"- {w}" for w in works)
+            for group, works in sorted(by_group.items())
         )
         return (
             "\n\nKnihovna právě obsahuje tato díla (podle tradice):\n"
@@ -316,6 +329,8 @@ def main():
                         "http://localhost:8005/v1); prázdné = lokální model")
     p.add_argument("--device", default="auto", help="auto|cuda|mps|cpu")
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
+    p.add_argument("--summaries-file", default=str(Path(__file__).parent / "summaries.json"),
+                   help="anotace děl z gen_summaries.py (chybějící soubor = bez anotací)")
     p.add_argument("--history-turns", type=int, default=10, help="párů otázka+odpověď v paměti")
     p.add_argument("--temperature", type=float, default=0.4)
     p.add_argument("--max-tokens", type=int, default=1024)
