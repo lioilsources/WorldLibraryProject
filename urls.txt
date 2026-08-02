@@ -125,19 +125,21 @@ https://archive.org/download/rigvedacomplete/Rig%20Veda%20Complete%20%28Sakala%2
   out=rigveda_complete_sanskrit.pdf
 
 # === 4. ČÍNA ===
-https://ctext.org/dao-de-jing/plaintext
+# ctext.org /plaintext vrací HTML (API chce klíč) — Gutenberg zh edice;
+# zhuangzi: zh originál na PG není, Giles 1889 EN překlad (#59709)
+https://www.gutenberg.org/ebooks/7337.txt.utf-8
   dir=/ancient_origins_1TB/chinese/laozi
   out=dao_de_jing.txt
 
-https://ctext.org/analects/plaintext
+https://www.gutenberg.org/ebooks/23839.txt.utf-8
   dir=/ancient_origins_1TB/chinese/konfucius
   out=analects.txt
 
-https://ctext.org/mengzi/plaintext
+https://www.gutenberg.org/ebooks/24178.txt.utf-8
   dir=/ancient_origins_1TB/chinese/mengzi
   out=mengzi.txt
 
-https://ctext.org/zhuangzi/plaintext
+https://www.gutenberg.org/ebooks/59709.txt.utf-8
   dir=/ancient_origins_1TB/chinese/zhuangzi
   out=zhuangzi.txt
 
