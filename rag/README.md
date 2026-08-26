@@ -107,7 +107,25 @@ AiStack musí mít nahozený gateway a translate: `make up-llm up-translate`.
 make serve             # chatbot na :8090
 ```
 
-### 5. Povídání
+### 5. Povídání — webové UI (mobil i desktop)
+
+Otevři v prohlížeči **`http://<IP-SPARKu>:8090/`**. Na telefonu v domácí
+síti to funguje hned, bez tunelu a bez appky — stránku jde přidat na
+plochu jako webovou aplikaci.
+
+UI umí: streamované odpovědi (token po tokenu), citace `[1]` provázané
+se sbalitelnou sekcí zdrojů, seznam děl (tlačítko „Díla" = `GET /works`),
+přepnutí modelu (`rychlejší` = translate, `hluboký rozbor` =
+swarm-director) a počtu úryvků, historii konverzace přes `session_id`
+v `localStorage` a tlačítko „Nová" pro reset. Zdroj je
+`static/chat.html` — čte se při každém requestu, takže úpravy vzhledu
+nevyžadují restart serveru.
+
+Pozn.: generování trvá jednotky minut (viz pasti v
+`PLAN-ol1nllm-integration.md`), proto UI ukazuje běžící stopky. Méně
+úryvků = rychlejší odpověď.
+
+### 5b. Povídání přes API
 
 ```bash
 curl -s localhost:8090/chat -H 'Content-Type: application/json' \

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1a17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Knihovna</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%238a6d3b'/><path d='M7 8h7a3 3 0 0 1 2 1v15a3 3 0 0 0-2-1H7z' fill='%23fff'/><path d='M25 8h-7a3 3 0 0 0-2 1v15a3 3 0 0 1 2-1h7z' fill='%23f0e6d2'/></svg>">
+<style>
+:root {
+  --bg: #faf8f4; --fg: #22201c; --muted: #6f695f; --line: #e2ddd3;
+  --card: #fff; --user: #2f6b4f; --user-fg: #fff;
+  --accent: #8a6d3b; --shadow: 0 1px 3px rgba(0,0,0,.07); --err: #a33;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1a17; --fg: #e8e4dc; --muted: #9a9184; --line: #33302a;
+    --card: #24221e; --user: #3d7a5c; --user-fg: #fff;
+    --accent: #c9a227; --shadow: 0 1px 3px rgba(0,0,0,.3); --err: #e07a7a;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex; flex-direction: column;
+}
+header {
+  padding: max(env(safe-area-inset-top), 8px) 12px 8px;
+  border-bottom: 1px solid var(--line); background: var(--card);
+  display: flex; flex-direction: column; gap: 6px;
+  position: sticky; top: 0; z-index: 10;
+}
+.row { display: flex; align-items: center; gap: 8px; }
+.row.tools > * { flex: 0 1 auto; min-width: 0; }
+h1 { font-size: 16px; margin: 0; font-weight: 600; letter-spacing: .2px; white-space: nowrap; }
+h1 span { color: var(--accent); }
+.spacer { flex: 1; }
+button, select {
+  font: inherit; font-size: 13px; color: var(--fg); background: var(--card);
+  border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px;
+  cursor: pointer; min-height: 34px;
+}
+button:active { opacity: .6; }
+#status { font-size: 11.5px; color: var(--muted); text-align: right;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#log { flex: 1; overflow-y: auto; padding: 14px; -webkit-overflow-scrolling: touch; }
+.msg { margin-bottom: 14px; display: flex; flex-direction: column; max-width: 92%; }
+.msg.user { margin-left: auto; align-items: flex-end; }
+.bubble {
+  padding: 10px 13px; border-radius: 14px; white-space: pre-wrap;
+  overflow-wrap: anywhere; box-shadow: var(--shadow);
+}
+.user .bubble { background: var(--user); color: var(--user-fg); border-bottom-right-radius: 4px; }
+.bot .bubble { background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.bot .bubble.err { color: var(--err); }
+.cite {
+  display: inline-block; background: var(--accent); color: #fff; font-size: 11px;
+  font-weight: 600; border-radius: 4px; padding: 0 4px; margin: 0 1px; vertical-align: 1px;
+}
+.meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+details.sources { margin-top: 6px; font-size: 13px; }
+details.sources summary { color: var(--muted); cursor: pointer; padding: 4px 0; }
+.src {
+  border-left: 2px solid var(--accent); padding: 4px 0 4px 9px; margin: 7px 0;
+}
+.src b { font-weight: 600; }
+.src .g { color: var(--muted); font-size: 12px; }
+.src .x { color: var(--muted); display: block; margin-top: 2px; font-size: 12.5px; }
+form {
+  display: flex; gap: 8px; padding: 10px 12px calc(env(safe-area-inset-bottom) + 10px);
+  border-top: 1px solid var(--line); background: var(--card);
+}
+textarea {
+  flex: 1; font: inherit; resize: none; padding: 9px 12px; border-radius: 18px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+  max-height: 120px; min-height: 40px;
+}
+#send { border-radius: 50%; width: 40px; height: 40px; padding: 0; font-size: 17px;
+  background: var(--user); color: var(--user-fg); border: none; flex: none; }
+#send:disabled { opacity: .4; }
+.dots::after {
+  content: '·'; animation: d 1.2s steps(4, end) infinite; color: var(--muted);
+}
+@keyframes d { 0%{content:'·'} 25%{content:'··'} 50%{content:'···'} 75%{content:'····'} }
+#works { padding: 0 14px 14px; font-size: 14px; }
+#works h3 { font-size: 13px; color: var(--accent); margin: 14px 0 4px;
+  text-transform: uppercase; letter-spacing: .5px; }
+#works div { padding: 2px 0; border-bottom: 1px solid var(--line); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="row">
+    <h1>📚 <span>Knihovna</span></h1>
+    <div class="spacer"></div>
+    <div id="status"></div>
+  </div>
+  <div class="row tools">
+    <select id="model" title="Model">
+      <option value="translate">rychlejší</option>
+      <option value="swarm-director">hluboký rozbor</option>
+    </select>
+    <select id="topk" title="Kolik úryvků z knih se použije">
+      <option value="3">3 úryvky</option>
+      <option value="5" selected>5 úryvků</option>
+      <option value="8">8 úryvků</option>
+    </select>
+    <div class="spacer"></div>
+    <button id="btnWorks" title="Seznam děl">Díla</button>
+    <button id="btnNew" title="Nová konverzace">Nová</button>
+  </div>
+</header>
+
+<div id="log"></div>
+<div id="works" class="hidden"></div>
+
+<form id="form">
+  <textarea id="input" rows="1" placeholder="Zeptej se na knihy…" autocomplete="off"></textarea>
+  <button id="send" type="submit" title="Odeslat">↑</button>
+</form>
+
+<script>
+const log = document.getElementById('log');
+const works = document.getElementById('works');
+const form = document.getElementById('form');
+const input = document.getElementById('input');
+const send = document.getElementById('send');
+const statusEl = document.getElementById('status');
+let sessionId = localStorage.getItem('sid') || null;
+let busy = false;
+
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// [1] [2] → barevné odznáčky, ať je vidět, že odpověď stojí na zdrojích
+const withCites = s => esc(s).replace(/\[(\d{1,2})\]/g, '<span class="cite">$1</span>');
+
+function bubble(who, html, cls) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + who;
+  const b = document.createElement('div');
+  b.className = 'bubble' + (cls ? ' ' + cls : '');
+  b.innerHTML = html;
+  wrap.appendChild(b);
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+  return wrap;
+}
+
+function renderSources(wrap, sources) {
+  if (!sources || !sources.length) return;
+  const d = document.createElement('details');
+  d.className = 'sources';
+  const items = sources.map((s, i) => {
+    const dist = typeof s.distance === 'number' ? s.distance.toFixed(3) : '?';
+    return `<div class="src"><b><span class="cite">${i + 1}</span> ${esc(s.work || s.title || '?')}</b>
+      <span class="g">· ${esc(s.group || '?')} · ${esc(s.lang || '?')} · ${dist}</span>
+      <span class="x">${esc((s.excerpt || '').trim())}…</span></div>`;
+  }).join('');
+  d.innerHTML = `<summary>📖 Zdroje (${sources.length})</summary>${items}`;
+  wrap.appendChild(d);
+}
+
+// české skloňování: 1 dílo, 2–4 díla, 5+ děl
+const plural = (n, one, few, many) => n === 1 ? one : (n >= 2 && n <= 4 ? few : many);
+
+async function refreshStatus() {
+  try {
+    const r = await fetch('/status');
+    const s = await r.json();
+    const w = `${s.works} ${plural(s.works, 'dílo', 'díla', 'děl')}`;
+    const d = `${s.documents.toLocaleString('cs')} ${plural(s.documents, 'úryvek', 'úryvky', 'úryvků')}`;
+    statusEl.textContent = `${w} · ${d} · ${s.llm_model}`;
+  } catch (e) {
+    statusEl.textContent = 'server neodpovídá — běží rag/server.py?';
+  }
+}
+
+document.getElementById('btnWorks').onclick = async () => {
+  if (!works.classList.contains('hidden')) {
+    works.classList.add('hidden'); log.classList.remove('hidden'); return;
+  }
+  works.innerHTML = 'Načítám…';
+  works.classList.remove('hidden'); log.classList.add('hidden');
+  try {
+    const r = await fetch('/works');
+    const data = await r.json();
+    const groups = {};
+    for (const w of data.works) (groups[w.group || 'ostatní'] ||= []).push(w);
+    works.innerHTML = Object.entries(groups).map(([g, ws]) =>
+      `<h3>${esc(g)} (${ws.length})</h3>` + ws.map(w =>
+        `<div><b>${esc(w.work)}</b>${w.summary ? ' — ' + esc(w.summary) : ''}</div>`
+      ).join('')
+    ).join('');
+  } catch (e) {
+    works.innerHTML = 'Nepodařilo se načíst seznam děl: ' + esc(e.message);
+  }
+};
+
+document.getElementById('btnNew').onclick = async () => {
+  if (sessionId) { try { await fetch('/reset', {method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({session_id: sessionId})}); } catch (e) {} }
+  sessionId = null; localStorage.removeItem('sid');
+  log.innerHTML = ''; works.classList.add('hidden'); log.classList.remove('hidden');
+  input.focus();
+};
+
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+// Enter odesílá na desktopu; na mobilu je Enter nový řádek (klávesnice má ↑)
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer: coarse)').matches) {
+    e.preventDefault(); form.requestSubmit();
+  }
+});
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  const message = input.value.trim();
+  if (!message || busy) return;
+
+  works.classList.add('hidden'); log.classList.remove('hidden');
+  bubble('user', esc(message));
+  input.value = ''; input.style.height = 'auto';
+  busy = true; send.disabled = true;
+
+  const wrap = bubble('bot', '<span class="dots"></span>');
+  const b = wrap.querySelector('.bubble');
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  wrap.appendChild(meta);
+
+  let answer = '';
+  // odpověď trvá i minuty — běžící stopky říkají „nezaseklo se to"
+  const t0 = Date.now();
+  const timer = setInterval(() => {
+    if (!answer) meta.textContent = `přemýšlí… ${Math.round((Date.now() - t0) / 1000)} s`;
+  }, 1000);
+
+  try {
+    const res = await fetch('/chat/stream', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        message, session_id: sessionId,
+        top_k: Number(document.getElementById('topk').value),
+        model: document.getElementById('model').value,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0, 200));
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, {stream: true});
+      const frames = buf.split('\n\n');
+      buf = frames.pop();
+      for (const f of frames) {
+        if (!f.startsWith('data: ')) continue;
+        const evt = JSON.parse(f.slice(6));
+        if (evt.delta) {
+          answer += evt.delta;
+          b.innerHTML = withCites(answer);
+          log.scrollTop = log.scrollHeight;
+        }
+        if (evt.done) {
+          sessionId = evt.session_id;
+          localStorage.setItem('sid', sessionId);
+          renderSources(wrap, evt.sources);
+          meta.textContent = `${evt.model} · ${Math.round((Date.now() - t0) / 1000)} s`;
+        }
+      }
+    }
+    if (!answer) { b.className = 'bubble err'; b.textContent = 'Prázdná odpověď od modelu.'; }
+  } catch (err) {
+    b.className = 'bubble err';
+    b.textContent = 'Chyba: ' + err.message;
+    meta.textContent = '';
+  } finally {
+    clearInterval(timer);
+    busy = false; send.disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+};
+
+refreshStatus();
+</script>
+</body>
+</html>

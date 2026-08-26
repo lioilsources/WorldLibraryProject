@@ -29,7 +29,7 @@ import chromadb
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -272,6 +272,14 @@ def create_app(args) -> FastAPI:
     app.add_middleware(
         CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
     )
+
+    @app.get("/", response_class=HTMLResponse)
+    def index():
+        """Mobilní webové UI — stačí otevřít http://<server>:8090/ v prohlížeči.
+        Čte se při každém requestu, takže úpravy chat.html nevyžadují restart."""
+        return (Path(__file__).parent / "static" / "chat.html").read_text(
+            encoding="utf-8"
+        )
 
     @app.post("/chat")
     def chat(req: ChatRequest):
