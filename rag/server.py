@@ -20,8 +20,11 @@ import argparse
 import json
 import os
 import re
+import time
+import unicodedata
 import uuid
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -35,8 +38,19 @@ from pydantic import BaseModel
 
 from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
 from embeddings import format_query, make_embedder
+from retrieval import build_alias_index, diversify, route, route_groups
 
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
+# model občas uvede překlad slovem ze zadání — useknout
+EXCERPT_LEAD_RE = re.compile(
+    r"^(?:překlad|český překlad|translation)\s*:\s*", re.IGNORECASE)
+
+EXCERPT_PROMPT = (
+    "Přelož do češtiny tenhle úryvek ze starého textu. Začíná i končí "
+    "uprostřed věty — přelož celý a tak, jak je: nedoplňuj chybějící začátek "
+    "ani konec, nevysvětluj, nekomentuj. Odpověz jen samotným překladem.\n\n"
+    "---\n{text}\n---"
+)
 
 
 class ChatRequest(BaseModel):
@@ -70,10 +84,29 @@ class RAGServer:
             if summaries_path.exists()
             else {}
         )
+        # summaries.json: hodnota je buď string (starý formát = jen anotace),
+        # nebo objekt {"summary": ..., "name_cs": ...} — číst tolerantně,
+        # ať server nastartuje s oběma.
+        #
+        # Klíče jsou jména děl z metadat Chromy, a ta jsou v NFD (vznikla
+        # z názvů souborů na macOS). Ruční doplněk se ale uloží v NFC a shoda
+        # by tiše selhala — proto se na obou stranách porovnává NFC.
+        summaries = {unicodedata.normalize("NFC", k): v for k, v in summaries.items()}
         for work, info in self.catalog.items():
-            info["summary"] = summaries.get(work)
+            entry = summaries.get(unicodedata.normalize("NFC", work))
+            if isinstance(entry, dict):
+                info["summary"] = entry.get("summary")
+                info["name_cs"] = entry.get("name_cs")
+            else:
+                info["summary"] = entry
+                info["name_cs"] = None
 
         self.system_prompt += self._catalog_prompt()
+
+        # rejstřík aliasů pro směrování dotazu na dílo (viz retrieval.py)
+        self.alias_index = build_alias_index(
+            {w: info.get("name_cs") for w, info in self.catalog.items()}
+        )
 
         self.embedder = make_embedder(
             args.embed_model, device=args.device, url=args.embed_url
@@ -93,6 +126,11 @@ class RAGServer:
         )
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
+        # vlákna na překlad úryvků — běží souběžně s generováním odpovědi
+        # aspoň top_k vláken, ať se překlady jedné odpovědi neserializují
+        self.translator = ThreadPoolExecutor(
+            max_workers=8, thread_name_prefix="excerpt-cs"
+        )
 
     def _build_catalog(self) -> dict:
         """work -> {group, lang, path, chunk_count} ze stránkovaného průchodu metadat."""
@@ -116,24 +154,45 @@ class RAGServer:
             offset += limit
         return catalog
 
+    # věta končí tečkou, za níž je mezera — ale tečka po samostatném velkém
+    # písmenu je iniciála („překlad J. P. Allen"), ne konec věty
+    _SENTENCE_END = re.compile(r"(?<=[.!?])(?<![A-Z][.!?])\s+")
+
+    @classmethod
+    def _first_sentence(cls, text: str) -> str:
+        """První věta anotace — do promptu jde zkrácená verze."""
+        return cls._SENTENCE_END.split(text.strip(), maxsplit=1)[0]
+
     def _catalog_prompt(self) -> str:
         """Sekce se seznamem děl pro systémový prompt — ať na „jaké knihy znáš?"
-        odpovídá ze skutečného katalogu, ne z pěti náhodných úryvků."""
+        odpovídá ze skutečného katalogu, ne z pěti náhodných úryvků.
+
+        Štíhlá varianta: jména (česká, když existují) + skupiny vždy; anotace
+        jen u malých skupin a zkrácené na první větu. Plné anotace zůstávají
+        v GET /works. Katalog jde do KAŽDÉHO dotazu a čeština tokenizuje
+        ~1 token/znak, takže každý znak se platí latencí prefillu."""
         by_group: dict[str, list[tuple[str, str | None]]] = {}
-        for work, info in sorted(self.catalog.items()):
+        for work, info in self.catalog.items():
+            label = info.get("name_cs") or work
             by_group.setdefault(info["group"] or "misc", []).append(
-                (work, info.get("summary"))
+                (label, info.get("summary"))
             )
-        # u velkých skupin (Tipitaka ~60 knih) jen názvy — anotace by prompt
-        # nafoukly o tisíce tokenů; plné anotace zůstávají v GET /works
-        max_anotovanych = 25
+        # řadit podle zobrazeného jména, ne podle klíče: české názvy začínají
+        # nikájí („Anguttara-nikája — kniha trojic"), takže se abecedou samy
+        # seskupí po sbírkách a seznam 60 pálijských knih je čitelný
+        for works in by_group.values():
+            works.sort()
+        # anotace jen u skupin do 10 děl — u velkých (Tipitaka 60, parvy 19)
+        # by i jednovětá anotace přidala tisíce znaků
+        max_anotovanych = 10
         blocks = []
         for group, works in sorted(by_group.items()):
             if len(works) > max_anotovanych:
                 blocks.append(f"### {group}\n" + ", ".join(w for w, _ in works))
             else:
                 blocks.append(f"### {group}\n" + "\n".join(
-                    f"- {w}" + (f" — {s}" if s else "") for w, s in works
+                    f"- {w}" + (f" — {self._first_sentence(s)}" if s else "")
+                    for w, s in works
                 ))
         lines = "\n".join(blocks)
         return (
@@ -143,26 +202,113 @@ class RAGServer:
             "seznamu. Obsah děl mimo dodané úryvky neznáš — nepředstírej opak."
         )
 
+    @staticmethod
+    def _excerpt(text: str, limit: int = 200) -> str:
+        """Ukázka z chunku pro zdroje v UI. Kráceno na poslední celé slovo —
+        půlka slova na konci se špatně čte a překladač z ní dělá nesmysl.
+        Začátek se nechává, jak je: tam řeže chunker, ne my."""
+        text = (text or "").strip()
+        if len(text) <= limit:
+            return text
+        cut = text[:limit]
+        space = cut.rfind(" ")
+        if space > limit // 2:
+            cut = cut[:space]
+        return cut.rstrip(" ,;:") + "…"
+
+    def _label(self, meta: dict) -> str:
+        """Jméno díla pro člověka — české, když ho katalog zná. Používá se
+        v promptu (katalog i hlavičky úryvků), aby model citoval názvy,
+        kterým Čech rozumí, a ne „Milindapañhapāḷi"."""
+        work = meta.get("work")
+        info = self.catalog.get(work) or {}
+        return info.get("name_cs") or work or meta.get("title") or "neznámý zdroj"
+
     def _sources(self, hits) -> list[dict]:
         return [
             {
                 "work": h["meta"].get("work"),
+                "name_cs": (self.catalog.get(h["meta"].get("work")) or {}).get("name_cs"),
                 "title": h["meta"].get("title"),
                 "group": h["meta"].get("group"),
                 "lang": h["meta"].get("lang"),
                 "path": h["meta"].get("path"),
                 "distance": h["distance"],
-                "excerpt": h["text"][:200],
+                "excerpt": self._excerpt(h["text"]),
             }
             for h in hits
         ]
 
+    def _translate_excerpt(self, source: dict) -> None:
+        """Doplní do jednoho zdroje klíč „excerpt_cs". Pálijský nebo hebrejský
+        úryvek je pro čtenáře nečitelný doklad; překlad z něj dělá citát.
+
+        Každý úryvek jde vlastním requestem: dávka po pěti se v jedné odpovědi
+        neúnosně dlouží, model ji uřízne na max_tokens a poslední dva úryvky
+        zůstanou nepřeložené (naměřeno). Vlákna běží souběžně s generováním
+        odpovědi (to trvá minuty, tohle sekundy), takže na latenci to není
+        znát. Chyba se spolkne — bez překladu je zdroj pořád použitelný."""
+        text = (source.get("excerpt") or "").strip()
+        if not text:
+            return
+        try:
+            resp = self.llm.chat.completions.create(
+                model=self.args.excerpt_model,
+                messages=[{"role": "user",
+                           "content": EXCERPT_PROMPT.format(text=text)}],
+                temperature=0.2,
+                max_tokens=self.args.excerpt_max_tokens,
+            )
+            answer = THINK_RE.sub("", resp.choices[0].message.content or "").strip()
+        except Exception as exc:  # noqa: BLE001 — překlad je bonus, ne podmínka
+            print(f"překlad úryvku selhal: {exc}")
+            return
+        answer = EXCERPT_LEAD_RE.sub("", answer).strip()
+        if answer:
+            source["excerpt_cs"] = answer
+
+    def _start_excerpt_translation(self, sources: list[dict]):
+        """Vrátí seznam futures (prázdný, když je překlad vypnutý)."""
+        if self.args.no_translate_excerpts:
+            return []
+        return [self.translator.submit(self._translate_excerpt, s)
+                for s in sources]
+
+    @staticmethod
+    def _await_excerpts(futures, timeout: float) -> None:
+        """Počká na překlady, ale ne donekonečna — zdroje bez překladu jsou
+        pořád lepší než odpověď, která nikdy nedojde. Lhůta platí na celou
+        sadu, ne na každý překlad zvlášť."""
+        deadline = time.monotonic() + timeout
+        for future in futures:
+            try:
+                future.result(timeout=max(0.0, deadline - time.monotonic()))
+            except Exception as exc:  # noqa: BLE001 — včetně TimeoutError
+                print(f"překlad úryvku nedorazil včas: {exc}")
+
     def retrieve(self, query: str, top_k: int):
+        """Vrátí (úryvky, kam se dotaz nasměroval).
+
+        Vyhledá se větší výběr (top_k × candidate_factor) a teprve z něj se
+        bere top_k s omezením na počet úryvků z jednoho díla — jinak top-5
+        běžně tvoří pětkrát tentýž svazek. Když otázka dílo jmenuje, hledá
+        se rovnou jen v něm; když jmenuje jen tradici, aspoň v ní."""
         text = format_query(query, self.args.embed_model)
         embedding = self.embedder.encode([text])[0]
+        works = [] if self.args.no_routing else route(query, self.alias_index)
+        # jmenované dílo je přesnější signál než tradice, takže skupiny
+        # se řeší, jen když se na dílo netrefíme
+        groups = [] if works or self.args.no_routing else route_groups(query)
+        where = None
+        if works:
+            where = {"work": {"$in": works}}
+        elif groups:
+            where = {"group": {"$in": groups}}
+        pool = max(top_k, top_k * self.args.candidate_factor)
         result = self.collection.query(
             query_embeddings=[embedding],
-            n_results=top_k,
+            n_results=pool,
+            where=where,
             include=["documents", "metadatas", "distances"],
         )
         hits = []
@@ -170,13 +316,17 @@ class RAGServer:
             result["documents"][0], result["metadatas"][0], result["distances"][0]
         ):
             hits.append({"text": doc, "meta": meta or {}, "distance": dist})
-        return hits
+        hits = diversify(
+            hits, top_k, self.args.max_per_work,
+            key=lambda h: h["meta"].get("work"),
+        )
+        return hits, {"works": works, "groups": groups}
 
     def build_messages(self, message: str, hits, history):
         context_lines = []
         for i, h in enumerate(hits, 1):
             m = h["meta"]
-            label = m.get("work") or m.get("title") or "neznámý zdroj"
+            label = self._label(m)
             context_lines.append(f"[{i}] {label} ({m.get('group', '?')}):\n{h['text']}")
         context = "\n\n".join(context_lines) if context_lines else "(nic nenalezeno)"
 
@@ -200,7 +350,9 @@ class RAGServer:
             session_id, deque(maxlen=2 * self.args.history_turns)
         )
 
-        hits = self.retrieve(req.message, req.top_k)
+        hits, routed = self.retrieve(req.message, req.top_k)
+        sources = self._sources(hits)
+        translation = self._start_excerpt_translation(sources)
         messages = self.build_messages(req.message, hits, history)
 
         extra = {}
@@ -221,7 +373,8 @@ class RAGServer:
         history.append(("user", req.message))
         history.append(("assistant", answer))
 
-        return {"answer": answer, "sources": self._sources(hits),
+        self._await_excerpts(translation, self.args.excerpt_timeout)
+        return {"answer": answer, "sources": sources, "routed": routed,
                 "session_id": session_id, "model": model}
 
     def chat_stream(self, req: ChatRequest):
@@ -232,7 +385,9 @@ class RAGServer:
             session_id, deque(maxlen=2 * self.args.history_turns)
         )
 
-        hits = self.retrieve(req.message, req.top_k)
+        hits, routed = self.retrieve(req.message, req.top_k)
+        sources = self._sources(hits)
+        translation = self._start_excerpt_translation(sources)
         messages = self.build_messages(req.message, hits, history)
 
         extra = {}
@@ -261,7 +416,9 @@ class RAGServer:
         history.append(("user", req.message))
         history.append(("assistant", answer))
 
-        final = {"done": True, "sources": self._sources(hits),
+        # překlad běžel po celou dobu streamu, takže tady už bývá hotový
+        self._await_excerpts(translation, self.args.excerpt_timeout)
+        final = {"done": True, "sources": sources, "routed": routed,
                  "session_id": session_id, "model": model}
         yield "data: " + json.dumps(final, ensure_ascii=False) + "\n\n"
 
@@ -316,6 +473,9 @@ def create_app(args) -> FastAPI:
             "collection": args.collection,
             "documents": server.collection.count(),
             "works": len(server.catalog),
+            # systémový prompt jde do každého dotazu a čeština tokenizuje
+            # ~1 token/znak — tohle číslo je přímo cena prefillu
+            "system_prompt_chars": len(server.system_prompt),
             "llm_model": args.llm_model,
             "llm_url": args.llm_url,
             "embed_model": args.embed_model,
@@ -348,6 +508,23 @@ def main():
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
     p.add_argument("--summaries-file", default=str(Path(__file__).parent / "summaries.json"),
                    help="anotace děl z gen_summaries.py (chybějící soubor = bez anotací)")
+    p.add_argument("--candidate-factor", type=int, default=4,
+                   help="kolikrát víc kandidátů než top_k načíst před "
+                        "prořezáním na diverzitu")
+    p.add_argument("--max-per-work", type=int, default=2,
+                   help="nejvíc úryvků z jednoho díla v top_k")
+    p.add_argument("--no-routing", action="store_true",
+                   help="nesměrovat dotaz na jmenované dílo (vypnout aliasy)")
+    p.add_argument("--excerpt-model", default="translate",
+                   help="model na překlad úryvků do češtiny (běží souběžně "
+                        "s odpovědí; schválně jiný než --llm-model, ať "
+                        "hluboký rozbor nepřekládá 200znakové útržky)")
+    p.add_argument("--excerpt-max-tokens", type=int, default=500,
+                   help="strop na JEDEN přeložený úryvek (200 znaků)")
+    p.add_argument("--excerpt-timeout", type=float, default=60.0,
+                   help="jak dlouho po dogenerování odpovědi čekat na překlad")
+    p.add_argument("--no-translate-excerpts", action="store_true",
+                   help="posílat úryvky jen v originále")
     p.add_argument("--history-turns", type=int, default=10, help="párů otázka+odpověď v paměti")
     p.add_argument("--temperature", type=float, default=0.4)
     p.add_argument("--max-tokens", type=int, default=1024)

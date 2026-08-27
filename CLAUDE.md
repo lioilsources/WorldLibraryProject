@@ -23,4 +23,8 @@ dosažitelná jako `joda`).
 
 - `PLAN-spark-chatbot.md` — nasazovací plán chatbota (fáze, verifikace, rollback)
 - `rag/README.md` — architektura a zprovoznění chatbota
+- `rag/retrieval.py` — směrování dotazu na dílo/tradici a diverzita výsledků
+  (kurátorská tabulka aliasů; `python3 retrieval.py` spustí selftest)
+- `rag/eval/` — měření retrievalu bez LLM proti zlatému standardu; baseline
+  a výsledky režimů v `rag/eval/results/`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)

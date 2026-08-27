@@ -13,6 +13,7 @@ Použití (na SPARK):
 
 import argparse
 import json
+import unicodedata
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -45,6 +46,12 @@ def main() -> int:
 
     out = Path(args.output)
     summaries = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
+    # hodnota je {"summary": ..., "name_cs": ...}; starší soubory mají jen
+    # string s anotací — převést, ať --force nesmaže ručně psané české názvy
+    summaries = {
+        w: (e if isinstance(e, dict) else {"summary": e})
+        for w, e in summaries.items()
+    }
 
     # díla + tradice z metadat (stránkovaně, jako server._build_catalog)
     works: dict[str, str] = {}
@@ -60,15 +67,17 @@ def main() -> int:
             break
         offset += limit
 
-    # anotace děl, která z katalogu zmizela, nedržet
-    stale = set(summaries) - set(works)
+    # anotace děl, která z katalogu zmizela, nedržet (porovnání v NFC —
+    # klíče z Chromy jsou NFD z názvů souborů, ruční editace bývá NFC)
+    nfc_works = {unicodedata.normalize("NFC", w) for w in works}
+    stale = {w for w in summaries if unicodedata.normalize("NFC", w) not in nfc_works}
     for work in stale:
         del summaries[work]
     if stale:
         print(f"odstraněno {len(stale)} anotací děl mimo katalog")
 
     for work, group in sorted(works.items()):
-        if work in summaries and not args.force:
+        if summaries.get(work, {}).get("summary") and not args.force:
             continue
         got = col.get(where={"work": work}, limit=3, include=["documents"])
         samples = "\n---\n".join(d[:600] for d in got["documents"])
@@ -79,12 +88,13 @@ def main() -> int:
             temperature=0.3,
             max_tokens=200,
         )
-        summaries[work] = (resp.choices[0].message.content or "").strip()
+        summary = (resp.choices[0].message.content or "").strip()
+        summaries.setdefault(work, {})["summary"] = summary
         # průběžný zápis — přerušený běh neztratí hotové anotace
         out.write_text(
             json.dumps(summaries, ensure_ascii=False, indent=1), encoding="utf-8"
         )
-        print(f"{work}: {summaries[work][:90]}")
+        print(f"{work}: {summary[:90]}")
 
     print(f"\nHotovo: {len(summaries)} anotací → {out}")
     return 0

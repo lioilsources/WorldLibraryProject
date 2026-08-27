@@ -141,10 +141,78 @@ Odpověď obsahuje `session_id` — pošli ho v dalším dotazu a chatbot si
 pamatuje kontext konverzace. `POST /reset` paměť smaže. Swagger UI na
 `/docs`, stav na `/status`.
 
+## Kvalita vyhledávání
+
+Dotaz je česky, korpus v pálí, sanskrtu, čínštině a hebrejštině — a
+multilingual-e5 v téhle situaci skoro nerozlišuje: **top-5 se u dotazu
+liší o ~0,007 vzdálenosti**, takže o pořadí rozhoduje spíš podíl tradice
+v korpusu než téma otázky. A pálijská Tipitaka je 60 z 93 děl, takže
+„Co říká Tao te ťing o wu-wej?" vracelo pět pálijských svazků.
+
+Proto `retrieval.py`:
+
+- **Směrování na dílo** — když otázka dílo jmenuje, hledá se rovnou v něm
+  (`where={"work": {"$in": [...]}}`). Aliasy jsou **kmeny bez diakritiky**
+  („therigath" trefí „v Therígáthě" i „Therígáthá"), hledají se od hranice
+  slova. Když sedí víc aliasů, platí jejich **průnik**, je-li neprázdný:
+  „Bhagavadgíta z Mahábháraty" → Bhíšmaparva, kdežto „Tao te ťing
+  a Zhuangzi" → obě díla.
+- **Směrování na tradici** — otázka bez názvu díla („co učí hinduistické
+  texty") aspoň zúží na skupinu. Tady se naopak **sjednocuje**, aby
+  „srovnej buddhismus a hinduismus" sáhlo do obou.
+- **Diverzita** — hledá se `top_k × --candidate-factor` kandidátů a z nich
+  se bere top_k s nejvýš `--max-per-work` úryvky z jednoho díla, aby
+  kontext nebyl pětkrát tentýž Šántiparva.
+
+Vypnout: `--no-routing`, `--max-per-work 99`.
+
+### Eval
+
+`eval/eval_retrieval.py` měří retrieval **bez LLM** (běží v sekundách)
+proti zlatému standardu `eval/golden.jsonl` (otázky se známým dílem
+a tradicí):
+
+```bash
+.venv/bin/python3 eval/eval_retrieval.py --retrieve-mode full \
+    --compare eval/results/baseline.json
+```
+
+Režimy `plain | route | diverse | full` izolují jednotlivé zásahy, takže
+je vidět, co doopravdy pomohlo. Naměřeno (24 otázek, top-5, srpen 2026):
+
+| režim | work-hit@5 | group-hit@5 | různých děl v top-5 |
+|---|---|---|---|
+| plain (stav před) | 0,61 | 0,67 | 2,33 |
+| route | 1,00 | 0,96 | 1,50 |
+| diverse | 0,61 | 0,67 | 2,79 |
+| **full** | **1,00** | **1,00** | 1,62 |
+
+Druhá sada `eval/golden_v2.jsonl` je psaná až po aliasech a jinými slovy
+(skloňování, jiné varianty názvů) — kontrola, že tabulka není ušitá na
+míru první sadě: 0,40 → 1,00 work-hit, 0,64 → 1,00 group-hit.
+
+Pozor: **hit@5 měří jen to, že se trefí správná kniha**, ne že je
+odpověď dobrá. Rozptyl vzdáleností (`mean_spread`) zůstává mizivý —
+model pořád nerozlišuje, jen se ho na to teď tolik neptáme.
+
 ## Personalizace
 
 - **Osobnost**: `prompts/librarian_cs.md`, přepínatelná přes
   `--prompt-file`. Výchozí je český „sečtělý knihovník" citující zdroje.
+- **Katalog v promptu**: seznam děl se skládá ze `summaries.json` a jde
+  do **každého** dotazu, takže se každý znak platí prefillem — anotace
+  se krátí na první větu a u velkých skupin (Tipitaka, parvy) se vypouští
+  úplně. Plné anotace zůstávají v `GET /works`.
+- **České názvy**: `summaries.json` má u díla `name_cs` (kurátorské, ručně
+  psané — `gen_summaries.py` je při `--force` nepřepíše). Používají se
+  v katalogu i v hlavičkách úryvků, takže model cituje „Otázky krále
+  Milindy", ne „Milindapañhapāḷi". Pálijské názvy začínají nikájí, takže
+  se seznam sám seskupí po sbírkách.
+- **Překlad úryvků**: ke každé odpovědi se `sources[].excerpt` překládá do
+  češtiny (`excerpt_cs`) — pálijský nebo hebrejský doklad je jinak pro
+  čtenáře nečitelný. Běží ve vlákně souběžně s generováním odpovědi
+  (`--excerpt-model`, výchozí `translate`), takže odpověď nezdrží;
+  vypíná `--no-translate-excerpts`.
 - **Paměť**: posledních `--history-turns` (výchozí 10) párů
   otázka/odpověď per session, drží se v RAM serveru.
 - **Model**: per dotaz nebo `--llm-model` (viz tabulka výše).

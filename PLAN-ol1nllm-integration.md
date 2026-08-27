@@ -210,7 +210,20 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
    (AiStack `docker-compose.translate.yaml`, commit 3b3aa2e) — RAG
    prompt s katalogem a top-5 chunky má 9–12k tokenů; pálí diakritika
    tokenizuje ~1 token/znak.
-8. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+8. **Jména děl z Chromy jsou v NFD**, protože vznikla z názvů souborů na
+   macOS (`Milindapañhapāḷi` = `n` + `~`, `l` + tečka…). Ručně psaný
+   katalog i zlatý standard jsou NFC, takže `==` tiše selže a vypadá to
+   jako chyba retrievalu — první baseline eval kvůli tomu hlásil o tři
+   „miss" víc, než jich doopravdy bylo. Kdekoli se jméno díla porovnává
+   nebo dává do `where={"work": ...}`, musí se sjednotit
+   (`unicodedata.normalize("NFC", …)` na obou stranách).
+9. **Embedding česky × korpus v pálí/sanskrtu je skoro slepý**: měřeno,
+   top-5 se u dotazu liší o ~0,007 vzdálenosti, takže pořadí rozhoduje
+   podíl tradice v korpusu (Tipitaka = 60 z 93 děl) víc než téma otázky.
+   Bez směrování na dílo/tradici (`rag/retrieval.py`) vracel dotaz na Tao
+   te ťing pálijské svazky. Kdyby se to mělo řešit v základu, znamená to
+   jiný embedding model a re-embed celého korpusu.
+10. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.
