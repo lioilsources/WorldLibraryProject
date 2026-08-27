@@ -1,0 +1,257 @@
+{
+  "ts": "2026-08-27T10:07:53Z",
+  "label": "golden_v2: full",
+  "mode": "full",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 14,
+    "routed": 13,
+    "routed_group": 0,
+    "work_hit_rate": 1.0,
+    "group_hit_rate": 1.0,
+    "mean_distinct": 1.5,
+    "mean_d1": 0.1951,
+    "mean_spread": 0.0076
+  },
+  "rows": [
+    {
+      "q": "Co znamená v Tao-te-ťingu pojem te?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2115,
+      "spread": 0.0045,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "dao de jing @0.211",
+        "dao de jing @0.213",
+        "dao de jing @0.214",
+        "dao de jing @0.215",
+        "dao de jing @0.216"
+      ]
+    },
+    {
+      "q": "Jaké rady dává Lao-c' vládcům?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2245,
+      "spread": 0.0141,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "dao de jing @0.224",
+        "dao de jing @0.231",
+        "dao de jing @0.231",
+        "dao de jing @0.236",
+        "dao de jing @0.239"
+      ]
+    },
+    {
+      "q": "Co se v Dhammapadě říká o hněvu?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1791,
+      "spread": 0.0087,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Dhammapadapāḷi @0.179",
+        "Dhammapadapāḷi @0.184",
+        "Dhammapadapāḷi @0.185",
+        "Dhammapadapāḷi @0.186",
+        "Dhammapadapāḷi @0.188"
+      ]
+    },
+    {
+      "q": "Vyprávěj příběh z Džátak o opičím králi.",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1885,
+      "spread": 0.0012,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "Jātakapāḷi 1 @0.189",
+        "Jātakapāḷi 1 @0.189",
+        "Jātakapāḷi 2 @0.191",
+        "Jātakapāḷi 2 @0.192",
+        "Jātakapāḷi 1 @0.190"
+      ]
+    },
+    {
+      "q": "Jak Mahábhárata líčí smrt Karny?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.1645,
+      "spread": 0.0069,
+      "routed": 18,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 11 — Stríparva @0.165",
+        "Mahábhárata 07 — Drónaparva @0.165",
+        "Mahábhárata 11 — Stríparva @0.169",
+        "Mahábhárata 08 — Karnaparva @0.170",
+        "Mahábhárata 07 — Drónaparva @0.171"
+      ]
+    },
+    {
+      "q": "O čem je Bhagavadgíta?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1994,
+      "spread": 0.0083,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 06 — Bhíšmaparva @0.199",
+        "Mahábhárata 06 — Bhíšmaparva @0.201",
+        "Mahábhárata 06 — Bhíšmaparva @0.202",
+        "Mahábhárata 06 — Bhíšmaparva @0.204",
+        "Mahábhárata 06 — Bhíšmaparva @0.208"
+      ]
+    },
+    {
+      "q": "Co vypráví Snorri o Thorovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1864,
+      "spread": 0.0065,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.186",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.189",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.190",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.192",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.193"
+      ]
+    },
+    {
+      "q": "Jak vypadá popis stvoření v knize Genesis?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2291,
+      "spread": 0.0017,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "westminster leningrad codex @0.229",
+        "westminster leningrad codex @0.230",
+        "westminster leningrad codex @0.230",
+        "westminster leningrad codex @0.231",
+        "westminster leningrad codex @0.231"
+      ]
+    },
+    {
+      "q": "Co učí zoroastrismus o dobru a zlu?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1815,
+      "spread": 0.0102,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "avesta darmesteter complete @0.182",
+        "avesta darmesteter complete @0.188",
+        "avesta darmesteter complete @0.192",
+        "avesta darmesteter complete @0.192",
+        "avesta darmesteter complete @0.192"
+      ]
+    },
+    {
+      "q": "Které texty od Hegela v knihovně máš?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1643,
+      "spread": 0.0053,
+      "routed": 3,
+      "routed_groups": [],
+      "top": [
+        "hegel werke band01 fruehe schriften @0.164",
+        "hegel werke band01 fruehe schriften @0.166",
+        "hegel werke band01 fruehe schriften @0.168",
+        "hegel werke band01 fruehe schriften @0.169",
+        "hegel werke band01 fruehe schriften @0.170"
+      ]
+    },
+    {
+      "q": "Jak buddhistická scholastika abhidhammy třídí jevy mysli?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 4,
+      "d1": 0.1834,
+      "spread": 0.0052,
+      "routed": 13,
+      "routed_groups": [],
+      "top": [
+        "Vibhaṅgapāḷi @0.183",
+        "Vibhaṅgapāḷi @0.186",
+        "Paṭṭhānapāḷi 1 @0.188",
+        "Paṭṭhānapāḷi 2 @0.188",
+        "Dhammasaṅgaṇīpāḷi @0.189"
+      ]
+    },
+    {
+      "q": "Co je to wu-wej a proč se o něm mluví?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.2123,
+      "spread": 0.0025,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "zhuangzi @0.212",
+        "westminster leningrad codex @0.212",
+        "zhuangzi @0.214",
+        "westminster leningrad codex @0.217",
+        "zhuangzi @0.215"
+      ]
+    },
+    {
+      "q": "Jaké otázky kladl Nágasénovi král?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1935,
+      "spread": 0.0206,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Milindapañhapāḷi @0.193",
+        "Milindapañhapāḷi @0.213",
+        "Milindapañhapāḷi @0.213",
+        "Milindapañhapāḷi @0.213",
+        "Milindapañhapāḷi @0.214"
+      ]
+    },
+    {
+      "q": "Co se zpívá ve Völuspě o konci světa?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2135,
+      "spread": 0.0106,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "The poetic Edda @0.213",
+        "The poetic Edda @0.216",
+        "The poetic Edda @0.216",
+        "The poetic Edda @0.224",
+        "The poetic Edda @0.224"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,440 @@
+{
+  "ts": "2026-08-27T10:06:37Z",
+  "label": "krok3: full (dílo+tradice+diverzita)",
+  "mode": "full",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 24,
+    "routed": 18,
+    "routed_group": 6,
+    "work_hit_rate": 1.0,
+    "group_hit_rate": 1.0,
+    "mean_distinct": 1.62,
+    "mean_d1": 0.1797,
+    "mean_spread": 0.0089
+  },
+  "rows": [
+    {
+      "q": "Co říká Tao te ťing o nečinnosti (wu-wej)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1915,
+      "spread": 0.0138,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "dao de jing @0.191",
+        "dao de jing @0.194",
+        "dao de jing @0.201",
+        "dao de jing @0.202",
+        "dao de jing @0.205"
+      ]
+    },
+    {
+      "q": "Jak Konfucius v Hovorech popisuje ušlechtilého člověka?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1829,
+      "spread": 0.0062,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "analects @0.183",
+        "analects @0.184",
+        "analects @0.184",
+        "analects @0.185",
+        "analects @0.189"
+      ]
+    },
+    {
+      "q": "Co soudí Mencius o lidské přirozenosti?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2052,
+      "spread": 0.009,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "mengzi @0.205",
+        "mengzi @0.212",
+        "mengzi @0.213",
+        "mengzi @0.214",
+        "mengzi @0.214"
+      ]
+    },
+    {
+      "q": "Vyprávěj mi Zhuangziho sen o motýlovi.",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1324,
+      "spread": 0.0238,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zhuangzi @0.132",
+        "zhuangzi @0.147",
+        "zhuangzi @0.154",
+        "zhuangzi @0.155",
+        "zhuangzi @0.156"
+      ]
+    },
+    {
+      "q": "Jaké verše o mysli obsahuje Dhammapada?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.166,
+      "spread": 0.0072,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Dhammapadapāḷi @0.166",
+        "Dhammapadapāḷi @0.171",
+        "Dhammapadapāḷi @0.172",
+        "Dhammapadapāḷi @0.172",
+        "Dhammapadapāḷi @0.173"
+      ]
+    },
+    {
+      "q": "Na co se ptá král Milinda mnicha Nágasény?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1818,
+      "spread": 0.0111,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Milindapañhapāḷi @0.182",
+        "Milindapañhapāḷi @0.189",
+        "Milindapañhapāḷi @0.192",
+        "Milindapañhapāḷi @0.192",
+        "Milindapañhapāḷi @0.193"
+      ]
+    },
+    {
+      "q": "Co zpívají mnišky v Therígáthě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2066,
+      "spread": 0.0084,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Therīgāthāpāḷi @0.207",
+        "Therīgāthāpāḷi @0.208",
+        "Therīgāthāpāḷi @0.213",
+        "Therīgāthāpāḷi @0.215",
+        "Therīgāthāpāḷi @0.215"
+      ]
+    },
+    {
+      "q": "Jak probíhala bitva na Kuruovském poli v Bhíšmaparvě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1858,
+      "spread": 0.0053,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 06 — Bhíšmaparva @0.186",
+        "Mahábhárata 06 — Bhíšmaparva @0.187",
+        "Mahábhárata 06 — Bhíšmaparva @0.188",
+        "Mahábhárata 06 — Bhíšmaparva @0.189",
+        "Mahábhárata 06 — Bhíšmaparva @0.191"
+      ]
+    },
+    {
+      "q": "O čem je hra v kostky v Sabháparvě Mahábháraty?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2134,
+      "spread": 0.006,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 02 — Sabháparva @0.213",
+        "Mahábhárata 02 — Sabháparva @0.218",
+        "Mahábhárata 02 — Sabháparva @0.219",
+        "Mahábhárata 02 — Sabháparva @0.219",
+        "Mahábhárata 02 — Sabháparva @0.219"
+      ]
+    },
+    {
+      "q": "Jak zní hymnus o stvoření světa v Rigvédě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1575,
+      "spread": 0.005,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "rigveda complete sanskrit @0.157",
+        "rigveda complete sanskrit @0.158",
+        "rigveda complete sanskrit @0.161",
+        "rigveda complete sanskrit @0.161",
+        "rigveda complete sanskrit @0.162"
+      ]
+    },
+    {
+      "q": "Jak Beowulf porazil Grendela?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1577,
+      "spread": 0.0051,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "Beowulf: An Anglo-Saxon Epic Poem @0.158",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.161",
+        "Beowulf @0.178",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.162",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.163"
+      ]
+    },
+    {
+      "q": "Co předpovídá vědma ve Vědmině písni (Völuspá) v Poetické Eddě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1788,
+      "spread": 0.0146,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "The poetic Edda @0.179",
+        "The poetic Edda @0.179",
+        "The poetic Edda @0.192",
+        "The poetic Edda @0.192",
+        "The poetic Edda @0.193"
+      ]
+    },
+    {
+      "q": "Jak Snorriho Edda popisuje stvoření světa z těla obra Ymiho?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1771,
+      "spread": 0.0145,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.177",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.180",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.184",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.189",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.192"
+      ]
+    },
+    {
+      "q": "Co je dialektika pána a raba ve Fenomenologii ducha?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1968,
+      "spread": 0.005,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "hegel werke band03 phaenomenologie @0.197",
+        "hegel werke band03 phaenomenologie @0.200",
+        "hegel werke band03 phaenomenologie @0.201",
+        "hegel werke band03 phaenomenologie @0.201",
+        "hegel werke band03 phaenomenologie @0.202"
+      ]
+    },
+    {
+      "q": "Jak Hegel ve Vědě o logice vykládá bytí a nic?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1432,
+      "spread": 0.0042,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "hegel werke band05 wissenschaft logik @0.143",
+        "hegel werke band05 wissenschaft logik @0.144",
+        "hegel werke band05 wissenschaft logik @0.145",
+        "hegel werke band05 wissenschaft logik @0.147",
+        "hegel werke band05 wissenschaft logik @0.147"
+      ]
+    },
+    {
+      "q": "Co říká hebrejská Bible o stvoření světa?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.2315,
+      "spread": 0.0006,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "westminster leningrad codex @0.232",
+        "westminster leningrad codex @0.232",
+        "westminster leningrad codex @0.232",
+        "westminster leningrad codex @0.232",
+        "westminster leningrad codex @0.232"
+      ]
+    },
+    {
+      "q": "Co jsou egyptské Texty pyramid a k čemu sloužily?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1413,
+      "spread": 0.0036,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pyramid texts allen @0.141",
+        "pyramid texts allen @0.142",
+        "pyramid texts allen @0.143",
+        "pyramid texts allen @0.144",
+        "pyramid texts allen @0.145"
+      ]
+    },
+    {
+      "q": "Co učí Avesta o Ahura Mazdovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1636,
+      "spread": 0.0074,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "avesta darmesteter complete @0.164",
+        "avesta darmesteter complete @0.165",
+        "avesta darmesteter complete @0.169",
+        "avesta darmesteter complete @0.170",
+        "avesta darmesteter complete @0.171"
+      ]
+    },
+    {
+      "q": "Co učí buddhismus o utrpení a jeho zániku?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 5,
+      "d1": 0.2005,
+      "spread": 0.0042,
+      "routed": 0,
+      "routed_groups": [
+        "pali"
+      ],
+      "top": [
+        "Buddhavaṃsapāḷi @0.200",
+        "Aṭṭhakanipātapāḷi @0.202",
+        "Chakkanipātapāḷi @0.202",
+        "Suttanipātapāḷi @0.204",
+        "Pācittiyapāḷi @0.205"
+      ]
+    },
+    {
+      "q": "Jak hinduistické texty vykládají karmu a dharmu?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 4,
+      "d1": 0.1804,
+      "spread": 0.0143,
+      "routed": 0,
+      "routed_groups": [
+        "sanskrit"
+      ],
+      "top": [
+        "Mahábhárata 03 — Vanaparva @0.180",
+        "Mahábhárata 03 — Vanaparva @0.191",
+        "Mahábhárata 05 — Udjógaparva @0.194",
+        "Mahábhárata 06 — Bhíšmaparva @0.194",
+        "Mahábhárata 07 — Drónaparva @0.195"
+      ]
+    },
+    {
+      "q": "Jak čínská filosofie chápe ctnost?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1807,
+      "spread": 0.0065,
+      "routed": 0,
+      "routed_groups": [
+        "chinese"
+      ],
+      "top": [
+        "zhuangzi @0.181",
+        "zhuangzi @0.181",
+        "dao de jing @0.191",
+        "zhuangzi @0.186",
+        "zhuangzi @0.187"
+      ]
+    },
+    {
+      "q": "Co říká severská mytologie o ragnaröku, konci světa?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.1775,
+      "spread": 0.0283,
+      "routed": 0,
+      "routed_groups": [
+        "european"
+      ],
+      "top": [
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.177",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.203",
+        "The poetic Edda @0.203",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.205",
+        "The poetic Edda @0.206"
+      ]
+    },
+    {
+      "q": "Jak německý idealismus pracuje s pojmem ducha?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1899,
+      "spread": 0.0057,
+      "routed": 0,
+      "routed_groups": [
+        "european_philosophy"
+      ],
+      "top": [
+        "hegel werke band01 fruehe schriften @0.190",
+        "hegel werke band03 phaenomenologie @0.194",
+        "hegel werke band03 phaenomenologie @0.195",
+        "hegel werke band01 fruehe schriften @0.196",
+        "hegel werke band03 phaenomenologie @0.196"
+      ]
+    },
+    {
+      "q": "Srovnej pojetí duše v buddhismu a v hinduismu.",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 4,
+      "d1": 0.1714,
+      "spread": 0.0031,
+      "routed": 0,
+      "routed_groups": [
+        "pali",
+        "sanskrit"
+      ],
+      "top": [
+        "Mūlapaṇṇāsapāḷi @0.171",
+        "Yamakapāḷi 3 @0.172",
+        "Yamakapāḷi 3 @0.173",
+        "Dhammasaṅgaṇīpāḷi @0.174",
+        "Uparipaṇṇāsapāḷi @0.174"
+      ]
+    }
+  ]
+}

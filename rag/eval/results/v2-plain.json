@@ -1,0 +1,257 @@
+{
+  "ts": "2026-08-27T10:07:31Z",
+  "label": "golden_v2: plain",
+  "mode": "plain",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 14,
+    "routed": 0,
+    "routed_group": 0,
+    "work_hit_rate": 0.4,
+    "group_hit_rate": 0.643,
+    "mean_distinct": 2.21,
+    "mean_d1": 0.193,
+    "mean_spread": 0.0055
+  },
+  "rows": [
+    {
+      "q": "Co znamená v Tao-te-ťingu pojem te?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 3,
+      "d1": 0.2022,
+      "spread": 0.0026,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Paṭṭhānapāḷi 3 @0.202",
+        "Yamakapāḷi 3 @0.202",
+        "Dhammasaṅgaṇīpāḷi @0.203",
+        "Dhammasaṅgaṇīpāḷi @0.204",
+        "Yamakapāḷi 3 @0.205"
+      ]
+    },
+    {
+      "q": "Jaké rady dává Lao-c' vládcům?",
+      "work_hit": false,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.2063,
+      "spread": 0.0053,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "zhuangzi @0.206",
+        "Mahábhárata 12 — Šántiparva @0.206",
+        "Mahábhárata 12 — Šántiparva @0.208",
+        "Mahábhárata 02 — Sabháparva @0.210",
+        "Mahábhárata 12 — Šántiparva @0.212"
+      ]
+    },
+    {
+      "q": "Co se v Dhammapadě říká o hněvu?",
+      "work_hit": false,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.1799,
+      "spread": 0.0011,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Dhammasaṅgaṇīpāḷi @0.180",
+        "Dhammasaṅgaṇīpāḷi @0.180",
+        "Dhammasaṅgaṇīpāḷi @0.181",
+        "Aṭṭhakanipātapāḷi @0.181",
+        "Dhātukathāpāḷi @0.181"
+      ]
+    },
+    {
+      "q": "Vyprávěj příběh z Džátak o opičím králi.",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 2,
+      "d1": 0.1962,
+      "spread": 0.0027,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "pyramid texts allen @0.196",
+        "pyramid texts allen @0.197",
+        "pyramid texts allen @0.197",
+        "westminster leningrad codex @0.198",
+        "westminster leningrad codex @0.199"
+      ]
+    },
+    {
+      "q": "Jak Mahábhárata líčí smrt Karny?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 3,
+      "d1": 0.1868,
+      "spread": 0.0048,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Mahāvaggapāḷi @0.187",
+        "Mahāvaggapāḷi @0.189",
+        "Dasakanipātapāḷi @0.189",
+        "Majjhimapaṇṇāsapāḷi @0.190",
+        "Majjhimapaṇṇāsapāḷi @0.192"
+      ]
+    },
+    {
+      "q": "O čem je Bhagavadgíta?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1994,
+      "spread": 0.0043,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 06 — Bhíšmaparva @0.199",
+        "Mahábhárata 06 — Bhíšmaparva @0.201",
+        "Mahábhárata 06 — Bhíšmaparva @0.202",
+        "Mahábhárata 13 — Anušásanaparva @0.203",
+        "Mahábhárata 06 — Bhíšmaparva @0.204"
+      ]
+    },
+    {
+      "q": "Co vypráví Snorri o Thorovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.1864,
+      "spread": 0.0037,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.186",
+        "The poetic Edda @0.188",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.189",
+        "The poetic Edda @0.190",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.190"
+      ]
+    },
+    {
+      "q": "Jak vypadá popis stvoření v knize Genesis?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 1,
+      "d1": 0.1985,
+      "spread": 0.0064,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "hegel werke band01 fruehe schriften @0.199",
+        "hegel werke band01 fruehe schriften @0.201",
+        "hegel werke band01 fruehe schriften @0.201",
+        "hegel werke band01 fruehe schriften @0.203",
+        "hegel werke band01 fruehe schriften @0.205"
+      ]
+    },
+    {
+      "q": "Co učí zoroastrismus o dobru a zlu?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1815,
+      "spread": 0.0102,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "avesta darmesteter complete @0.182",
+        "avesta darmesteter complete @0.188",
+        "avesta darmesteter complete @0.192",
+        "avesta darmesteter complete @0.192",
+        "avesta darmesteter complete @0.192"
+      ]
+    },
+    {
+      "q": "Které texty od Hegela v knihovně máš?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.1643,
+      "spread": 0.0053,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "hegel werke band01 fruehe schriften @0.164",
+        "hegel werke band01 fruehe schriften @0.166",
+        "hegel werke band01 fruehe schriften @0.168",
+        "hegel werke band01 fruehe schriften @0.169",
+        "hegel werke band01 fruehe schriften @0.170"
+      ]
+    },
+    {
+      "q": "Jak buddhistická scholastika abhidhammy třídí jevy mysli?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.1779,
+      "spread": 0.0079,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Mahāvaggo @0.178",
+        "Mahāvaggo @0.182",
+        "Paṭisambhidāmaggapāḷi @0.183",
+        "Vibhaṅgapāḷi @0.183",
+        "Vibhaṅgapāḷi @0.186"
+      ]
+    },
+    {
+      "q": "Co je to wu-wej a proč se o něm mluví?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.2123,
+      "spread": 0.0029,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "zhuangzi @0.212",
+        "westminster leningrad codex @0.212",
+        "zhuangzi @0.214",
+        "zhuangzi @0.215",
+        "zhuangzi @0.215"
+      ]
+    },
+    {
+      "q": "Jaké otázky kladl Nágasénovi král?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 3,
+      "d1": 0.1971,
+      "spread": 0.0128,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Mahábhárata 09 — Šaljaparva @0.197",
+        "Mahábhárata 05 — Udjógaparva @0.203",
+        "Mahábhárata 03 — Vanaparva @0.208",
+        "Mahábhárata 05 — Udjógaparva @0.208",
+        "Mahábhárata 03 — Vanaparva @0.210"
+      ]
+    },
+    {
+      "q": "Co se zpívá ve Völuspě o konci světa?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.2126,
+      "spread": 0.0071,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "Beowulf: An Anglo-Saxon Epic Poem @0.213",
+        "The poetic Edda @0.213",
+        "The poetic Edda @0.216",
+        "The poetic Edda @0.216",
+        "Beowulf: An Anglo-Saxon Epic Poem @0.220"
+      ]
+    }
+  ]
+}

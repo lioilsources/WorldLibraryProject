@@ -1,0 +1,25 @@
+{"q": "Co říká Tao te ťing o nečinnosti (wu-wej)?", "expect_work": "dao de jing", "expect_group": "chinese"}
+{"q": "Jak Konfucius v Hovorech popisuje ušlechtilého člověka?", "expect_work": "analects", "expect_group": "chinese"}
+{"q": "Co soudí Mencius o lidské přirozenosti?", "expect_work": "mengzi", "expect_group": "chinese"}
+{"q": "Vyprávěj mi Zhuangziho sen o motýlovi.", "expect_work": "zhuangzi", "expect_group": "chinese"}
+{"q": "Jaké verše o mysli obsahuje Dhammapada?", "expect_work": "Dhammapadapāḷi", "expect_group": "pali"}
+{"q": "Na co se ptá král Milinda mnicha Nágasény?", "expect_work": "Milindapañhapāḷi", "expect_group": "pali"}
+{"q": "Co zpívají mnišky v Therígáthě?", "expect_work": "Therīgāthāpāḷi", "expect_group": "pali"}
+{"q": "Jak probíhala bitva na Kuruovském poli v Bhíšmaparvě?", "expect_work": "Mahábhárata 06 — Bhíšmaparva", "expect_group": "sanskrit"}
+{"q": "O čem je hra v kostky v Sabháparvě Mahábháraty?", "expect_work": "Mahábhárata 02 — Sabháparva", "expect_group": "sanskrit"}
+{"q": "Jak zní hymnus o stvoření světa v Rigvédě?", "expect_work": "rigveda complete sanskrit", "expect_group": "sanskrit"}
+{"q": "Jak Beowulf porazil Grendela?", "expect_work": ["Beowulf", "Beowulf: An Anglo-Saxon Epic Poem"], "expect_group": "european"}
+{"q": "Co předpovídá vědma ve Vědmině písni (Völuspá) v Poetické Eddě?", "expect_work": "The poetic Edda", "expect_group": "european"}
+{"q": "Jak Snorriho Edda popisuje stvoření světa z těla obra Ymiho?", "expect_work": "The Younger Edda; Also called Snorre's Edda, or The Prose Edda", "expect_group": "european"}
+{"q": "Co je dialektika pána a raba ve Fenomenologii ducha?", "expect_work": "hegel werke band03 phaenomenologie", "expect_group": "european_philosophy"}
+{"q": "Jak Hegel ve Vědě o logice vykládá bytí a nic?", "expect_work": "hegel werke band05 wissenschaft logik", "expect_group": "european_philosophy"}
+{"q": "Co říká hebrejská Bible o stvoření světa?", "expect_work": "westminster leningrad codex", "expect_group": "bible"}
+{"q": "Co jsou egyptské Texty pyramid a k čemu sloužily?", "expect_work": "pyramid texts allen", "expect_group": "egypt"}
+{"q": "Co učí Avesta o Ahura Mazdovi?", "expect_work": "avesta darmesteter complete", "expect_group": "avesta"}
+{"q": "Co učí buddhismus o utrpení a jeho zániku?", "expect_group": "pali"}
+{"q": "Jak hinduistické texty vykládají karmu a dharmu?", "expect_group": "sanskrit"}
+{"q": "Jak čínská filosofie chápe ctnost?", "expect_group": "chinese"}
+{"q": "Co říká severská mytologie o ragnaröku, konci světa?", "expect_group": "european"}
+{"q": "Jak německý idealismus pracuje s pojmem ducha?", "expect_group": "european_philosophy"}
+{"q": "Srovnej pojetí duše v buddhismu a v hinduismu.", "expect_group": ["pali", "sanskrit"], "diversity": true}
+{"q": "Jaké knihy máš v knihovně?", "catalog": true}
