@@ -1,95 +1,356 @@
 {
- "Beowulf": "Dílo *Beowulf* je staroslovní epická báseň původem z anglosaské tradice, která vypráví o hrdinských činech Beowulfa, vytouženého bojovníka, který pomáhá králi Hrothgarovi v boji proti strašidlu Grendelovi a jeho matce, a později se stává králem vlastního národa.",
- "Beowulf: An Anglo-Saxon Epic Poem": "Dílo „Beowulf: An Anglo-Saxon Epic Poem“ je překlad staroanglické epické báseň vypravující příběh hrdiny Beowulfa, který bojuje proti příšerě Grendelovi a jeho matce, a později i proti drakovi, přičemž se ukazuje jako ochránce lidí a symbol odvahy a čestnosti.",
- "Mahábhárata 01 — Ádiparva": "Dílo *Mahábhárata 01 — Ádiparva* je první částí starověké indické epické báječnosti Mahábhárata, vypracované sanskrtsky, která vypravuje o počátcích legendárního konfliktu mezi dvěma kmeny, Kauravy a Pandavy, a zahrnuje příběhy bohů, hrdinů a duchů, které vedou k hlavnímu střetnutí v boji o královský trůn.",
- "Mahábhárata 02 — Sabháparva": "Dílo „Mahábhárata 02 — Sabháparva“ je druhá kniha epické indické báječné tvorby Mahábhárata, která v sanskrtní tradiční formě vypráví o událostech spojených s královským dvorem a přípravou k vyhlášení války mezi Pandavci a Kurukšetra. Text zahrnuje příběh výstavby královského paláce, vztahy mezi postavami a předcházející události k samotnému konfliktu.",
- "Mahábhárata 03 — Vanaparva": "Třetí kniha Mahábháraty Vanaparva popisuje vyhnanství pandíských princez po zradném sázkovém hře a jejich život v lese. V knize jsou zaznamenány jejich výhody, návštěvy učenců a mystiků, a také vzájemné vztahy mezi postavami, především mezi Draupadí a panovníky.",
- "Mahábhárata 04 — Virátaparva": "Dílo *Mahábhárata 04 — Virátaparva* je čtvrtá kniha epické indické legendy Mahábhárata, která vypráví o letech uplynulých po sázce a o tom, jak Pándavové v uprchli do města Virata, kde se převléknou za otroky a slouží u krále Drupada, aby se vyhnuli odhalení.",
- "Mahábhárata 05 — Udjógaparva": "Dílo *Mahábhárata 05 — Udjógaparva* je pátá kniha vyprávění Mahábhárata, vyprávěného Vyasou, která pokračuje v příběhu pandavů a kurů. Udjógaparva se zabývá přípravou na vyhlášku třináctiletého exilu, svatbami Abhimanyu a jeho bratrů, příbuznými a hosty, a rovněž vyjadřuje Yudhishthirovu vnitřní bolest a tíhu z přijatého osudu.",
- "Mahábhárata 06 — Bhíšmaparva": "Dílo *Mahábhárata 06 — Bhíšmaparva* je šestá část eposu Mahábhárata, která se zabývá událostmi kolem bitvy na Kuručišti, včetně příprav bojovníků, vyhlášení války a smrti Bhíšmy. Obsahuje popis armád, bojových postavení a základní události, které vedou k vrcholu konfliktu mezi Pandavovci a Kuruyem.",
- "Mahábhárata 07 — Drónaparva": "Dílo „Mahábhárata 07 — Drónaparva“ je sedmým dílem eposu Mahábhárata, který v sanskrtu pochází z tradice Vyasy. Drónaparva pokračuje v vyprávění o Velkém boji mezi Kurus a Pándav, zejména po pádu Bhíšmy a jeho dopadu na dálší průběh války.",
- "Mahábhárata 08 — Karnaparva": "Dílo „Mahábhárata 08 — Karnaparva“ je osmý díl sanskrtského eposu Mahábhárata, který popisuje události spojené s vedením károvské armády Karňou, včetně zápasu v boji proti Pándavům a jeho nakonec tragické smrti.",
- "Mahábhárata 09 — Šaljaparva": "Dílo „Mahábhárata 09 — Šaljaparva“ je devátá kniha epického indického díla Mahábhárata, která pokračuje v vyprávění o Velké válce Kurů a Pandavů. Tato část se zabývá bitvou, v níž Shalya vede zbývající síly Kauravů proti Pandavům a nakonec padá v boji.",
- "Mahábhárata 10 — Sauptikaparva": "Dílo „Mahábhárata 10 — Sauptikaparva“ je desátá kniha vyprávění o Mahábhárata, jedné z nejdůležitějších sanskrtních eposů. Tato část vypravuje o událostech, jež se odehrály po bitvě u Kurukšetru, především o smrti krále Drupada a o cestě Drona a jeho syna Ašvatthamany po bitvě, kdy se vydají do lesa a setkávají s různými bytostmi.",
- "Mahábhárata 11 — Stríparva": "Mahábhárata 11 — Stríparva je jedenáctý díl eposu Mahábhárata, který se zabývá událostmi po skončení vytrvalého boje mezi Pandavovci a Kurucemi. Popisuje osudy a vnitřní rozpolcení krále Dhritarashtry po ztrátě synů a jeho lítost nad zničeným královstvím.",
- "Mahábhárata 12 — Šántiparva": "Dílo „Mahábhárata 12 — Šántiparva“ je dvanácté knížecí indické epické báječnosti Mahábháraty, která po vyrovnání mezi Pandavy a Kauravy se zabývá následky války, smírem, filozofickými a etickými otázkami, a výklady o správném životním vedení.",
- "Mahábhárata 13 — Anušásanaparva": "Dílo *Mahábhárata 13 — Anušásanaparva* je částí jednoho z nejvýznamnějších sanskrtských eposů, Mahábháraty, která se zabývá filozofickými a etickými otázkami, zejména v rozhovoru Yudhišthiryho a Bhíšmyho po bitvě na Kurukšetře. Obsahuje moudrosti a nauky týkající se osudu, dharma a vztahu mezi člověkem, bohy a časem.",
- "Mahábhárata 14 — Ášvamédhikaparva": "Dílo „Mahábhárata 14 — Ášvamédhikaparva“ je čtrnáctý zpěv indické epické báje, Mahábháraty, která pochází z sanskrtské tradice. Tento zpěv popisuje obřad ášvaméda, kterým Yudhišthira prokazuje svou vládu nad zemí, a zároveň se zabývá odhodláním a vnitřním bolestí Dhritarasthry po ztrátě synů.",
- "Mahábhárata 15 — Ášramavásikaparva": "Knihovní dílo „Mahábhárata 15 — Ášramavásikaparva“ je český překlad patnácté knihy základní hinduistické epopoeje Mahábhárata, originálně psané v sanskrite. Tato kniha vypráví o tom, jak po získání království pandavové, zejména Yudhišthira, zvládají vztahy se starším králem Dritarastřem a jeho okolím, a jak se k němu a jeho rodině chovali s úctou a péčí.",
- "Mahábhárata 16 — Mausalaparva": "Dílo *Mahábhárata 16 — Mausalaparva* je šestnáctá část klasické indické epické báje, vyprávějící o posledních událostech po dobytí Dvárákany a osudu dynastie Vrišní, zejména o smrti bohům blízkého Vasudevy a dalších členů jeho rodu. Text popisuje tragické události vyvolané karmickou spravedlností a pokračuje v vyprávění o dějišti a osudech hlavních postav po skončení hlavního boje.",
- "Mahábhárata 17 — Maháprasthánikaparva": "Dílo „Mahábhárata 17 — Maháprasthánikaparva“ je sedmnácté knížko ze známé indické epické báje, vyprávějící o odchodu panovníků Yudhishthira a jeho bratrů z království. Text obsahuje vyprávění o jejich posledních dnech v městě, o předání trůnu a o jejich cestě směrem k osvobození.",
- "Mahábhárata 18 — Svargáróhanaparva": "Dílo „Mahábhárata 18 — Svargáróhanaparva“ je osmnácté z dílů eposu Mahábhárata, který pochází z sanskrtské tradice. Obsahuje vyprávění o návratu hlavních postav po bitvě u Kurukšetru do nebeských sfér a jejich setkání s bohy, přičemž se zabývá zážitky a rozhodnutími Yudhishthira a jeho bratrů v nebi.",
- "The Younger Edda; Also called Snorre's Edda, or The Prose Edda": "The Younger Edda je základním zdrojem o starých skandinávských mýtech a legendách, který shrnuje poznatky o bohůch, počátcích světa, osudech a vyprávěních o boji mezi asy a jíty. Text obsahuje i učení o skaldském umění a je doplněn překladem, poznámkami a slovníkem.",
- "The poetic Edda": "Dílo *The Poetic Edda* je sbírka staronorských rungských básní, které se zabývají příběhy a legendami germánské mytologie a hrdinského cyklu. Texty zahrnují údaj o bohyních, jako je Odín nebo Freja, i o hrdinech a jejich osudech.",
- "analects": "Dílo *Analects* (tradice: čínská) je sbírka řečí a činů konfucia, která shrnuje jeho filozofii a výkony. Text se zabývá etikou, vzděláním, správou státu a ideálem osoby *junzi*, tj. osoby ošacené.",
- "dao de jing": "*Dao de jing* je základní text daoistické tradice, který se zabývá přírodními zákony vesmíru, filozofií *dao* (cesty) a *de* (činění). Text se skládá ze dvou částí – *Dao Jing* a *De Jing* – a vznikl jako sbírka krátkých kapitol, které vysvětluje vztah mezi neviditelným půvolem vesmíru (*dao*) a lidským jednáním, důraz kladoucí na jednoduchost, neviditelné působení a přirozené vyrovnání.",
- "mengzi": "Shrnutí díla „Mengzi“ (tradice: chinese): Dílo je sbírka dialogů a rozprávek čínského filozofa Mengziho, který rozvíjí myšlenky konfucianismu, s důrazem na důležitost láska, spravedlnosti a vlády založené na dobru a ostražitosti vůči soběstažnosti a násilí.",
- "zhuangzi": "Dílo *Zhuangzi* je filozofický sbírka básní a příběhů z čínské tradiční mystické školy Daoismu, která se zabývá přirozeností, relativitou hodnot a osvícením prostřednictvím humoru, parabol a meditativních myšlenek.",
- "Aṭṭhakanipātapāḷi": "Aṭṭhakanipātapāḷi je část Anguttaranykāy, která obsahuje vybrané sutry o osmi boděch týkajících se rozvoje láska, moudrosti a základních aspektů monastického života. Text se zabývá praktickými doporučeními pro rozvoj upozornění, samostatnosti a cesty k dosažení osvícení.",
- "Buddhavaṃsapāḷi": "Buddhavaṃsapāḷi je text patřící do Khuddakanikāje, která obsahuje hymny a poznámky k životu a učení Buddhy. Text se zabývá slávou a významem Buddhy, jeho moudrostí, silou a lásce k lidem, a popisuje jeho činy i reakce světa na jeho učení.",
- "Cariyāpiṭakapāḷi": "Dílo *Cariyāpiṭakapāḷi* obsahuje vyprávky o životě a cestě k probuzení minulých buddhů a dalších postav, vyprávěné v básnické formě. Texty sledují jejich dřívější životy, jejich cesty po dobro a rozhodnutí, která vedla k dosažení osvícení.",
- "Catukkanipātapāḷi": "Dílo *Catukkanipātapāḷi* je součástí palijského knižního závěru *Aṅguttara-nikāja*, který patří mezi klasické texty Theravādin. Obsahuje vyprávění o čtyřech duchovních zásadách a jejich důsledcích, včetně výkladu o nezvládnutí a zvládnutí vyšších hodnot jako sīla, samādhi, paññā a vimutti.",
- "Chakkanipātapāḷi": "Dílo *Chakkanipātapāḷi* je součástí klasické palijské literatury a obsahuje vyprávění o šesti významných kvalitách, které činí mnicha hodnostním a důstojným obětování. Text se zabývá popisem těchto šesti duchovních vlastností a jejich významu v kontextu buddhismu.",
- "Cūḷaniddesapāḷi": "Dílo *Cūḷaniddesapāḷi* je text z Khuddakanikāje, který vypráví příběh moudrého bráhmany, jenž hledá pravé poznání a setkává se s vyjadřováním mahāpurisalakkhaṇ, tedy znaků velkého býti, při cestě k Bude.",
- "Cūḷavaggapāḷi": "Cūḷavaggapāḷi je součástí Vinayapiṭake, textu palijské buddhistické tradice, který popisuje konflikty mezi mnichy a zásahy Buddhy, který je řeší a upozorňuje na jejich negativní důsledky pro společenství.",
- "Dasakanipātapāḷi": "*Dasakanipātapāḷi* je text z palijské tradice, který se zabývá následkami (anisaṃsou) dobrých skutků a postupným rozvíjením pozitivních duševních stavů směrem k poznání a osvobození. Text obsahuje dialogy mezi mnichem Ānandou a Buddhou, kde se rozvádí, jak kvalitní skutky a duševní stavy vede k osvětlení a poznání pravdy.",
- "Dhammapadapāḷi": "Dhammapadapāḷi je sbírka buddhistických básní a učení v jazyce pali, která shrnuje základní morální a filozofické výkony zpěvky o duchovní cestě, vnitřním ovládání a dosažení osvícení. Text se zaměřuje na vliv myšlenek na lidské jednání a život, důležitost přemýšlení a pozornosti, a rozlišuje mezi správným a špatným chováním.",
- "Dhammasaṅgaṇīpāḷi": "Dhammasaṅgaṇīpāḷi je součást Abhidhammy v palijské tradici a seznamuje se systémem klasifikace dhammā (duchovních a mentálních faktorů) prostřednictvím matic, které uspořádávají dhammy podle různých kritérií jako jsou jejich povaha, funkce, vztah k cestě nebo tělu.",
- "Dhātukathāpāḷi": "Dhātukathāpāḷi je součástí Abhidhammapiṭaku a zabývá se systematickým rozezřením vztahů mezi základními kategorii existence, jako jsou skhandhy, āyatane a dhātuy, prostřednictvím logických dvojic a jejich kombinací.",
- "Dukanipātapāḷi": "Dukanipātapāḷi je část Aṅguttaranyikāye, která se zabývá dvěma druhy vajj – okamžitým a přetrvávajícím – a jejich dopady na člověka, zejména v kontextu následků zločinů a nutnosti vědomého vedení jednání, řeči a myšlenek.",
- "Ekakanipātapāḷi": "Dílo *Ekakanipātapāḷi* je součástí buddhistického kanonu v jazyce pali, konkrétně kapitola z *Aṅguttarānikāy*, která se zabývá vlivem různých podnětů – jako jsou tvar, zvuk, vůně, chutě, doteky a myšlenky – na vznik a zesílení loutkářských žádostí a zloby. Text uvádí, že žádný jiný podnět nezpůsobuje takové zapojení myšlenek jako například krásný tvar nebo příjemné zvuky.",
- "Ekādasakanipātapāḷi": "Ekādasakanipātapāḷi je část buddhistického kanonu v jazyce pali, konkrétně patří mezi texty Aṅguttara-nikāya, který obsahuje učení o různých kvalitách a jejich následkách. Text se zabývá vztahem mezi karmickými a duševními stavy, jako jsou kusálna sīlā, avippaṭisāra, pāmojja, pīti, passaddhi, sukha, samādhi a yathābhūtañāṇadassana, a jejich postupným vyvíjením směrem k osvobození.",
- "Itivuttakapāḷi": "Itivuttakapāḷi je text z Khuddakanikāje, který obsahuje náboženské ústavy (utta) vyslovené Buddhou, doplněné výkladovými básními (gāthā), které shrnují jejich význam. Obsahuje návody na opuštění jediného dharma, jako je láska, zloba, moha nebo hrdost, jako cestu k osvobození z trápení.",
- "Jātakapāḷi 1": "Jātakapāḷi 1 je sbírka buddhistických báseň, které vyprávějí o minulých životech Buddhy a obsahují náležitá učení a morální lekce. Text je součástí Khuddakanikāje a zahrnuje jednotlivé jātaky s latinským označením a českým překladem výběru.",
- "Jātakapāḷi 2": "Jātakapāḷi 2 je druhá část sbírky jātak, která obsahuje vyprávění o minulých životech Buddhy, vypravená formou příběhů a básní. Text zahrnuje 17. nippāta se 521. Tesakuṇajātakou, kde se hovoří o královském rodičovství, vzdělání a hodnotách, jako je sebekontrola, odpuštění a správné vedení.",
- "Kathāvatthupāḷi": "Kathāvatthupāḷi je text z Abhidhammapiṭaky, který se zabývá vyvracením chybných učení a předkládáním správného pojetí prostřednictvím logických otázek a odpovědí. Obsahuje systematické vyvážení různých názorů a jejich korektní interpretace v souladu s buddhismem.",
- "Khandhavaggo": "Khandhavaggo je část buddhistického kanonu vypracovaného v jazyce pali, která patří do Saṃyuttanikāyo a zabývá se tematicky seskupenými vyprávěními a učeními o khandách, tedy základních elementech existence. Text obsahuje rozmluvy a příběhy, ve kterých se Buddha a jeho žáci věnují otázkám týkajícím se těla, myšlenek a trpéni, často v reakci na otázky laiků a monachů.",
- "Khuddakapāṭhapāḷi": "Khuddakapāṭhapāḷi je sbírka krátkých textů z palijského kanonu, která zahrnuje základní formule přijetí učení Buddhy, pořady sice a filozofické otázky. Obsahuje například prohlášení o věnování se Buddhovi, Dhammě a Sanghovi, sice o ochozích, těle a duši, i otázky a odpovědi týkající se podstat věcí.",
- "Mahāniddesapāḷi": "Dílo *Mahāniddesapāḷi* je součástí Khuddakanikāje a obsahuje náležitě vyložené a komentované sútty (příběhy), které se zabývají příčinami a důsledky touhy po žádostech, zejména touhách smyslových a duševních. Text analyzuje různé formy touhy, jejich projevy a jejich dopad na člověka.",
- "Mahāvaggapāḷi": "Dílo *Mahāvaggapāḷi* je součástí Dīghanikāju, sbírky dlouhých sutr v pali, které obsahují vyprávění o minulých životech Buddhy a jiných významných postavách, příběhy o jejich cestě k probuzení a výklady o dharma. Text se zabývá především vyprávěními o minulých životech Buddhy a jiných vyšlych postavách, jejich cestě k probuzení a výklady o dharma.",
- "Mahāvaggo": "*Mahāvaggo* je část Saṃyuttanikāja, jednoho ze základních textů Theravādinů, který obsahuje sbírku křesťanských kázání a diskusí mezi Buddhou a jeho žáky, zaměřených především na vnitřní a společenské aspekty duchovního života, etiku a cestu k osvícení. Text se zabývá téměř výhradně vztahy mezi moudrými lidmi, jejich společenstvím a cestou k osvobozdění.",
- "Majjhimapaṇṇāsapāḷi": "Majjhimapaṇṇāsapāḷi je část Majjhimanikāje, jedné z pěti knih pali kanonu, která obsahuža střední díla (sutta) o různých učeních a prakticích radách Buddhy. Texty se zabývají tematicky široce – od vztahu k učení, pravému životu a meditativním praktikám až po výklad osvícení a osvobozní cesty.",
- "Milindapañhapāḷi": "Dílo *Milindapañhapāḷi* je text západní palijské tradice, který zaznamenává filozofické a teologické rozhovory mezi nábožensky zaujatým panovníkem Milindem a buddhistickým mnichem Nāgasenou, vysvětlujícími základy dharma.",
- "Mūlapaṇṇāsapāḷi": "Dílo *Mūlapaṇṇāsapāḷi* je součástí *Majjhimanikāye*, sbírky středních kusů buddhistického kanonu v jazyce pali. Obsahuje vyprávění, ve kterém Buddha vysvětluje, jak nevědomý člověk špatně pochopuje různé existence a z toho vznikají jeho předsudky a pohnutky.",
- "Navakanipātapāḷi": "Navakanipātapāḷi je část pali kanonu, která obsahuje vybrané vypravění z Aṅguttaranykāy, uspořádané do devíti kapitol. Obsahuje učení Buddhy o cestě k probuzení, zahrnující například osamělou meditativní řeč, kultivaci morálky, soustředění a moudrosti.",
- "Nettippakaraṇapāḷi": "Nettippakaraṇapāḷi je text z Khuddakanikāje, který vysvětluje základní pojmy a směry v buddhistickém učení, zejména prostřednictvím analýzy deseti učení a šestnácti základních pojmů. Obsahuje výklad o kvalitách, směrech učení, základních kategoriích a jejich vztazích k dhammě.",
- "Nidānavaggo": "*Saṃyuttanikāyo*, *Nidānavaggo* je sbírka vyprávění Gautama Buddy, která se zaměřuje na výklad zákonitosti závislé vzniklости (*paṭiccasamuppāda*), tedy na procesy vedoucí k vzniku a zániku utrpení, a detailně rozvíjí jednotlivé členy této zákonitosti a jejich vzájemné vztahy.",
- "Pañcakanipātapāḷi": "Dílo *Pañcakanipātapāḷi* je část klasického palijského kanonu, konkrétně Aṅguttaranikāye, a obsahuje vyprávění o pěti duševních silách (*sekhabalāni*), jako je věra (*saddhā*), stydlé (*hirī*), obavy (*ottappa*), úsilí (*vīriya*) a moudrost (*paññā*), stejně jako o důsledcích jejich absence. Text poskytuje učení o vlastnostech vedoucích k duševnímu blahu nebo naopak k utrpení.",
- "Parivārapāḷi": "*Parivārapāḷi* je část Vinajového zákona ve Starší pali tradici, která se zabývá podrobným výkladem prvního z pěti důvodů výpadku (*pārājika*), jeho formulací, podmínkami a důsledky. Text analyzuje, za jakých okolností byl první pārājika stanoven, jaké jsou jeho aspekty a jak se vztahuje k různým částem pravidel monastického řádu.",
- "Paṭisambhidāmaggapāḷi": "Dílo Paṭisambhidāmaggapāḷi je text z Khuddakanikāje, který popisuje různé typy pramudrého poznání (ñāṇa) rozvíjeného prostřednictvím praxe a meditačního vývoje. Obsahuje seznam poznatků týkajících se zrání, ovládání, soustředění, poznávání děje se, prázna, osvobození a pravdy.",
- "Paṭṭhānapāḷi 1": "*Paṭṭhānapāḷi 1* je první část textu z Abhidharmického kanonu v Theravādině, který pojednává o zákonitostech vzniku a propojení duševních a fyzických jevů prostřednictvím dvaceti paccayy (podmínek). Text detailně popisuje jednotlivé podmínky a jejich vztah k dhammám, tedy ke základním elementům existence v budhistické kosmologii.",
- "Paṭṭhānapāḷi 2": "Dílo *Paṭṭhānapāḷi 2* je součástí Abhidharmapiṭaky v palijské tradici a zabývá se detailní analýzou zákonitostí vzniku a propojení duchovních a hmotných jevů (dhammů) prostřednictvím příčinných a závislých vztahů (paccaya). Text systematicky rozebírá různé kombinace podmínek a jejich vliv na vznik a změnu psychofyzických procesů.",
- "Paṭṭhānapāḷi 3": "*Paṭṭhānapāḷi 3* je třetí část pali textu z Abhidhammapiṭaky, který se zabývá důsledkovými vztahy mezi různými psychickými a fyzickými jevy podle zákonů příčinnosti (paccaya). Text detailně analyzuje, jak jednotlivé dhammy vzájemně závisí a vznikají podle různých druhů závislosti, zejména hetupaccayu a dalších.",
- "Paṭṭhānapāḷi 4": "*Paṭṭhānapāḷi 4* je čtvrtý díl složky Paṭṭhānapāḷi v Abhidhammapiṭake, která se zabývá podrobným výkladem zákonů vzniku a propojení duchovních a hmotných jevů. Text analyzuje vztahy mezi klesy a neklesy na základě různých způsobů závislosti (hetupaccayo a nahetupaccayo) v rámci pěti skupin (khandhā).",
- "Paṭṭhānapāḷi 5": "*Paṭṭhānapāḷi 5* je pátý díl textu Paṭṭhānapāḷi z Abhidhammapiṭaky, který se zabývá klasifikací a vzájemnými závislostmi duchovních a hmotných jevů (dhammů) prostřednictvím tzv. třízákladních a čtyřzákladních závislostí (tikatika a catukka), zejména v souvislosti s různými typy poznatků a jejich kombinacemi. Obsahuje systematické výčty a výklady, jak jednotlivé dhammy vzájemně závisí jako příčina a podmínka.",
- "Pācittiyapāḷi": "*Pācittiyapāḷi* je část Vinajjí, která obsahuje pravidla trestných případů (pācittiyas) a jejich vysvětlení, konkrétně se zabývá příběhem a výkladem prvního pravidla o lživém tvrzení (musāvādavaggo). Text obsahuje vyprávění o události, kdy mnich Hatthaka lží o svém zraku a za to je před sestrou upozorněn a zjištěním se mu hrozí trest.",
- "Pārājikapāḷi": "Dílo *Pārājikapāḷi* je součástí Vinajího korpusu ve formě vypravování o základních pravidlech monastického života, kde se zachycuje dialogy a příběhy týkající se závažných hříchů a jejich důsledků v klášteře. Obsahuje příběhy a vyjádření, která阐明ují vztah mezi Buddhou a jeho žáky nebo jinými postavami, často v reakci na otázky nebo kritiku.",
- "Pāthikavaggapāḷi": "Dílo *Pāthikavaggapāḷi* je text z Dīghanikāju, který vypráví příběh setkání Buddha s paribbājakem Bhaggavagottasem. Obsahuje dialog, ve kterém se oba rozhodují, kdo z nich bude uctívat druhého, a zároveň se dotýká tématu duchovního vlivu a důvěry mezi náboženskými postavami.",
- "Petavatthupāḷi": "*Petavatthupāḷi* je text základního textového sbírky Theravady, který se zabývá oslavami a pohřebními obřady pro duchy, zejména duchy zemřelých příbuzných. Obsahuje básnická vyprávění o duchech, jejich osudu a významu darování a působení dobrého karmy pro jejich prospěch.",
- "Peṭakopadesapāḷi": "Dílo *Peṭakopadesapāḷi* je text z Khuddakanikāje, který se zabývá výkladem čtyř pravd a jejich pochopení prostřednictvím učení a vnitřního zamyšlení, doplněného básnickými shrnutími a výkladními příběhy. Obsahuje postupné kroky k dosažení správného poznání a rozlišuje různé typy chápání a cest k poznání.",
- "Puggalapaññattipāḷi": "*Puggalapaññattipāḷi* je text Abhidhammy v Pali kanonu, který klasifikuje různé typy lidí podle jejich duševních a morálních vlastností, především v kontextu jejich postupu na cestě k osvícení. Obsahuje seznamy a výčty různých duševních stavů a osobností, včetně stadií probuzení a různých duševních dispozic.",
- "Sagāthāvaggo": "*Sagāthāvaggo* je část knihy *Saṃyuttanikāyo* v palijské tradici, která obsahuje vybrané sutyty (sermony) Buddhy, především ve formě gát (versů), často vyslovené dévátami (nebeskými bytostmi). Text se zabývá náboženskými a filozofickými tématy, jako je osvobození, smrt, bdělost a osvícení.",
- "Saḷāyatanavaggo": "Saḷāyatanavaggo je část Saṃyuttanikāje, která se zabývá šesti smyslovými dveřmi a jejich objektivy, a uvádí učení o nezbytnosti poznání nezůstavosti, utrpení a bezdušnosti všech smysových zkušeností. Text obsahuje řadu sutta, ve kterých se Bhotto učí o nepříčetnosti a nejistotě smyslů a jejich objektů, jako základ pro dosažení osvícení.",
- "Sattakanipātapāḷi": "Dílo *Sattakanipātapāḷi* je část Aṅguttaraniyáyového sbírky ve Staropale češtiny a obsahuje učení o sedmi duchovních vlastnostech, které vedou k neoblíbení nebo naopak oblíbení mezi spolubratry. Text se zabývá konkrétními kvalitami moncha, jako jsou touha po zisku, sebevědomí, lhostejnost, nebo naopak upřímnost, zdržení, sebeovládání a moudrost.",
- "Sīlakkhandhavaggapāḷi": "Dílo *Sīlakkhandhavaggapāḷi* je součástí Dīghanikāy, sbírky delších křesťanských prorockých příběhů v jazyce Pali. Obsahuje vyprávění o konverzaci mezi buddhistickým mnichem a jeho žákem, který hovoří o učení Buddhy, Dhammě a Sanghě, a jejich rozdílném postojí k těmto učením.",
- "Suttanipātapāḷi": "*Uragavaggo* je sbírka pořekadl a zpěvů, které ilustrují odstranění základních překážek a osvobození od příčin trávení, často v podobě báječných nebo symbolických příběhů. Text patří do Khuddakanikāje a jeho verše se opakují v různých kontextech, zdůrazňujících cestu ku duševnímu vyrovnání a vytržení z přilnavosti, láska a zlosti.",
- "Theragāthāpāḷi": "*Theragāthāpāḷi* je část Khuddakanikāje v Pali kanonu, která obsahuje básně vyrovnávající se staršímu mnichům (thera), vyjádřené v první osobě. Texty vyjadřují jejich zkušenosti s duchovním životem, meditativní praxí a dosažením osvícení.",
- "Therāpadānapāḷi 1": "Dílo *Therāpadānapāḷi 1* je text z palijské tradice, který patří do Khuddakanikāje a obsahuje básně o životě a dosažení osvícených mnichů (*Therā*). Text se skládá z odstavců, ve kterých mnichové vypravují, jak opustili svět, jak se věnovali meditaci a jak dosáhli vyššího vědomí.",
- "Therāpadānapāḷi 2": "Therāpadānapāḷi 2 je část klasického textu z Khuddakanikāje, který obsahuje vyprávění o životě a dosvědčeních vybraných mnichů (thera). Text se skládá z básnických gát, kde jednotliví mníchi vyjadřují své zkušenosti s osvícením, duchovní cestou a významem učení Buddhy.",
- "Therīgāthāpāḷi": "Therīgāthāpāḷi je text z palijské tradice, který obsahuje básně a životopisné údaje starších bhikkhuní, žen, které se staly mnichami v buddhismu. Text představuje jejich osobní zkušenosti, duchovní cesty a nauky, často vyjádřené ve formě básní a posmrtných slov.",
- "Tikanipātapāḷi": "Tikanipātapāḷi je text z Águttaryanikáje, který patří mezi klasické palijské texty buddhismu. Obsahuje vyprávění o rozdílech mezi běžlým člověkem a moudrým, popisuje jejich znaky a způsoby života.",
- "Udānapāḷi": "Udānapāḷi je součástí Khuddakanikāje v Pali kanonu a obsahuje vyprávění o osvícení a počátečních zkušenostech Buddha po dosažení probuzení, včetně jeho pochopení zákonitosti závislého vzniku (paṭiccasamuppāda) v přímém i obráceném směru.",
- "Uparipaṇṇāsapāḷi": "Uparipaṇṇāsapāḷi je část Majjhimanikāje, sbírky středních proroctví v palijském kanonu Theravādy. Text se zabývá rozpravou mezi Buddhou a nigaṇṭhy (představitele jiných náboženských směrů), kde se probírá otázka karmy, důsledků činů a cesty k osvobození od utrpení.",
- "Vibhaṅgapāḷi": "*Vibhaṅgapāḷi* je součástí Abhidhammapiṭaky v palijské tradici a zabývá se rozborovým výkladem pěti hromad (khandh), konkrétně těla (rūpa), pocity (vedanā), vnímání (saññā), tvarné skladky (saṅkhārā) a vědomí (viññāṇa), s detailním rozlišováním jejich druhů a charakteristik.",
- "Vimānavatthupāḷi": "Vimānavatthupāḷi je text z Khuddakanikāje, který popisuje vzhled a původ nebeských paláců, vzniklých jako důsledek karmických činů, a uvádí, jak konkrétní činy v minulosti ovlivňují život v těchto světech. Text obsahuje otázky a odpovědi mezi muničím Moggallanou a běžícími bohy, které objasňují příčiny jejich osudu.",
- "Yamakapāḷi 1": "*Yamakapāḷi 1* je součástí Abhidhammapiṭaku a zabývá se analýzou základních duševních faktorů (mūla) u kvalitních a nekvalitních děl, myšlenek a prožitků. Text systematicky zkoumá vztah mezi různými typy duševních kořenů a jejich projevy v psychických dějích.",
- "Yamakapāḷi 2": "Dílo *Yamakapāḷi 2* je částí Abhidharmického sbírky v Palikanonu, zabývá se třemi druhmi formací (saṅkhārā) – tělesnou, řečovou a myšlenkovou – a prostřednictvím dialogových páru (yamaka) analyzuje jejich vztah k tělu, řeči a mysli.",
- "Yamakapāḷi 3": "*Yamakapāḷi 3* je třetí část textu z Abhidharmapiṭaky, který se zabývá párymi podobnými a opačnými pojmy z oblasti duchovního a filozofického učení buddhismu, konkrétně se zaměřuje na kvality a přírody dhammů jako jsou kusala, akusala a abyākata.",
- "avesta darmesteter complete": "Dílo „Avesta Darmesteter Complete“ je celková edice závažných textů z avestské tradice, konkrétně překladů Zend Avesty, které byly zahrnuty do série *Sacred Books of the East*. Obsahuje tři části, včetně Vendidádu, Yasny a dalších textů, doplněné úvodními studiemi a poznámkami.",
- "hegel werke band01 fruehe schriften": "Tato kniha obsahuje díla Georga Wilhelm Friedricha Hegla z rané doby jeho tvorby, včetně fragmentů o náboženství a křesťanství, kritických poznámek k politickému stavu a filozofických rukopisů z let 1793–1800. Jedná se o nově vydoušenou edici založenou na dílech z let 1832–1845, s redakčním dohledem Eva Moldenhauer a Karl Markus Michel.",
- "hegel werke band03 phaenomenologie": "Třetí díl kritické vydání děl Hegla obsahuje *Phänomenologie des Geistes*, jedno z nejvlivnějších děl německé ideje, které sleduje vývoj duše k plnohodnotnému poznání skrze analýzu různých tvarů vědomí a jeho historických formací.",
- "hegel werke band05 wissenschaft logik": "Tato publikace obsahuje první díl Hegelovy *Vědy o logice*, která patří mezi základní spisy filosofie. Text se zabývá objektivní logikou a probírá problematiku Seinu, včetně jeho kvalitativních určení a přechodů mezi Seinem a Něčím.",
- "pyramid texts allen": "Dílo „Pyramid Texts“ Jamese P. Allena je překlad a studium nejstarších egyptských náboženských textů zasvěcených posmrtnému životu faraona. Texty pocházejí z hrobek raných dynastických králů a obsahují kouzla, rituály a modlitby pro ochranu a obnovu života mrtvého.",
- "rigveda complete sanskrit": "Dílo „Rigveda Complete Sanskrit“ je sbírka hymnů z nejstaršího textu hinduistického náboženství, Rigvedy, v originálním sanskrtském znění. Obsahuje náboženské a mytologické texty věnované bohům jako Agni, Větru a dalším, doprovázené výklady o rituálech, bohům a kosmologii.",
- "westminster leningrad codex": "Westminster Leningrad Codex je digitální verze hebrejského textu Bible podle Leningradského kódu, doplněná o 1231 poznámek. Jedná se o výsledek práce Westminster Hebrew Institute, který text udržuje a aktualizuje."
+ "Beowulf": {
+  "summary": "Beowulf je staroslovní anglický epický báseň vyprávějící příběh hrdiny Beowulfa, který se v boji s monstry a poté jako král zabývá ochranou svého lidu. Dílo pojednává o dobrodružství, hrdosti, smrti a dědictví v kontextu germánské a skandinávské tradice.",
+  "name_cs": "Beowulf (překlad F. B. Gummere)"
+ },
+ "Beowulf: An Anglo-Saxon Epic Poem": {
+  "summary": "Tento překlad anglosaské epické báje *Beowulf* přináší českému čtenáři známou staroslověnskou legendu o hrdinovi Beowulfovi, který bojuje proti příšernému monstrovi Grendelovi a jeho matce, a v krajině dánských králů získává slávu i poklady. Dílo ztvárňuje motivy hrdinství, odvahy a osudu v kulturním prostředí rané anglosaské společnosti.",
+  "name_cs": "Beowulf (překlad J. L. Hall)"
+ },
+ "Mahábhárata 01 — Ádiparva": {
+  "summary": "Dílo *Mahábhárata 01 — Ádiparva* je první částí jednoho z nejvýznamnějších sanskrtských eposů, který vypráví legendární příběh o konfliktu mezi dvěma kmotry, Pandavovci a Kauravovci. Ádiparva zahajuje vyprávění a uvádí hlavní postavy, představuje počátky konfliktu a základní motivy děje."
+ },
+ "Mahábhárata 02 — Sabháparva": {
+  "summary": "Dílo *Mahábhárata 02 — Sabháparva* je druhá kniha epického sanskrtického díla Mahábhárata, pocházející z údajného autora Vyasy. Obsahuje příběh výstavby paláce panovníkům Pandavům, zahrnující legendy o dítěti Maya, o výrobě palácového komplexu a vyjednávání mezi postavami, včetně Arjany a Krishopa."
+ },
+ "Mahábhárata 03 — Vanaparva": {
+  "summary": "Dílo *Mahábhárata 03 — Vanaparva* je třetí kniha epické indické báječné Mahábháraty, vyprávějící příběh exilu pandavských bratrů v lesech. Obsahuje vyprávění o jejich životě v divočině, setkání s různými postavami a přípravu na jejich návrat, plným dobrodružství a filozofických úvah."
+ },
+ "Mahábhárata 04 — Virátaparva": {
+  "summary": "Mahábhárata 04 — Virátaparva je čtvrtý díl epického díla Mahábhárata, které vzniklo na základě sanskrtské tradice. Tento díl vypráví o tom, jak pandavští princezní se převlečení za obyčejné lidí přesunou do království Viraty, kde slouží králi Matsyům, aby strávili poslední rok svého vyhnanství bez toho, aby je odhalili jejich nepřátelé."
+ },
+ "Mahábhárata 05 — Udjógaparva": {
+  "summary": "Dílo *Mahábhárata 05 — Udjógaparva* je pátá kniha eposu Mahábhárata, která se zabývá přípravami a snahami Pandavů po jejich ukrytí během třináctého roku vyhnanství. Popisuje jejich službu u různých králů, svatbu Abhimanyu, přípravy k boji a vyjednávání o návratu do Hánédánu."
+ },
+ "Mahábhárata 06 — Bhíšmaparva": {
+  "summary": "Dílo *Mahábhárata 06 — Bhíšmaparva* je šestá kniha z vyprávění Mahabharaty, která se zabývá událostmi spojenými s Bhíšmou a vyprázdněním bojiště před vyvrcholením války mezi Pandavai a Kuruy. Obsahuje popis příprav na bitvu, uspořádání armád a náboženské úvahy."
+ },
+ "Mahábhárata 07 — Drónaparva": {
+  "summary": "Dílo „Mahábhárata 07 — Drónaparva“ je sedmý díl epické indické legendy Mahábhárata, která pochází z sanskrtu. Drónaparva se zabývá událostmi po smrti Bhíšmy, včetně reakce Dhrítarashtry a pokračování války mezi Pandavy a Kauravy."
+ },
+ "Mahábhárata 08 — Karnaparva": {
+  "summary": "Knihovní anotace: Dílo „Mahábhárata 08 — Karnaparva“ je osmým dílem epické indické báječné Mahábhárata, vyprávějícím o dějích spojených s bitvami a osudem Karna. Obsahuje popis drtivého boje mezi armádami Kurů a Pandavů, jehož výsledkem je smrt Karna a dalších významných postav."
+ },
+ "Mahábhárata 09 — Šaljaparva": {
+  "summary": "Dílo „Mahábhárata 09 — Šaljaparva“ je devátá kniha epického díla Mahábhárata, vyprávějící o dálkách po smrti Karna a o posledních bojích Kauravů pod vedením Šalya. Popisuje bitvy mezi Kuruy a Pandavy, smrt Šalya a pád Džošthipa, a zároveň vyjadřuje hluboké lítostné city po ztrátě královského rodu."
+ },
+ "Mahábhárata 10 — Sauptikaparva": {
+  "summary": "Dílo „Mahábhárata 10 — Sauptikaparva“ je desátá kniha z klasické sanskrtské verze epického díla Mahábhárata, která vypráví o událostech probíhajících po bitvě u Kurukšetru. V této části se hlavní postavy vydávají do lesa, kde se setkávají s různými bytostmi a probíhá dálka, která ovlivňuje jejich cesty i osudy."
+ },
+ "Mahábhárata 11 — Stríparva": {
+  "summary": "Dílo *Mahábhárata 11 — Stríparva* je českým překladem jedenácté knihy znamenitého indického eposu *Mahábhárata*, vypracovaného z sanskrtského originálu. Tato část se zabývá osudy krále Dhritarashtry po bitvě o Kurukšetru, jeho žalmu a rozpačitým postavení po ztrátě rodiny a všech příbuzných."
+ },
+ "Mahábhárata 12 — Šántiparva": {
+  "summary": "Dílo „Mahábhárata 12 — Šántiparva“ je dvanácté kníží epického sanskrtského díla Mahábhárata, které se zabývá hlavně smyšlením Yudhišthira po bitvě u Kurukšetru a radou mnichů, jak správně vládnout a obnovit společenské a duchovní pořádky."
+ },
+ "Mahábhárata 13 — Anušásanaparva": {
+  "summary": "Dílo „Mahábhárata 13 — Anušásanaparva“ je třináctá kniha eposu Mahábhárata, která se zabývá naukami a výklady po běhu bolestivé smrti Bhishmyho. Obsahuje rozhovory a filozofické úvahy o osudu, duchovním vývoji a morální odpovědnosti, kde Yudhishthira klade otázky Bhishmě, který mu v posmrtné agonii předává duchovní a etické vyučování."
+ },
+ "Mahábhárata 14 — Ášvamédhikaparva": {
+  "summary": "Dílo „Mahábhárata 14 — Ášvamédhikaparva“ je čtrnáctým dílem eposu Mahábhárata, který popisuje události po vykonaném Ášvamedhově obřadu, kdy Yudhištira královským činem potvrzuje svou mocenskou moc. Text zahrnuje vyprávění o reakci Dhritarathry a jeho žal na ztrátu synů, stejně jako raděm a odpuštěním poskytnutým Yudhištire."
+ },
+ "Mahábhárata 15 — Ášramavásikaparva": {
+  "summary": "Dílo „Mahábhárata 15 — Ášramavásikaparva“ je čtrnáctý díl překladu eposu Mahábhárata do angličtiny, který se zabývá událostmi po návratu pandavů z exilu, zejména jejich vztahy k bývalému králi Dritarastře a jeho manželce Gandháře. Text popisuje jejich pokorné chování, péči o bývalého soupeře a způsob, jak udržují mír a stabilitu v království."
+ },
+ "Mahábhárata 16 — Mausalaparva": {
+  "summary": "Dílo „Mahábhárata 16 — Mausalaparva“ je šestnáctý základní díl epické indické báječné slohové tvorby Mahábhárata, která vznikla v sanskrtské tradici. Tento díl vypráví o událostech po skončení vyvrcholení vyjednávání a války, zejména o osudu dynastie Vrishní a jejím zániku, včetně tragické smrti Vasudevy a jeho potomků, a představuje duchovní a filozofické odrazové body vyvrcholení vyprávění."
+ },
+ "Mahábhárata 17 — Maháprasthánikaparva": {
+  "summary": "Dílo „Mahábhárata 17 — Maháprasthánikaparva“ je sedmnáctý díl známé indické epické báseň Mahábhárata, přeložený z původního sanskrtského textu. Obsahuje vyprávění o odchodu pánových bratrů z království, jejich posledních rozhodnutích a přípravě na smrtelný život v horách."
+ },
+ "Mahábhárata 18 — Svargáróhanaparva": {
+  "summary": "Dílo „Mahábhárata 18 — Svargáróhanaparva“ je osmnáctá kniha ze známé indické epické báje, vyprávějící o osudu hlavních postav po skončení války. Tato část se zabývá jejich cestou do nebe, kde se setkávají s bohy a odklání se od Duryodhany, jehož nepříjemná minulost nechceme přenášet do nebeského života."
+ },
+ "The Younger Edda; Also called Snorre's Edda, or The Prose Edda": {
+  "summary": "The Younger Edda, též známá jako Snorreho Edda nebo Prozaická Edda, je středověkým výkladovým dílem o skádském umění a nordické mytologii. Obsahuje příběhy o vzniku světa, bohůch jako Odin, Thor a Frey a jejich boji proti chaotickým silám.",
+  "name_cs": "Mladší (Snorriho) Edda"
+ },
+ "The poetic Edda": {
+  "summary": "Dílo *The Poetic Edda* je sbírka staronordických rungrových básní, která pochází z období mezi 9. a 13. stoletím a obsahuje mytologické, hagiografické i hrdinské texty. Obsahuje například známé útržky jako *Hovamól*, *Vafþrúðnismál* nebo příběhy o Niflunganech a Brynhildě.",
+  "name_cs": "Starší (Poetická) Edda (překlad H. A. Bellows)"
+ },
+ "analects": {
+  "summary": "Dílo *Analects* (česká tradice: *Analecty*) je sbírka řečí a vyjadřování konfucia a jeho žáků, shrnující jeho nábožensko-filozofické učení. Obsahuje výklady o etice, společnosti, vzdělání, vztazích mezi lidmi a ideálu spravedlivého a osamostatněného člověka.",
+  "name_cs": "Hovory (Lun-jü) — Konfucius"
+ },
+ "dao de jing": {
+  "summary": "*Dao de jing* je základní filozofický text čínské tradice, který shrnuje myšlenky starověkého mystika Lao Tze. Text se zabývá podstatou „Dao“ (cesty) jako nejvyšším principem vesmíru a životního vedení, a klade důraz na přirozenost, nečinnost (*wu wei*) a harmonii s přírodou.",
+  "name_cs": "Tao te ťing — Lao-c'"
+ },
+ "mengzi": {
+  "summary": "Dílo *Mengzi* je sbírka textů tvořených v dialogové formě, ve které filosof Mengzi rozvíjí myšlenky konfucianství, zejména tématu důležitosti duchovní hodnot jako jsou láska, spravedlnost a milosrdenství v politice a společnosti. Obsahuje rozhovory s vládci a dalšími osobnostmi, ve kterých argumentuje za vládu založenou na humanitě a proti zneužívání moci.",
+  "name_cs": "Meng-c' (Mencius)"
+ },
+ "zhuangzi": {
+  "summary": "Dílo *Zhuangzi* je filozofický spis pocházející z antické Číny, který patří mezi hlavní texty taoistické tradice. Sestává se z různorodých povídek, parabol a reflejí, které probírají témata jako přírodní řád, relativita hodnot, svoboda duše a vztah člověka k přírodě a společnosti.",
+  "name_cs": "Čuang-c' (Zhuangzi, překlad H. A. Giles)"
+ },
+ "Aṭṭhakanipātapāḷi": {
+  "summary": "Dílo *Aṭṭhakanipātapāḷi* je část Pali kanonu obsahující osmnáct suttí z kategorií Mettā a Pañña, která se zabývají rozvojem laskavosti a moudrosti, vnitřním upokojením a cestou k osvícení. Texty obsahují výklady a příběhy, jak dosáhnout duševního klidu a rozvíjet pozitivní vlastnosti prostřednictvím meditace a etického života.",
+  "name_cs": "Anguttara-nikája — kniha osmic"
+ },
+ "Buddhavaṃsapāḷi": {
+  "summary": "Buddhavaṃsapāḷi je text z Khuddakanikāje, který obsahuje hymny a poezii sloužící k oslavě a poctě Buddhy, popisuje jeho moudrost, sílu a láska k všem bytostem. Text se zabývá vyjádřením úcty k Bude a jeho významu pro lidstvo a nebeské bytosti.",
+  "name_cs": "Khuddaka-nikája — Buddhavansa (rodokmen buddhů)"
+ },
+ "Cariyāpiṭakapāḷi": {
+  "summary": "Dílo *Cariyāpiṭakapāḷi* obsahuje vyprávění životních děl pěti vysoce zasvěcených osob, které v různých životních situacích dosahují nebeských a duševních hodnot prostřednictvím upřímného a odhodlaného jednání.",
+  "name_cs": "Khuddaka-nikája — Čarijápitaka (koš chování)"
+ },
+ "Catukkanipātapāḷi": {
+  "summary": "Dílo *Catukkanipātapāḷi* je součástí knihy *Aṅguttarānikāyo* v palijské buddhské tradici, která obsahuje náboženské vypráví a učení o duchovní cestě. Text se zabývá například důsledky nedodržování osvícených hodnot, jako je morálka, soustředění, moudrost a osvobození, nebo naopak jejich opakem, který vede k pádu z duchovní cesty.",
+  "name_cs": "Anguttara-nikája — kniha čtveřic"
+ },
+ "Chakkanipātapāḷi": {
+  "summary": "*Chakkanipātapāḷi* je text z Aṅguttaraniyáy, který pojednává o šesti znakách, díky nimž je mniš vyzdvižen k obětování a považován za nejvyšší pole pro uskutečnění dobré činohry. Text popisuje vlastnosti a dosažení mniše, jako například osvojení mnoha zjevení, pamatování minulých životů a použití duchovního oka k poznání osudů živlů.",
+  "name_cs": "Anguttara-nikája — kniha šestic"
+ },
+ "Cūḷaniddesapāḷi": {
+  "summary": "Dílo *Cūḷaniddesapāḷi* je text z Khuddakanikāje, který obsahuje vyprávění o příbězích a poezii spojené s duchovními a filozofickými tématy, včetně vyobrazení mudrého muže a jeho cesty k poznání, stejně jako odkazy na život a učení Buddhy.",
+  "name_cs": "Khuddaka-nikája — Malý výklad k Sutta-nipátě"
+ },
+ "Cūḷavaggapāḷi": {
+  "summary": "Cūḷavaggapāḷi je součást Vinajapitaku, který obsahuje vybrané vypravodobné a právní texty o řešení sporů mezi mnichy a stanovení pravidel monastického řádu. Text se zabývá konkrétními příběhy a vyjadřuje zásady vedoucí k míru a porozumění v klášteře.",
+  "name_cs": "Vinaja — Malý oddíl"
+ },
+ "Dasakanipātapāḷi": {
+  "summary": "Dasakanipātapāḷi je část Aṅguttaraniyáky, která obsahuje vybrané učení Buddhy o duchovní cestě, především ve formě dialogů mezi Buddhou a jeho blízkými, kde se rozvíjí myšlenky o příčinech a následcích kvalitního chování, meditativních stavech a cestě k osvobození.",
+  "name_cs": "Anguttara-nikája — kniha desítek"
+ },
+ "Dhammapadapāḷi": {
+  "summary": "Dhammapadapāḷi je sbírka 423 básníček v jazyce pali, které shrnují základní morální a filozofické učení buddhismu, vysvětlované příbuzenstvím myšlení, slova a činů, důsledků karmy a cesty k osvobození. Text se zaměřuje na rozvoj správného chování, pozornosti a uvědomělosti jako cesty k duševnímu klidu a vyrovnání.",
+  "name_cs": "Khuddaka-nikája — Dhammapadam"
+ },
+ "Dhammasaṅgaṇīpāḷi": {
+  "summary": "Dhammasaṅgaṇīpāḷi je součástí Abhidhammy a uvádí klasifikaci psychických a rysů duševních procesů podle různých hledisek, jako je příčinnost, příjemnost, intenzita či patřičnost k cestě k osvobození. Text systematicky seskupuje dhammy do tří skupin v každé kapitole.",
+  "name_cs": "Abhidhamma — Výčet jevů"
+ },
+ "Dhātukathāpāḷi": {
+  "summary": "Dhātukathāpāḷi je text z Abhidhammy v Theravādině, který systematicky analyzuje vzájemné vztahy mezi základními kategoriami existence – khandami, áyatany, dhātuy a samuday – a zkoumá jejich propojení a oddělení.",
+  "name_cs": "Abhidhamma — Rozprava o prvcích"
+ },
+ "Dukanipātapāḷi": {
+  "summary": "Dukanipātapāḷi je text z Anguttaranyikāy, který popisuje dva druhy vajj (trestních sankcí): diṭṭhadhammiku a samparāyiku, a jejich dopady na správné chování a vnitřní vyčištění osoby.",
+  "name_cs": "Anguttara-nikája — kniha dvojic"
+ },
+ "Ekakanipātapāḷi": {
+  "summary": "Ekakanipātapāḷi je součástí Aṅguttaranykāyany, palijské sbírky jednotlivých učení Buddhy. Sestává se z opakujících se dvojic, kde se Buda uvádí, že žádný jiný tvar, zvuk, vůně, chut, dotek nebo myšlenka nevyvolává tolik přitažlivosti nebo odporu jako určitý konkrétní objekt, a to u mužů i žen.",
+  "name_cs": "Anguttara-nikája — kniha jednotek"
+ },
+ "Ekādasakanipātapāḷi": {
+  "summary": "Dílo *Ekādasakanipātapāḷi* je součástí knihy *Aṅguttara-nikāyo* v paličtině, která obsahuje učení Buddhy v krátkých složkách podle počtu bodů. Tento oddíl se zabývá postupnými přechody od morálních činů až po plné poznání reality, ukazuje vztahy mezi myšlenkami, emocemi a duchovním rozvojem.",
+  "name_cs": "Anguttara-nikája — kniha jedenáctek"
+ },
+ "Itivuttakapāḷi": {
+  "summary": "Itivuttakapāḷi je text z Khuddakanikāje, který obsahuje sbírku stručných učení Buddhy, většinou ve formě jediného výkladu k jedinému duchovnímu zneklidňujícímu faktoru, jako je láska, zloba, moha nebo hrdost, doprovázeného často lyrickým slovotvorem. Dílo se zabývá významem odstranění těchto překážek cestou k osvícení.",
+  "name_cs": "Khuddaka-nikája — Itivuttaka („Tak bylo řečeno“)"
+ },
+ "Jātakapāḷi 1": {
+  "summary": "Jātakapāḷi 1 je sbírka vyprávění o minulých životech Buddha, zpracovaná v rámci Khuddakanikāye v palijské tradici. Text obsahuje jednotlivé jātaky, které ilustrují morální a duchovní hodnoty prostřednictvím báječných a náboženských příběhů.",
+  "name_cs": "Khuddaka-nikája — Džátaky (příběhy dřívějších zrození) 1"
+ },
+ "Jātakapāḷi 2": {
+  "summary": "*Jātakapāḷi 2* je část sbírky jātak z knihy *Khuddakanikāyo*, která obsahuje vyprávění o minulých životech Bůda. Text zahrnuje 521. jātaku *Tesakuṇa*, ve které je zachycen dialog a náležitosti královského života spolu s etickým učením.",
+  "name_cs": "Khuddaka-nikája — Džátaky (příběhy dřívějších zrození) 2"
+ },
+ "Kathāvatthupāḷi": {
+  "summary": "Kathāvatthupāḷi je text z Abhidhammapiṭaky, který se zabývá vyvrcholením a korekcí nesprávných učení prostřednictvím logických argumentů a jemných rozlišení v oblasti dharma. Obsahuje diskuse a výklady týkající se správného chápání pravdy a podstaty být.",
+  "name_cs": "Abhidhamma — Body sporu"
+ },
+ "Khandhavaggo": {
+  "summary": "Khandhavaggo je část Saṃyuttanikāy z palijské tradice, která se zabývá výkladem pěti skupin (khandh) – základních elementů těla a myšlení. Text obsahuje vyprávění o setkání moudrého a zkušeného člověka s Buddhou a Sariputtem, kteří mu vysvětlují, jak se tělo a duše chovají v souvislosti s nemocí a utrpením.",
+  "name_cs": "Samjutta-nikája — Oddíl o složkách osobnosti"
+ },
+ "Khuddakapāṭhapāḷi": {
+  "summary": "Dílo *Khuddakapāṭhapāḷi* je sbírka krátkých básní a učení z buddhského kanonu v jazyce pali, obsahující texty sloužící k memorování a nácviku, jako například slovní hry, otázky a odpovědi, nebo pokyny k vnitřnímu rozvoji a etickému životu.",
+  "name_cs": "Khuddaka-nikája — Krátké texty"
+ },
+ "Mahāniddesapāḷi": {
+  "summary": "Dílo *Mahāniddesapāḷi* je součástí knižního sbírky *Khuddakanikāya* v palijské tradici a obsahuje náboženské poezie a výklady o káme (přání), rozlišuje mezi základními a skvělnými kámy a popisuje jejich působení na člověka.",
+  "name_cs": "Khuddaka-nikája — Velký výklad k Sutta-nipátě"
+ },
+ "Mahāvaggapāḷi": {
+  "summary": "Dílo *Mahāvaggapāḷi* je částí *Dīghanikāju* a obsahuje delší suttové vyprávění, které se zabývají příběhy a učením minulých Buddů a jejich dobovém prostředí. Texty v něm shrnují životy a dějiny raně buddhistických kmenů a učení, která vedou k pochopení osvícení.",
+  "name_cs": "Dígha-nikája — Velký oddíl"
+ },
+ "Mahāvaggo": {
+  "summary": "*Mahāvaggo* je část sbírky *Saṃyuttanikāyo* v textech buddhistické tradice v jazyce pali, která obsahuje vyprávění o učení Buddhy týkající se příčin a důsledků špatných a dobrých činů, vnitřního rozvoje a cesty k osvícení. Texty se zabývají například neznánkou, špatným zvykem, správným učením a významem dobrého společenství pro duhový růst.",
+  "name_cs": "Samjutta-nikája — Velký oddíl"
+ },
+ "Majjhimapaṇṇāsapāḷi": {
+  "summary": "*Majjhimapaṇṇāsapāḷi* je část Majjhimanikāye, sbírky středních proroctví (sutta) v Palikanonu. Obsahuje vyprávění o setkání Buddhy s učenci a jeho výklady o cestě k osvobození, včetně učení o čtyřech základech připomínání a dosažení niybanu.",
+  "name_cs": "Madždžhima-nikája — druhá padesátka"
+ },
+ "Milindapañhapāḷi": {
+  "summary": "Dílo *Milindapañhapāḷi* je sbírka otázek a odpovědí, které si vyměňují panovník Milinda a mnich Nāgasena. Obsahuje filozofické a teologické rozhovory阐明佛教教义，通过对话形式探讨信仰、 existenci a smysl života.",
+  "name_cs": "Khuddaka-nikája — Otázky krále Milindy"
+ },
+ "Mūlapaṇṇāsapāḷi": {
+  "summary": "Dílo *Mūlapaṇṇāsapāḷi* je součástí *Majjhimanikāja*, sbírky středních buddhistických sutr. Obsahuje učení o příčině radosti a neznalosti, kdy se jednotlivec klame ve svém vnímání světa, považuje ho za trvalý, uspokojivý a samostatný, což vede k utrpení.",
+  "name_cs": "Madždžhima-nikája — první padesátka"
+ },
+ "Navakanipātapāḷi": {
+  "summary": "Dílo *Navakanipātapāḷi* je součástí paliho kanonu Theravādinské tradice, konkrétně patří k Aṅguttaranikāye, a obsahuje vyprávění a učení Buddhy zaměřená na cestu k probuzení (bodhi). Text se zabývá výkladem dharma (učení), jejichž uplatnění vede k rozvoji kusálních vlastností, k usmíření a osvobození prostřednictvím zákona, meditace a moudrosti.",
+  "name_cs": "Anguttara-nikája — kniha devítek"
+ },
+ "Nettippakaraṇapāḷi": {
+  "summary": "Nettippakaraṇapāḷi je text z Khuddakanikāje, který se zabývá výkladovými zásadami a metodami interpretace buddhistických sutr. Obsahuje výklad o deseti směrech (nayyā), osmnácti základních slovech a dalších klíčových pojmech, které pomáhají pochopit význam a výslovnost učení.",
+  "name_cs": "Khuddaka-nikája — Netti (průvodce výkladem)"
+ },
+ "Nidānavaggo": {
+  "summary": "*Saṃyuttanikāyo*, *Nidānavaggo*, je soubor buddhistických sutr, které se zaměřují na výklad a analýzu karmického procesu a zákonu příčinnosti, zejména na výklad dvaceti dvěma článkům závislé vzniklости (*paṭiccasamuppāda*). Texty obsahují výklady a rozbor jednotlivých článků, které vysvětlují původ utrpení a cestu k jeho zániku.",
+  "name_cs": "Samjutta-nikája — Oddíl o příčinách"
+ },
+ "Pañcakanipātapāḷi": {
+  "summary": "Dílo *Pañcakanipātapāḷi* je část buddhistického kanonu ve stylu zkrácených opakovacích složek, která obsahuje učení o pěti sektuálních silách a jejich významu pro životní cestu. Text popisuje pět duchovních sil – věra, hří, strach z provinilosti, úsilí a moudrost – a jejich opačná zla, která vedou k utrpení a nebezpečnému osudu.",
+  "name_cs": "Anguttara-nikája — kniha pětic"
+ },
+ "Parivārapāḷi": {
+  "summary": "*Parivārapāḷi* je část Vinajjapiṭaku v Theravādinské tradici, která se zabývá výkladem prvního (závažného) zákona, tzv. pārājiky, a obsahuje detailní otázky týkající se jeho formulace, podmínek a důsledků. Text analyzuje, za jakých okolností a proč byl první pārājika zaveden, a probírá jeho vztah k různým aspektům monastického života a morálního řádu.",
+  "name_cs": "Vinaja — Parivára (dodatek k řeholi)"
+ },
+ "Paṭisambhidāmaggapāḷi": {
+  "summary": "*Paṭisambhidāmaggapāḷi* je text z Khuddakanikāje, který popisuje různé typy jiných a vyšších poznatků (*ñāṇa*), dosažených prostřednictvím rozvoje moudrosti (*paññā*). Text se zabývá klasifikací a charakteristikami poznatků vztahujících se k učení, etice, meditativní koncentraci, poznání dharma, práznosti, osvobození a jiným aspektům duchovního postupu.",
+  "name_cs": "Khuddaka-nikája — Cesta rozlišujícího poznání"
+ },
+ "Paṭṭhānapāḷi 1": {
+  "summary": "*Paṭṭhānapāḷi 1* je částí Abhidhammy v palijazyce, která se zabývá výčtem a vysvětlením 24 závislostí (paccayo), tedy způsobností, které určují vzájemné vztahy mezi duchovými a hmotnými jevy v rámci kauzální struktury dharma. Text detailně popisuje jednotlivé závislosti a jejich působení na vznik a existence různých mentálních a fyzických procesů.",
+  "name_cs": "Abhidhamma — Vztahy podmíněnosti 1"
+ },
+ "Paṭṭhānapāḷi 2": {
+  "summary": "Dílo Paṭṭhānapāḷi 2 je součástí Abhidharmapiṭaky v buddhském kanonu v jazyce pāli a zabývá se podrobným výkladem zákonů příčinnosti (paticcasamuppāda) v rámci analýzy duševních a fyzických procesů. Text detailně rozebírá vzájemné závislosti mezi různými psychickými a fyzickými stavy a jejich vznik podle příčinné závislosti.",
+  "name_cs": "Abhidhamma — Vztahy podmíněnosti 2"
+ },
+ "Paṭṭhānapāḷi 3": {
+  "summary": "*Paṭṭhānapāḷi 3* je třetí část Paṭṭhānapāḷi z Abhidhammapiṭaky, která se zabývá detailním výkladem zákonů příčinnosti (paccaya) mezi různými duševními a fyzickými stavy (dhammy) v rámci budhské Abhidhammy. Text analyzuje různé typy závislostí a vzájemných vztahů mezi základními elementy existence.",
+  "name_cs": "Abhidhamma — Vztahy podmíněnosti 3"
+ },
+ "Paṭṭhānapāḷi 4": {
+  "summary": "*Paṭṭhānapāḷi 4* je čtvrtý díl složky Paṭṭhānapāḷi v rámci Abhidhammy, která se zabývá podrobným výkladem podmínek vzniku a propojení různých psychických a fyzických jevů. Text analyzuje vztahy mezi klesy a bezklesy, zejména v kontextu pěti skandh a jejich vzájemných podmínek.",
+  "name_cs": "Abhidhamma — Vztahy podmíněnosti 4"
+ },
+ "Paṭṭhānapāḷi 5": {
+  "summary": "*Paṭṭhānapāḷi 5* je pátý díl textu Paṭṭhānapāḷi z Abhidhammapiṭaky, který se zabývá klasifikací děl dle jejich příčin a podmínek vztahujících se k různým typům citových prožitků. Obsahuje analýzu vzniku a vzájemných vztahů děl spojených s radostným, bolestivým a neutrálním prožitkem podle tří základních podmínek.",
+  "name_cs": "Abhidhamma — Vztahy podmíněnosti 5"
+ },
+ "Pācittiyapāḷi": {
+  "summary": "*Pācittiyapāḷi* je část Vinajjí, tedy prvního zákoníku buddhistického monastického řádu, který se zabývá konkrétními pravidly pro přiznání a odpuštění hříchů, zejména hříchem lži. Text obsahuje příběhy a výklady k pravidlům, například k pravidlu o lži, které se aplikuje, když mniška lže o něčem, co neviděl nebo nezjistil.",
+  "name_cs": "Vinaja — Pácittija (odčinitelné přestupky)"
+ },
+ "Pārājikapāḷi": {
+  "summary": "*Pārājikapāḷi* je text z Vinají, který obsahuje vybrané vyprávění o dějích, které se týkají závažných pravidel (pārājik) a interakcí mezi Buddha a jeho žáky, často ve formě dialogů s bráhmy a jinými postavami. Text ilustruje morální a etické zásady monastického života a význam správného chování.",
+  "name_cs": "Vinaja — Párádžika (nejtěžší přestupky)"
+ },
+ "Pāthikavaggapāḷi": {
+  "summary": "Dílo *Pāthikavaggapāḷi* obsahuje vyprávění o setkání Buddhy s licchavím Sunakkhattem, který se snaží vyvolat jeho zlost, a další podobné příběhy ukazující, jak Buddha klidně a moudře reaguje na pokusy otestovat jeho vnitřní rovnováhu a odolnost.",
+  "name_cs": "Dígha-nikája — Páthikův oddíl"
+ },
+ "Petavatthupāḷi": {
+  "summary": "*Petavatthupāḷi* je součástí Khuddakanikāje v palijském kanonu a obsahuje básně a přísloví týkající se odplaty za podávaná dárky a správného jednání vůči předkům a nevědomým duchům.",
+  "name_cs": "Khuddaka-nikája — Příběhy hladových duchů"
+ },
+ "Peṭakopadesapāḷi": {
+  "summary": "Dílo *Peṭakopadesapāḷi* je text z Khuddakanikāje, který se zabývá vznikem správné učednické víry prostřednictvím vnějšího výkladu a vnitřního zamyšlení nad čtyřmi pravdy. Popisuje příčiny a podmínky pro rozvoj pravého poznání a uvádí několik přirovnání a slohových způsobů, jak se pravda předkládá.",
+  "name_cs": "Khuddaka-nikája — Petakopadésa (návod k výkladu koše)"
+ },
+ "Puggalapaññattipāḷi": {
+  "summary": "*Puggalapaññattipāḷi* je text z Abhidharmy z Pali kanonu, který klasifikuje různé typy lidí podle jejich duchovního a psychologického stavu. Obsahuje seznamy a popisy různých kategorií, jako jsou skupiny podle způsobu uvolnění, sklonů, úrovně duchovního rozvoje a jiných znaků.",
+  "name_cs": "Abhidhamma — Popis typů osob"
+ },
+ "Sagāthāvaggo": {
+  "summary": "Dílo *Sagāthāvaggo* je část palijského kanonu Saṃyuttanikāyo, která obsahuje vybrané suttové vypráví, v nichž se vyskytují gáthy – zpěvy nebo básně. Text se zabývá dialogy mezi Buddhou a démonem, v nichž se rozvíjí tematika osvícení, osvobozdění a vnitřního klidu prostřednictvím básnických odpovědí a filozofických reflekcí.",
+  "name_cs": "Samjutta-nikája — Oddíl s verši"
+ },
+ "Saḷāyatanavaggo": {
+  "summary": "Saḷāyatanavaggo je část palijského Saṃyuttanikāje, která se zabývá šesti smysly a jejich objekty, přičemž uplatňuje učení o neustalosti (anicce), trýze (dukkhe) a bezduchu (anattā) v rámci poznání nepravé sebe. Text obsahuje několik sutta, ve kterých se Buddha vysvětluje, jak poznávat oči, uši, nos, jazyk, tělo a rozum jako neustalé, trýznivé a bezduché, a tím uspokojení a osvobození.",
+  "name_cs": "Samjutta-nikája — Oddíl o šesti smyslech"
+ },
+ "Sattakanipātapāḷi": {
+  "summary": "Dílo *Sattakanipātapāḷi* je část buddhistického kanonu v jazyce pali, která se zabývá sedmi zákonkami vedoucími k neoblíbení nebo oblíbení mezi společenstvím mnišském. Text popisuje vlastnosti moncha, které ho činí neoblíbeným či naopak uctívaným, a dále vysvětluje sedm sil (bala), jako jsou věra, úsilí, stydlivost a moudrost.",
+  "name_cs": "Anguttara-nikája — kniha sedmic"
+ },
+ "Sīlakkhandhavaggapāḷi": {
+  "summary": "Dílo *Sīlakkhandhavaggapāḷi* je částí Dīghanikāju, sbírky delších proroctví a vyprávění z buddyjské tradice. Obsahuje vyprávění o rozdílných názorech mezi dvěma ascetickými učenci a jejich žáky, kteří se významně liší ve svém hodnocení Buddhy, učení a Sanghy.",
+  "name_cs": "Dígha-nikája — Oddíl o mravnosti"
+ },
+ "Suttanipātapāḷi": {
+  "summary": "*Uragavaggo* je sbírka osamostatněných kusových učení (sutta) patřící do *Suttanipātapāḷi*, jedné z částí Khuddakanikāje v Paličaně. Texty se zabývají odstraněním znečistků duše, jako jsou zlost, láska, hlad, hrdost a jiné překážky, a ukazují cestu k duševnímu vyrovnání a osvícení.",
+  "name_cs": "Khuddaka-nikája — Sutta-nipáta"
+ },
+ "Theragāthāpāḷi": {
+  "summary": "*Theragāthāpāḷi* je část Pali kanonu patřící do Khuddakanikāje, která obsahuje básnické vyjádření životních a meditačních zkušeností vyrovnalých mnichů. Texty tvoří jednotlivé gāthy, básnické odstavce, které vyjadřují jejich poznání, vnitřní pokoj a dosažené duchovní stavy po cestě k osvobození.",
+  "name_cs": "Khuddaka-nikája — Théragáthá (zpěvy starších mnichů)"
+ },
+ "Therāpadānapāḷi 1": {
+  "summary": "Therāpadānapāḷi 1 je text z palijské tradice, který patří do Khuddakanikāje a obsahuje vyprávění o životě a úspěších starších mnichů (thera). Text je sestaven ve formě básní, kde jednotlivé sloky vyjadřují jejich zkušenosti, dárce, mystické projevy a cesty k osvícení.",
+  "name_cs": "Khuddaka-nikája — Apadána (životopisy starších) 1"
+ },
+ "Therāpadānapāḷi 2": {
+  "summary": "Therāpadānapāḷi 2 je část klasického Theravādinova textu, který patří do Khuddakanikāje, a obsahuje vyprávění o životě a dobrodružstvích vybraných mnichů (Theragāthā). Text je složen z básnických odstavců vyjadřujících jejich duchovní cesty, osvícení a zkušenosti po dosažení probuzení.",
+  "name_cs": "Khuddaka-nikája — Apadána (životopisy starších) 2"
+ },
+ "Therīgāthāpāḷi": {
+  "summary": "*Therīgāthāpāḷi* je součástí Khuddakanikāje v palijské tradici a sestává se z básní vyjádřených staršími (therī) mnichy, které popisují jejich duchovní cesty, osvícení a zkušenosti s vyrovnáním se s touhou, utrpením a smrtí. Texty jsou tvořeny odřeklými verši jednotlivých mnichyí, doprovázenémi krátkými komentáři.",
+  "name_cs": "Khuddaka-nikája — Thérígáthá (zpěvy starších mnišek)"
+ },
+ "Tikanipātapāḷi": {
+  "summary": "Tikanipātapāḷi je části Aṅguttaranikāje, která obsahuje vyprávění o rozdílech mezi hloupým a moudlým člověkem, zejména prostřednictvím tří znaků, podle kterých se oba typy lidí odlišují. Text se zabývá charakterem, řečí a činem jako základními znaky pro rozpoznání moudrého člověka a hlupáka.",
+  "name_cs": "Anguttara-nikája — kniha trojic"
+ },
+ "Udānapāḷi": {
+  "summary": "Udānapāḷi je sbírka vyprávění, která ilustrují učení Bude a jeho poznání dharma, zejména příčinnou souvislost (paṭiccasamuppāda), a popisuje okamžiky jeho osvícení a následné výklady. Texty jsou uspořádány do čtyř oddílů a obsahují meditační prohlídky a filozofické odvození základních principů buddhismu.",
+  "name_cs": "Khuddaka-nikája — Udána (Buddhova zvolání)"
+ },
+ "Uparipaṇṇāsapāḷi": {
+  "summary": "Uparipaṇṇāsapāḷi je text z Majjhimanikāje, buddhistické sbírky středních proroctví v jazyce pali. Obsahuje vyprávění, ve kterém Buddha vysvětluje, že současná pocity radosti, utrpení nebo lhostejnosti jsou důsledkem minulých činů a že osvobozenecká cesta spočívá v zastavení tvorby nových činů.",
+  "name_cs": "Madždžhima-nikája — třetí padesátka"
+ },
+ "Vibhaṅgapāḷi": {
+  "summary": "*Vibhaṅgapāḷi* je část Abhidhammy v buddhismu v jazyce pāli, která systematicky analyzuje a klasifikuje různé aspekty duševní a hmotné existence. Obsahuje podrobné výklady o pěti skupinách (*khandhách*), včetně hmotné skupiny (*rūpakkhandha*), pocity (*vedanā*), vnímání (*saññī*), duševních vlastnostech (*saṅkhārā*) a vědomí (*viññāṇa*).",
+  "name_cs": "Abhidhamma — Rozbory"
+ },
+ "Vimānavatthupāḷi": {
+  "summary": "*Vimānavatthupāḷi* je text z Khuddakanikāje, který popisuje vznik a podobu různých nebeských paláců (vimān) a jejich obyvatele, přičemž každá část vypravuje o jednotlivém vimānu a jeho původu včetně příčin a skutků, jež k jeho zrození vedly. Text obsahuje dialogy mezi moudrým mnichem Moggallanou a nebeskými býtěmi, kteří vysvětluji, jaké dobré činy v minulosti přivedly k jejich současnému stavu.",
+  "name_cs": "Khuddaka-nikája — Příběhy nebeských paláců"
+ },
+ "Yamakapāḷi 1": {
+  "summary": "Dílo *Yamakapāḷi 1* je část Abhidhammapiṭaky, která se zabývá systematickým zkoumáním kořenů (mūla) dobrých a zlých duševních děl, jejich vzájemnými vztahy a klasifikací prostřednictvím párových otázek. Text analyzuje vlastnosti kusalamūla a akusalamūla a jejich různé kombinace u duševních děl.",
+  "name_cs": "Abhidhamma — Dvojice 1"
+ },
+ "Yamakapāḷi 2": {
+  "summary": "*Yamakapāḷi 2* je část Abhidhammapiṭaky, která se zabývá analýzou a rozlišováním různých typů skandh a saṅkhārů, zejména tělesných, řečových a myšlenkových formací, prostřednictvím dialogových otázek a odpovědí.",
+  "name_cs": "Abhidhamma — Dvojice 2"
+ },
+ "Yamakapāḷi 3": {
+  "summary": "Dílo *Yamakapāḷi 3* je součástí Abhidhammapiṭaku a zabývá se klasifikací a vzájemnými vztahy psychických a duševních faktorů podle jejich morálního charakteru – kusálních, nekusálních a bezcharakterových. Text je tvořen opakovanými otázkami a odpovědmi, které systematicky procházejí různé kombinace těchto faktorů.",
+  "name_cs": "Abhidhamma — Dvojice 3"
+ },
+ "avesta darmesteter complete": {
+  "summary": "Dílo *Avesta Darmesteter Complete* je překlad základního náboženského textu zoroastrismu, známého jako Zend Avesta, ve třech částech. Obsahuje překlady textů jako Vendîdâd, Yasna, Yasty a další, podle vydání *Sacred Books of the East* z let 1880–1887.",
+  "name_cs": "Avesta (překlad J. Darmesteter)"
+ },
+ "hegel werke band01 fruehe schriften": {
+  "summary": "Tento svazek obsahuje Hegelovy díla a fragmenty z raného období jeho tvorby, vzniklá mezi lety 1793 a 1800, včetně jeho poznámek k filozofii, náboženství, politice a korespondence. Jedná se o základní texty, které odrážejí jeho počáteční filozofické myšlenky a vývoj před jeho hlavními díly.",
+  "name_cs": "Hegel — Rané spisy (Werke 1)"
+ },
+ "hegel werke band03 phaenomenologie": {
+  "summary": "Třetí svazek díla Georga Wilhelma Friedricha Hegla obsahuje *Phänomenologie des Geistes*, která představuje základní filozofické dílo zabývající se postupem ducha k poznání skutečnosti prostřednictvím historie, kritiky vědomí a vyjasnění logiky rozvoje myšlenky.",
+  "name_cs": "Hegel — Fenomenologie ducha (Werke 3)"
+ },
+ "hegel werke band05 wissenschaft logik": {
+  "summary": "Dílo obsahuje Hegelovu *Vědu o logice*, první část objektivní logiky, která se zabývá základními kategoriemi a rozvojem myšlenky od *Sein* (Bytí) přes *Bestimmtheit* (Kvalitu) až k *Fürsichsein* (Prosebečnost), s důrazem na dialektický vývoj logických pojmů.",
+  "name_cs": "Hegel — Věda o logice (Werke 5)"
+ },
+ "pyramid texts allen": {
+  "summary": "Dílo obsahuje překlad a komentář k pyramidním textům, nejstarším známým egyptským náboženským textům, které byly vytesány do hrobek v pyramidách a sloužily k ochraně a zajištění života faraóna v podzemí. Texty zahrnují kouzla, rituály a náboženské formule spojené s posmrtným životem.",
+  "name_cs": "Texty pyramid (překlad J. P. Allen)"
+ },
+ "rigveda complete sanskrit": {
+  "summary": "Dílo „Rigveda Complete Sanskrit“ obsahuje hymny z první knihy Rigvedy v originálním sanskrtu, které se věnují bohům a božstvím jako je Agni, Váyu a další, a popisují rituály, požehnání a kosmické pořádky vyjádřené konceptem rita.",
+  "name_cs": "Rgvéd (sanskrtský originál)"
+ },
+ "westminster leningrad codex": {
+  "summary": "Westminster Leningrad Codex je digitální verze hebrejského textu Starého zákona podle kódu Leningradského kódu s přes 1230 poznámkami, vzniklý na základě spolupráce s Westminster Hebrew Institute. Text je přizpůsoben pro vědeckou a studijní práci a zrcadlí nejnovější známé korekce hebrejského písmu.",
+  "name_cs": "Hebrejská bible — Leningradský kodex"
+ }
 }
