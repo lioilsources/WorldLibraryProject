@@ -1,18 +1,18 @@
 {
-  "ts": "2026-08-27T10:06:37Z",
-  "label": "krok3: full (dílo+tradice+diverzita)",
+  "ts": "2026-08-29T06:46:21Z",
+  "label": "po vyhození Leningradského kodexu",
   "mode": "full",
   "top_k": 5,
   "embed_model": "intfloat/multilingual-e5-large",
   "aggregate": {
-    "questions": 24,
-    "routed": 18,
+    "questions": 23,
+    "routed": 17,
     "routed_group": 6,
     "work_hit_rate": 1.0,
     "group_hit_rate": 1.0,
-    "mean_distinct": 1.62,
-    "mean_d1": 0.1797,
-    "mean_spread": 0.0089
+    "mean_distinct": 1.65,
+    "mean_d1": 0.1776,
+    "mean_spread": 0.0095
   },
   "rows": [
     {
@@ -225,15 +225,15 @@
       "group_hit": true,
       "distinct": 1,
       "d1": 0.1771,
-      "spread": 0.0145,
+      "spread": 0.0154,
       "routed": 1,
       "routed_groups": [],
       "top": [
         "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.177",
         "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.180",
         "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.184",
-        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.189",
-        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.192"
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.192",
+        "The Younger Edda; Also called Snorre's Edda, or The Prose Edda @0.193"
       ]
     },
     {
@@ -271,37 +271,19 @@
       ]
     },
     {
-      "q": "Co říká hebrejská Bible o stvoření světa?",
-      "work_hit": true,
-      "group_hit": true,
-      "distinct": 1,
-      "d1": 0.2315,
-      "spread": 0.0006,
-      "routed": 1,
-      "routed_groups": [],
-      "top": [
-        "westminster leningrad codex @0.232",
-        "westminster leningrad codex @0.232",
-        "westminster leningrad codex @0.232",
-        "westminster leningrad codex @0.232",
-        "westminster leningrad codex @0.232"
-      ]
-    },
-    {
       "q": "Co jsou egyptské Texty pyramid a k čemu sloužily?",
       "work_hit": true,
       "group_hit": true,
       "distinct": 1,
-      "d1": 0.1413,
-      "spread": 0.0036,
+      "d1": 0.1452,
+      "spread": 0.008,
       "routed": 1,
       "routed_groups": [],
       "top": [
-        "pyramid texts allen @0.141",
-        "pyramid texts allen @0.142",
-        "pyramid texts allen @0.143",
-        "pyramid texts allen @0.144",
-        "pyramid texts allen @0.145"
+        "pyramid texts allen @0.145",
+        "pyramid texts allen @0.149",
+        "pyramid texts allen @0.153",
+        "pyramid texts allen @0.153"
       ]
     },
     {

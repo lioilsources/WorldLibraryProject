@@ -66,7 +66,8 @@ def query(collection, embedding, n_results, works=None, groups=None):
     ]
 
 
-def make_retriever(mode, collection, index, top_k, factor, max_per_work):
+def make_retriever(mode, collection, index, top_k, factor, max_per_work,
+                   known_groups=None):
     """Režimy měří jednotlivé zásahy zvlášť, ať je vidět, co pomohlo:
     plain (dnešek) → route (směrování na dílo) → diverse (strop na dílo)
     → full (obojí, tj. server.py)."""
@@ -75,7 +76,8 @@ def make_retriever(mode, collection, index, top_k, factor, max_per_work):
 
     def retrieve(q, emb):
         works = route(q, index) if routing else []
-        groups = route_groups(q) if routing and not works else []
+        groups = [g for g in (route_groups(q) if routing and not works else [])
+                  if known_groups is None or g in known_groups]
         pool = max(top_k, top_k * factor) if diverse else top_k
         hits = query(collection, emb, pool, works, groups)
         if diverse:
@@ -89,23 +91,25 @@ def make_retriever(mode, collection, index, top_k, factor, max_per_work):
 
 
 def load_catalog(collection, summaries_file):
-    """{dílo: český název} — pro rejstřík aliasů (stejný vstup jako server)."""
+    """({dílo: český název}, {tradice}) — stejný vstup jako má server."""
     import unicodedata
     summaries = json.loads(Path(summaries_file).read_text(encoding="utf-8"))
     summaries = {unicodedata.normalize("NFC", k): v for k, v in summaries.items()}
-    catalog, limit, offset = {}, 1000, 0
+    catalog, groups, limit, offset = {}, set(), 1000, 0
     while True:
         page = collection.get(include=["metadatas"], limit=limit, offset=offset)
         metas = page["metadatas"] or []
         for m in metas:
             w = (m or {}).get("work")
+            if m and m.get("group"):
+                groups.add(m["group"])
             if w and w not in catalog:
                 entry = summaries.get(unicodedata.normalize("NFC", w))
                 catalog[w] = entry.get("name_cs") if isinstance(entry, dict) else None
         if len(metas) < limit:
             break
         offset += limit
-    return catalog
+    return catalog, groups
 
 
 def evaluate(questions, retrieve, embedder, model_name):
@@ -181,11 +185,11 @@ def main():
         .get_collection(args.collection)
     embedder = make_embedder(args.embed_model, device=args.device)
 
-    index = (load_catalog(collection, args.summaries_file)
-             if args.retrieve_mode in ("route", "full") else {})
+    index, groups = (load_catalog(collection, args.summaries_file)
+                     if args.retrieve_mode in ("route", "full") else ({}, None))
     retrieve = make_retriever(
         args.retrieve_mode, collection, build_alias_index(index),
-        args.top_k, args.candidate_factor, args.max_per_work,
+        args.top_k, args.candidate_factor, args.max_per_work, groups,
     )
     rows = evaluate(questions, retrieve, embedder, args.embed_model)
     agg = aggregate(rows)

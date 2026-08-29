@@ -66,6 +66,7 @@ EXCLUDE_PATH_MARKERS = (
     "european_philosophy/kant",  # frakturové OCR — nečitelné
     "hegel_werke_vol1",          # frakturové OCR; Suhrkamp bandy (band01/03/05) jsou čisté
     "madrid_codex", "grolier_codex", "dresden_kingsborough",  # obrazová faksimile, text jen popisky
+    "westminster_leningrad_codex",  # hebrejština přes transliterační font → mojibake
 )
 
 # Mahábhárata: maha01–maha18 → názvy parv (Ganguliho členění)
@@ -81,15 +82,48 @@ MAHA_PARVY = {
 MIN_PDF_CHARS = 1000
 
 
+def _script(ch: str) -> str:
+    """Hrubé zařazení písmene do písma — jen tolik, kolik potřebuje brána."""
+    o = ord(ch)
+    if o < 128:
+        return "ascii"
+    if 0x0590 <= o <= 0x05FF:
+        return "hebrew"
+    if 0x4E00 <= o <= 0x9FFF or 0x3400 <= o <= 0x4DBF:
+        return "han"
+    if 0x0900 <= o <= 0x097F:
+        return "devanagari"
+    if 0x0370 <= o <= 0x03FF or 0x1F00 <= o <= 0x1FFF:
+        return "greek"
+    if 0x0600 <= o <= 0x06FF:
+        return "arabic"
+    return "latin-ext"
+
+
+# Podíl latinky s diakritikou mezi písmeny. Naměřeno na korpusu: pálí
+# v romanizaci 0,10–0,20, čeština a němčina pod 0,05, čínština 0 —
+# kdežto Leningradský kodex 0,50, protože jeho „hebrejština" je ve
+# skutečnosti transliterace vysázená nestandardním fontem (Ą, Ď, Ň…).
+MAX_LATIN_EXT = 0.35
+
+
 def pdf_text_quality_ok(text: str) -> bool:
     """Brána proti OCR šumu a vadnému kódování: málo písmen = šum
-    (interpunkční rozsypaný čaj), PUA znaky = custom font bez unicode mapy."""
+    (interpunkční rozsypaný čaj), PUA znaky = custom font bez unicode mapy,
+    záplava exotické latinky = transliterační font místo pořádného písma.
+
+    To poslední PUA kontrola nechytí — mojibake Leningradského kodexu je
+    složené z obyčejných latinských písmen s diakritikou, takže projde
+    i na `letters`. Prošlo a 2 461 chunků guláše leželo v korpusu měsíc."""
     sample = text[:20000]
     if not sample:
         return False
     letters = sum(ch.isalpha() or ch.isspace() for ch in sample) / len(sample)
     pua = sum(0xE000 <= ord(ch) <= 0xF8FF for ch in sample) / len(sample)
-    return letters >= 0.6 and pua < 0.02
+    alpha = [ch for ch in sample if ch.isalpha()]
+    latin_ext = (sum(1 for ch in alpha if _script(ch) == "latin-ext") / len(alpha)
+                 if alpha else 0.0)
+    return letters >= 0.6 and pua < 0.02 and latin_ext < MAX_LATIN_EXT
 
 
 def is_lfs_pointer(path: Path) -> bool:

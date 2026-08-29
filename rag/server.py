@@ -108,6 +108,12 @@ class RAGServer:
         self.alias_index = build_alias_index(
             {w: info.get("name_cs") for w, info in self.catalog.items()}
         )
+        # tradice, které korpus opravdu má — aliasy na skupinu smějí mířit jen
+        # do nich. Jinak by dotaz na Bibli (dílo vyhozené kvůli mojibake)
+        # zúžil hledání na prázdnou množinu a model by dostal nulový kontext.
+        self.known_groups = {
+            info["group"] for info in self.catalog.values() if info.get("group")
+        }
 
         self.embedder = make_embedder(
             args.embed_model, device=args.device, url=args.embed_url
@@ -302,7 +308,8 @@ class RAGServer:
         works = [] if self.args.no_routing else route(query, self.alias_index)
         # jmenované dílo je přesnější signál než tradice, takže skupiny
         # se řeší, jen když se na dílo netrefíme
-        groups = [] if works or self.args.no_routing else route_groups(query)
+        groups = ([] if works or self.args.no_routing
+                  else [g for g in route_groups(query) if g in self.known_groups])
         where = None
         if works:
             where = {"work": {"$in": works}}

@@ -146,7 +146,7 @@ pamatuje kontext konverzace. `POST /reset` paměť smaže. Swagger UI na
 Dotaz je česky, korpus v pálí, sanskrtu, čínštině a hebrejštině — a
 multilingual-e5 v téhle situaci skoro nerozlišuje: **top-5 se u dotazu
 liší o ~0,007 vzdálenosti**, takže o pořadí rozhoduje spíš podíl tradice
-v korpusu než téma otázky. A pálijská Tipitaka je 60 z 93 děl, takže
+v korpusu než téma otázky. A pálijská Tipitaka je 60 z 92 děl, takže
 „Co říká Tao te ťing o wu-wej?" vracelo pět pálijských svazků.
 
 Proto `retrieval.py`:
@@ -178,7 +178,7 @@ a tradicí):
 ```
 
 Režimy `plain | route | diverse | full` izolují jednotlivé zásahy, takže
-je vidět, co doopravdy pomohlo. Naměřeno (24 otázek, top-5, srpen 2026):
+je vidět, co doopravdy pomohlo. Naměřeno (23 otázek, top-5, srpen 2026):
 
 | režim | work-hit@5 | group-hit@5 | různých děl v top-5 |
 |---|---|---|---|
@@ -190,6 +190,11 @@ je vidět, co doopravdy pomohlo. Naměřeno (24 otázek, top-5, srpen 2026):
 Druhá sada `eval/golden_v2.jsonl` je psaná až po aliasech a jinými slovy
 (skloňování, jiné varianty názvů) — kontrola, že tabulka není ušitá na
 míru první sadě: 0,40 → 1,00 work-hit, 0,64 → 1,00 group-hit.
+
+**Kandidáti se před výběrem čistí** (`looks_tabular`): rejstříky, obsahy
+a konkordance vypadnou, protože jako citace neříkají nic a překladač z nich
+dělá nesmysl. U dotazu na egyptské texty jich bylo 16 z 20 kandidátů.
+Když by po filtru nezbylo nic, tabulka se vrátí — prázdný kontext je horší.
 
 Pozor: **hit@5 měří jen to, že se trefí správná kniha**, ne že je
 odpověď dobrá. Rozptyl vzdáleností (`mean_spread`) zůstává mizivý —
@@ -209,10 +214,17 @@ model pořád nerozlišuje, jen se ho na to teď tolik neptáme.
   Milindy", ne „Milindapañhapāḷi". Pálijské názvy začínají nikájí, takže
   se seznam sám seskupí po sbírkách.
 - **Překlad úryvků**: ke každé odpovědi se `sources[].excerpt` překládá do
-  češtiny (`excerpt_cs`) — pálijský nebo hebrejský doklad je jinak pro
+  češtiny (`excerpt_cs`) — pálijský nebo čínský doklad je jinak pro
   čtenáře nečitelný. Běží ve vlákně souběžně s generováním odpovědi
   (`--excerpt-model`, výchozí `translate`), takže odpověď nezdrží;
-  vypíná `--no-translate-excerpts`.
+  vypíná `--no-translate-excerpts`. Když model úryvek jen opíše místo
+  překladu (u pálijských veršů běžné, ověřeno i na angličtině), pozná to
+  `is_echo()` a pole se neposílá — v appce je pak jen originál.
+
+**Korpus jsou originály, ne překlady** — na tom projekt stojí, jde právě
+o to, jak si model poradí s cizojazyčným úryvkem. Nepoužitelné dílo se
+proto opravuje lepším zdrojem v původním jazyce, nebo vyhazuje; české
+překlady do knihovny nepatří. Překládá se až výstup (odpověď a `excerpt_cs`).
 - **Paměť**: posledních `--history-turns` (výchozí 10) párů
   otázka/odpověď per session, drží se v RAM serveru.
 - **Model**: per dotaz nebo `--llm-model` (viz tabulka výše).

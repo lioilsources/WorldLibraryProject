@@ -5,7 +5,6 @@
 {"q": "Jak Mahábhárata líčí smrt Karny?", "expect_group": "sanskrit"}
 {"q": "O čem je Bhagavadgíta?", "expect_work": "Mahábhárata 06 — Bhíšmaparva", "expect_group": "sanskrit"}
 {"q": "Co vypráví Snorri o Thorovi?", "expect_work": "The Younger Edda; Also called Snorre's Edda, or The Prose Edda", "expect_group": "european"}
-{"q": "Jak vypadá popis stvoření v knize Genesis?", "expect_work": "westminster leningrad codex", "expect_group": "bible"}
 {"q": "Co učí zoroastrismus o dobru a zlu?", "expect_work": "avesta darmesteter complete", "expect_group": "avesta"}
 {"q": "Které texty od Hegela v knihovně máš?", "expect_group": "european_philosophy"}
 {"q": "Jak buddhistická scholastika abhidhammy třídí jevy mysli?", "expect_group": "pali"}

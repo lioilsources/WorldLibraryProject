@@ -348,9 +348,5 @@
  "rigveda complete sanskrit": {
   "summary": "Griffithův anglický veršovaný překlad Rgvédu s rozsáhlým poznámkovým aparátem, naskenovaný a přečtený OCR. Text je anglicky, ne v sanskrtu (navzdory názvu souboru), a nese občasné chyby rozpoznávání.",
   "name_cs": "Rgvéd (anglický překlad R. T. H. Griffith, OCR ze skenu)"
- },
- "westminster leningrad codex": {
-  "summary": "Westminster Leningrad Codex je digitální verze hebrejského textu Starého zákona podle kódu Leningradského kódu s přes 1230 poznámkami, vzniklý na základě spolupráce s Westminster Hebrew Institute. Text je přizpůsoben pro vědeckou a studijní práci a zrcadlí nejnovější známé korekce hebrejského písmu.",
-  "name_cs": "Hebrejská bible — Leningradský kodex"
  }
 }

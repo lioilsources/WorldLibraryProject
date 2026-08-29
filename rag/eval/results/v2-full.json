@@ -1,18 +1,18 @@
 {
-  "ts": "2026-08-27T10:07:53Z",
-  "label": "golden_v2: full",
+  "ts": "2026-08-29T06:46:34Z",
+  "label": "golden_v2 po vyhození kodexu",
   "mode": "full",
   "top_k": 5,
   "embed_model": "intfloat/multilingual-e5-large",
   "aggregate": {
-    "questions": 14,
-    "routed": 13,
+    "questions": 13,
+    "routed": 12,
     "routed_group": 0,
     "work_hit_rate": 1.0,
     "group_hit_rate": 1.0,
-    "mean_distinct": 1.5,
-    "mean_d1": 0.1951,
-    "mean_spread": 0.0076
+    "mean_distinct": 1.54,
+    "mean_d1": 0.1925,
+    "mean_spread": 0.0081
   },
   "rows": [
     {
@@ -135,23 +135,6 @@
       ]
     },
     {
-      "q": "Jak vypadá popis stvoření v knize Genesis?",
-      "work_hit": true,
-      "group_hit": true,
-      "distinct": 1,
-      "d1": 0.2291,
-      "spread": 0.0017,
-      "routed": 1,
-      "routed_groups": [],
-      "top": [
-        "westminster leningrad codex @0.229",
-        "westminster leningrad codex @0.230",
-        "westminster leningrad codex @0.230",
-        "westminster leningrad codex @0.231",
-        "westminster leningrad codex @0.231"
-      ]
-    },
-    {
       "q": "Co učí zoroastrismus o dobru a zlu?",
       "work_hit": true,
       "group_hit": true,
@@ -208,15 +191,15 @@
       "group_hit": true,
       "distinct": 2,
       "d1": 0.2123,
-      "spread": 0.0025,
+      "spread": 0.0037,
       "routed": 0,
       "routed_groups": [],
       "top": [
         "zhuangzi @0.212",
-        "westminster leningrad codex @0.212",
         "zhuangzi @0.214",
-        "westminster leningrad codex @0.217",
-        "zhuangzi @0.215"
+        "Mahábhárata 01 — Ádiparva @0.219",
+        "zhuangzi @0.215",
+        "zhuangzi @0.216"
       ]
     },
     {

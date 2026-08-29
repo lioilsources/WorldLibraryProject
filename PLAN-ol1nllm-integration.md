@@ -219,11 +219,22 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
    (`unicodedata.normalize("NFC", …)` na obou stranách).
 9. **Embedding česky × korpus v pálí/sanskrtu je skoro slepý**: měřeno,
    top-5 se u dotazu liší o ~0,007 vzdálenosti, takže pořadí rozhoduje
-   podíl tradice v korpusu (Tipitaka = 60 z 93 děl) víc než téma otázky.
+   podíl tradice v korpusu (Tipitaka = 60 z 92 děl) víc než téma otázky.
    Bez směrování na dílo/tradici (`rag/retrieval.py`) vracel dotaz na Tao
    te ťing pálijské svazky. Kdyby se to mělo řešit v základu, znamená to
    jiný embedding model a re-embed celého korpusu.
-10. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+10. **Brána kvality PDF nechytí transliterační fonty.** Westminster
+    Leningrad Codex prošel ingestem, ačkoli jeho „hebrejština" byla
+    mojibake z nestandardního fontu — 2 461 chunků s **nula** hebrejskými
+    písmeny leželo v korpusu měsíc. `pdf_text_quality_ok()` hlídalo jen
+    podíl písmen a PUA znaky, jenže ten guláš je složený z obyčejné
+    latinky s diakritikou. Dílo je od 29. 8. 2026 smazané z kolekce
+    i z `summaries.json`, cesta je v `EXCLUDE_PATH_MARKERS` a brána nově
+    hlídá i podíl latinky s diakritikou (`MAX_LATIN_EXT`). Korpus: 92 děl,
+    41 232 chunků. Pozor při případném re-ingestu — ID chunku se počítá
+    ze `sha256(cesty)`, takže nový text na staré cestě by `embed_books.py`
+    přeskočil jako „už tam je"; staré chunky musí padnout první.
+11. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.

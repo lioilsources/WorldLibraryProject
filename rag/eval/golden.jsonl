@@ -13,7 +13,6 @@
 {"q": "Jak Snorriho Edda popisuje stvoření světa z těla obra Ymiho?", "expect_work": "The Younger Edda; Also called Snorre's Edda, or The Prose Edda", "expect_group": "european"}
 {"q": "Co je dialektika pána a raba ve Fenomenologii ducha?", "expect_work": "hegel werke band03 phaenomenologie", "expect_group": "european_philosophy"}
 {"q": "Jak Hegel ve Vědě o logice vykládá bytí a nic?", "expect_work": "hegel werke band05 wissenschaft logik", "expect_group": "european_philosophy"}
-{"q": "Co říká hebrejská Bible o stvoření světa?", "expect_work": "westminster leningrad codex", "expect_group": "bible"}
 {"q": "Co jsou egyptské Texty pyramid a k čemu sloužily?", "expect_work": "pyramid texts allen", "expect_group": "egypt"}
 {"q": "Co učí Avesta o Ahura Mazdovi?", "expect_work": "avesta darmesteter complete", "expect_group": "avesta"}
 {"q": "Co učí buddhismus o utrpení a jeho zániku?", "expect_group": "pali"}

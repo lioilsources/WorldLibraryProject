@@ -3,6 +3,13 @@
 Multijazyčný korpus filozofických a posvátných textů (download pipeline
 v kořeni, RAG chatbot v `rag/`). Dokumentace a komentáře česky.
 
+**Knihovna drží originály.** Smysl projektu je zjistit, jak si LLM poradí
+s exotickými jazyky — pálí, sanskrtem, klasickou čínštinou, hebrejštinou —
+takže se do korpusu **nepřidávají české ani anglické překlady děl**.
+Nepoužitelné dílo (rozbitá textová vrstva, mojibake) se opravuje lepším
+zdrojem v původním jazyce, nebo se vyhodí. Do češtiny se překládá až
+výstup: odpověď knihovníka a pole `excerpt_cs` u zdrojů.
+
 ## Infrastruktura — jména strojů
 
 | Jméno | Co to je | Role |
