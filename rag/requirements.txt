@@ -10,3 +10,10 @@ fastapi>=0.115
 uvicorn>=0.30
 openai>=1.40
 pydantic>=2.0
+
+# Katalog + fulltext (Postgres na JODA), TEI ingest, registry
+psycopg[binary]>=3.2
+psycopg_pool>=3.2
+lxml>=5
+pyyaml>=6
+pytest>=8

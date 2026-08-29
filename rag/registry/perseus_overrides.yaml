@@ -1,0 +1,144 @@
+# Kurátorské výjimky pro Perseus (řečtina/latina). Metadata děl se čtou
+# z __cts__.xml / teiHeader; tady je jen to, co odtud nejde: český název
+# a jméno autora, priorita (1 = kanonické: kapitoly + summary directorem)
+# a aliasy pro směrování dotazu. Klíč = work_id ('grc.tlg0012.tlg001').
+# Ostatní díla dostanou prioritu 2 automaticky (3 = fragmenty, lexika, scholia).
+#
+# Pro celého autora (všechna jeho díla) slouží sekce `authors:` — hodí se
+# u Platóna nebo Plútarcha, kde je desítky děl a jméno autora je to, co
+# uživatel do dotazu napíše.
+
+authors:
+  tlg0012: {author_cs: Homér, aliases: [homer, homér, homerov]}
+  tlg0013: {author_cs: Homérské hymny, aliases: [homersk]}
+  tlg0020: {author_cs: Hésiodos, aliases: [hesiod]}
+  tlg0059: {author_cs: Platón, aliases: [platon, platón, plato, sokrat]}
+  tlg0086: {author_cs: Aristotelés, aliases: [aristotel]}
+  tlg0016: {author_cs: Hérodotos, aliases: [herodot]}
+  tlg0003: {author_cs: Thúkýdidés, aliases: [thukydid, thúkýdid, thucydid]}
+  tlg0085: {author_cs: Aischylos, aliases: [aischyl, aeschyl]}
+  tlg0011: {author_cs: Sofoklés, aliases: [sofokl, sophokl, sophocl]}
+  tlg0006: {author_cs: Eurípidés, aliases: [euripid]}
+  tlg0019: {author_cs: Aristofanés, aliases: [aristofan, aristophan]}
+  tlg0032: {author_cs: Xenofón, aliases: [xenofon, xenophon]}
+  tlg0557: {author_cs: Epiktétos, aliases: [epiktet, epictet]}
+  tlg0562: {author_cs: Marcus Aurelius, aliases: [marcus aureli, marka aureli, markus aureli]}
+  tlg0004: {author_cs: Diogenés Laertios, aliases: [diogen, laert]}
+  tlg0031: {author_cs: Nový zákon, aliases: [novy zakon, nový zákon, evangeli, apoštol, apostol]}
+  tlg0062: {author_cs: Lúkiános, aliases: [lukian, lúkián, lucian]}
+  tlg0007: {author_cs: Plútarchos, aliases: [plutarch, plútarch]}
+  tlg0001: {author_cs: Apollónios Rhodský, aliases: [apollonios, argonaut]}
+  tlg0005: {author_cs: Theokritos, aliases: [theokrit, theocrit]}
+  tlg0526: {author_cs: Flavius Josephus, aliases: [josephus, josef flavi]}
+  phi0690: {author_cs: Vergilius, aliases: [vergil, virgil]}
+  phi0474: {author_cs: Cicero, aliases: [cicero, ciceron]}
+  phi1017: {author_cs: Seneca, aliases: [senec, seneka]}
+  phi0550: {author_cs: Lucretius, aliases: [lucreti, lukreci]}
+  phi0959: {author_cs: Ovidius, aliases: [ovidi]}
+  phi1351: {author_cs: Tacitus, aliases: [tacit]}
+  phi0914: {author_cs: Livius, aliases: [livi, ab urbe condita]}
+  phi0893: {author_cs: Horatius, aliases: [horati, horac]}
+  phi0448: {author_cs: Caesar, aliases: [caesar, cézar, galsk]}
+  phi0631: {author_cs: Sallustius, aliases: [sallust]}
+  phi0472: {author_cs: Catullus, aliases: [catull, katull]}
+  phi0119: {author_cs: Plautus, aliases: [plaut]}
+  phi0134: {author_cs: Terentius, aliases: [terenti, terenc]}
+  phi0978: {author_cs: Plinius Starší, aliases: [plini]}
+  phi1002: {author_cs: Quintilianus, aliases: [quintilian, kvintilian]}
+
+works:
+  # --- Řecko ---
+  grc.tlg0012.tlg001: {name_cs: Ílias — Homér, priority: 1, aliases: [ilias, iliad, achill, trojsk]}
+  grc.tlg0012.tlg002: {name_cs: Odysseia — Homér, priority: 1, aliases: [odyssei, odysse, odysseus]}
+  grc.tlg0020.tlg001: {name_cs: Zrození bohů (Theogonie) — Hésiodos, priority: 1, aliases: [theogoni, zrozeni bohu]}
+  grc.tlg0020.tlg002: {name_cs: Práce a dni — Hésiodos, priority: 1, aliases: [prace a dni, práce a dni, works and days]}
+  grc.tlg0059.tlg030: {name_cs: Ústava — Platón, priority: 1, aliases: [ustav, ústav, republic, politeia]}
+  grc.tlg0059.tlg002: {name_cs: Obrana Sókratova — Platón, priority: 1, aliases: [obrana sokrat, apologi]}
+  grc.tlg0059.tlg003: {name_cs: Kritón — Platón, priority: 1, aliases: [kriton]}
+  grc.tlg0059.tlg004: {name_cs: Faidón — Platón, priority: 1, aliases: [faidon, phaedo, faedon]}
+  grc.tlg0059.tlg011: {name_cs: Symposion — Platón, priority: 1, aliases: [symposi, hostina]}
+  grc.tlg0059.tlg012: {name_cs: Faidros — Platón, priority: 1, aliases: [faidr, phaedr]}
+  grc.tlg0059.tlg023: {name_cs: Gorgias — Platón, priority: 1, aliases: [gorgi]}
+  grc.tlg0059.tlg022: {name_cs: Prótagoras — Platón, priority: 1, aliases: [protagor]}
+  grc.tlg0059.tlg031: {name_cs: Tímaios — Platón, priority: 1, aliases: [timai]}
+  grc.tlg0059.tlg034: {name_cs: Zákony — Platón, priority: 1, aliases: [zakony, zákony]}
+  grc.tlg0059.tlg006: {name_cs: Theaitétos — Platón, priority: 1, aliases: [theaitet]}
+  grc.tlg0059.tlg009: {name_cs: Parmenidés — Platón, priority: 1, aliases: [parmenid]}
+  grc.tlg0059.tlg007: {name_cs: Sofistés — Platón, priority: 1, aliases: [sofist, sophist]}
+  grc.tlg0059.tlg024: {name_cs: Menón — Platón, priority: 1, aliases: [menon]}
+  grc.tlg0059.tlg001: {name_cs: Euthyfrón — Platón, priority: 1, aliases: [euthyfr, euthyphr]}
+  grc.tlg0086.tlg010: {name_cs: Etika Níkomachova — Aristotelés, priority: 1, aliases: [nikomach, etika nikomach]}
+  grc.tlg0086.tlg035: {name_cs: Politika — Aristotelés, priority: 1, aliases: [politik]}
+  grc.tlg0086.tlg025: {name_cs: Metafyzika — Aristotelés, priority: 1, aliases: [metafyzik, metaphysic]}
+  grc.tlg0086.tlg034: {name_cs: Poetika — Aristotelés, priority: 1, aliases: [poetik]}
+  grc.tlg0086.tlg038: {name_cs: Rétorika — Aristotelés, priority: 1, aliases: [retorik, rétorik, rhetoric]}
+  grc.tlg0086.tlg003: {name_cs: Athénská ústava — Aristotelés, priority: 2}
+  grc.tlg0016.tlg001: {name_cs: Dějiny — Hérodotos, priority: 1, aliases: [dejiny herodot]}
+  grc.tlg0003.tlg001: {name_cs: Dějiny peloponéské války — Thúkýdidés, priority: 1, aliases: [peloponesk, peloponésk]}
+  grc.tlg0085.tlg005: {name_cs: Agamemnón — Aischylos, priority: 1, aliases: [agamemnon]}
+  grc.tlg0085.tlg003: {name_cs: Upoutaný Prométheus — Aischylos, priority: 1, aliases: [promethe, prométhe]}
+  grc.tlg0085.tlg002: {name_cs: Peršané — Aischylos, priority: 1, aliases: [persan, peršan]}
+  grc.tlg0085.tlg006: {name_cs: Oběť na hrobě (Choéfory) — Aischylos, priority: 1, aliases: [choefor]}
+  grc.tlg0085.tlg007: {name_cs: Usmířené Lítice (Eumenidy) — Aischylos, priority: 1, aliases: [eumenid]}
+  grc.tlg0011.tlg004: {name_cs: Král Oidipús — Sofoklés, priority: 1, aliases: [oidip, oedip]}
+  grc.tlg0011.tlg002: {name_cs: Antigona — Sofoklés, priority: 1, aliases: [antigon]}
+  grc.tlg0011.tlg005: {name_cs: Élektra — Sofoklés, priority: 1, aliases: [elektr]}
+  grc.tlg0011.tlg007: {name_cs: Oidipús na Kolónu — Sofoklés, priority: 1, aliases: [kolon]}
+  grc.tlg0006.tlg003: {name_cs: Médeia — Eurípidés, priority: 1, aliases: [medei, médei]}
+  grc.tlg0006.tlg017: {name_cs: Bakchantky — Eurípidés, priority: 1, aliases: [bakchant, bacch]}
+  grc.tlg0006.tlg005: {name_cs: Hippolytos — Eurípidés, priority: 1, aliases: [hippolyt]}
+  grc.tlg0006.tlg011: {name_cs: Trójanky — Eurípidés, priority: 1, aliases: [trojank]}
+  grc.tlg0019.tlg003: {name_cs: Oblaka — Aristofanés, priority: 1, aliases: [oblak]}
+  grc.tlg0019.tlg006: {name_cs: Ptáci — Aristofanés, priority: 1, aliases: [ptaci, ptáci]}
+  grc.tlg0019.tlg007: {name_cs: Lysistraté — Aristofanés, priority: 1, aliases: [lysistrat]}
+  grc.tlg0019.tlg009: {name_cs: Žáby — Aristofanés, priority: 1, aliases: [zaby, žáby]}
+  grc.tlg0032.tlg002: {name_cs: Vzpomínky na Sókrata — Xenofón, priority: 1, aliases: [vzpominky na sokrat, memorabili]}
+  grc.tlg0032.tlg006: {name_cs: Anabáze — Xenofón, priority: 1, aliases: [anabaz, anabas]}
+  grc.tlg0557.tlg001: {name_cs: Rozpravy — Epiktétos, priority: 1, aliases: [rozpravy, diatrib]}
+  grc.tlg0562.tlg001: {name_cs: Hovory k sobě — Marcus Aurelius, priority: 1, aliases: [hovory k sob, meditations, ad se ipsum]}
+  grc.tlg0004.tlg001: {name_cs: Životy slavných filosofů — Diogenés Laertios, priority: 1, aliases: [zivoty filosof, životy filosof]}
+  grc.tlg0031.tlg001: {name_cs: Evangelium podle Matouše, priority: 1, aliases: [matous, matouš]}
+  grc.tlg0031.tlg002: {name_cs: Evangelium podle Marka, priority: 1, aliases: [marek, markov]}
+  grc.tlg0031.tlg003: {name_cs: Evangelium podle Lukáše, priority: 1, aliases: [lukas, lukáš]}
+  grc.tlg0031.tlg004: {name_cs: Evangelium podle Jana, priority: 1, aliases: [evangelium podle jana, janov]}
+  grc.tlg0031.tlg005: {name_cs: Skutky apoštolů, priority: 1, aliases: [skutky]}
+  grc.tlg0031.tlg006: {name_cs: List Římanům, priority: 1, aliases: [rimanum, římanům]}
+  grc.tlg0031.tlg027: {name_cs: Zjevení Janovo (Apokalypsa), priority: 1, aliases: [apokalyps, zjeveni]}
+  grc.tlg0001.tlg001: {name_cs: Argonautika — Apollónios Rhodský, priority: 1, aliases: [argonautik]}
+  grc.tlg0062.tlg012: {name_cs: Pravdivé příběhy — Lúkiános, priority: 2, aliases: [pravdive pribehy]}
+  # --- Řím ---
+  lat.phi0690.phi003: {name_cs: Aeneis — Vergilius, priority: 1, aliases: [aenei, eneid, aeneas]}
+  lat.phi0690.phi002: {name_cs: Zpěvy rolnické (Georgica) — Vergilius, priority: 1, aliases: [georgic, zpevy rolnick]}
+  lat.phi0690.phi001: {name_cs: Zpěvy pastýřské (Bucolica) — Vergilius, priority: 1, aliases: [bucolic, eklog, zpevy pastyr]}
+  lat.phi0550.phi001: {name_cs: O přírodě (De rerum natura) — Lucretius, priority: 1, aliases: [de rerum natura, o prirode, o přírodě]}
+  lat.phi0474.phi055: {name_cs: O povinnostech (De officiis) — Cicero, priority: 1, aliases: [de officiis, o povinnostech]}
+  lat.phi0474.phi052: {name_cs: O přátelství (Laelius) — Cicero, priority: 1, aliases: [laelius, de amicitia, o pratelstvi cicero]}
+  lat.phi0474.phi051: {name_cs: O stáří (Cato maior) — Cicero, priority: 1, aliases: [de senectute, o stari, o stáří]}
+  lat.phi0474.phi043: {name_cs: O státě (De re publica) — Cicero, priority: 1, aliases: [de re publica, o state]}
+  lat.phi0474.phi049: {name_cs: Tuskulské hovory — Cicero, priority: 1, aliases: [tuskul, tuscul]}
+  lat.phi0474.phi050: {name_cs: O přirozenosti bohů — Cicero, priority: 1, aliases: [de natura deorum, o prirozenosti bohu]}
+  lat.phi0474.phi048: {name_cs: O nejvyšším dobru a zlu — Cicero, priority: 1, aliases: [de finibus]}
+  lat.phi0474.phi013: {name_cs: Řeči proti Catilinovi — Cicero, priority: 2, aliases: [catilin, katilin]}
+  lat.phi1017.phi015: {name_cs: Listy Luciliovi — Seneca, priority: 1, aliases: [listy lucili, epistulae morales, lucili]}
+  lat.phi1017.phi014: {name_cs: O laskavosti (De clementia) — Seneca, priority: 2, aliases: [de clementia]}
+  lat.phi1017.phi013: {name_cs: O dobrodiních (De beneficiis) — Seneca, priority: 2, aliases: [de beneficiis]}
+  lat.phi1017.phi004: {name_cs: Médea — Seneca, priority: 2}
+  lat.phi0959.phi006: {name_cs: Proměny (Metamorphoses) — Ovidius, priority: 1, aliases: [promeny, proměny, metamorph]}
+  lat.phi0959.phi001: {name_cs: Lásky (Amores) — Ovidius, priority: 2, aliases: [amores]}
+  lat.phi0959.phi004: {name_cs: Umění milovat (Ars amatoria) — Ovidius, priority: 2, aliases: [ars amatoria, umeni milovat]}
+  lat.phi0959.phi007: {name_cs: Kalendář (Fasti) — Ovidius, priority: 2, aliases: [fasti]}
+  lat.phi1351.phi002: {name_cs: Germánie — Tacitus, priority: 1, aliases: [germani, germán]}
+  lat.phi1351.phi001: {name_cs: Život Agricolův — Tacitus, priority: 2, aliases: [agricol]}
+  lat.phi1351.phi005: {name_cs: Letopisy (Annales) — Tacitus, priority: 1, aliases: [annales, letopisy, anály]}
+  lat.phi0914.phi001: {name_cs: Dějiny od založení Města — Livius, priority: 1, aliases: [od zalozeni mesta, ab urbe]}
+  lat.phi0893.phi001: {name_cs: Ódy (Carmina) — Horatius, priority: 1, aliases: [ody horati, ódy, carmina horati]}
+  lat.phi0893.phi006: {name_cs: O umění básnickém (Ars poetica) — Horatius, priority: 1, aliases: [ars poetica, umeni basnick]}
+  lat.phi0893.phi004: {name_cs: Satiry — Horatius, priority: 2, aliases: [satir]}
+  lat.phi0448.phi001: {name_cs: Zápisky o válce galské — Caesar, priority: 1, aliases: [valka galsk, válka galsk, de bello gallico]}
+  lat.phi0448.phi002: {name_cs: Zápisky o válce občanské — Caesar, priority: 2, aliases: [de bello civili]}
+  lat.phi0631.phi001: {name_cs: Catilinovo spiknutí — Sallustius, priority: 1, aliases: [catilinovo spiknuti]}
+  lat.phi0631.phi002: {name_cs: Válka s Jugurthou — Sallustius, priority: 2, aliases: [jugurth]}
+  lat.phi0472.phi001: {name_cs: Básně (Carmina) — Catullus, priority: 1, aliases: [catull, lesbi]}
+  lat.phi0978.phi001: {name_cs: Přírodověda (Naturalis historia) — Plinius Starší, priority: 2, aliases: [naturalis historia, prirodoved]}
+  lat.phi1254.phi001: {name_cs: Attické noci — Gellius, priority: 2, aliases: [atticke noci, noctes atticae]}
+  lat.phi1002.phi001: {name_cs: Základy rétoriky — Quintilianus, priority: 2, aliases: [institutio oratoria]}

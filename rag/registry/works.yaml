@@ -1,0 +1,1736 @@
+# Kurátorský registr děl. name_cs, autor, jazyk a edice jsou ruční — LLM je
+# nikdy nepřepisuje. lang_original = jazyk DÍLA, lang_corpus = jazyk TEXTU
+# v korpusu (poctivě: u překladů 'en'). Klíč = work_id (ASCII slug, stabilní).
+# Perseus tady není — ten se čte z __cts__.xml, jen výjimky jsou
+# v perseus_overrides.yaml. Vygenerováno bootstrap_works.py, pak ručně revidováno.
+
+ae.avesta_darmesteter:
+  path: avesta/avesta_darmesteter_complete.pdf
+  group: avesta
+  work_legacy: avesta darmesteter complete
+  title: The Zend-Avesta
+  name_cs: Avesta (překlad J. Darmesteter)
+  author: anonym (zoroastrijský kánon)
+  lang_original: ae
+  lang_corpus: en
+  form: hymnus
+  period: 2. tis. – 1. tis. př. n. l.
+  edition: překlad James Darmesteter, SBE 4/23/31 (1880–1887)
+  priority: 1
+  aliases:
+  - ahura mazd
+  - avest
+  - zarathustr
+  - zoroastr
+  chapters:
+    detector: pdf_bookmarks
+ang.beowulf_gummere:
+  path: european/beowulf/pg981.txt
+  group: european
+  work_legacy: Beowulf
+  title: Beowulf
+  name_cs: Beowulf (překlad F. B. Gummere)
+  author: anonym
+  lang_original: ang
+  lang_corpus: en
+  form: epos
+  period: 8.–11. stol.
+  edition: 'překlad Francis B. Gummere, 1910 (Gutenberg #981)'
+  priority: 1
+  aliases:
+  - beowulf
+  chapters:
+    detector: roman_bare
+ang.beowulf_hall:
+  path: european/beowulf/pg16328.txt
+  group: european
+  work_legacy: 'Beowulf: An Anglo-Saxon Epic Poem'
+  title: 'Beowulf: An Anglo-Saxon Epic Poem'
+  name_cs: Beowulf (překlad J. L. Hall)
+  author: anonym
+  lang_original: ang
+  lang_corpus: en
+  form: epos
+  period: 8.–11. stol.
+  edition: 'překlad John Lesslie Hall, 1892 (Gutenberg #16328)'
+  priority: 1
+  aliases:
+  - beowulf
+  chapters:
+    detector: roman_dot_upper_title
+de.hegel_werke01:
+  path: european_philosophy/hegel/hegel_werke_band01_fruehe_schriften.pdf
+  group: european_philosophy
+  work_legacy: hegel werke band01 fruehe schriften
+  title: Frühe Schriften (Werke 1)
+  name_cs: Hegel — Rané spisy (Werke 1)
+  author: Georg Wilhelm Friedrich Hegel
+  author_cs: G. W. F. Hegel
+  lang_original: de
+  lang_corpus: de
+  form: traktat
+  period: 1793–1800
+  edition: Suhrkamp Werke, Bd. 1
+  priority: 2
+  aliases:
+  - hegel
+  chapters:
+    detector: hegel
+de.hegel_werke03:
+  path: european_philosophy/hegel/hegel_werke_band03_phaenomenologie.pdf
+  group: european_philosophy
+  work_legacy: hegel werke band03 phaenomenologie
+  title: Phänomenologie des Geistes (Werke 3)
+  name_cs: Hegel — Fenomenologie ducha (Werke 3)
+  author: Georg Wilhelm Friedrich Hegel
+  author_cs: G. W. F. Hegel
+  lang_original: de
+  lang_corpus: de
+  form: traktat
+  period: '1807'
+  edition: Suhrkamp Werke, Bd. 3
+  priority: 1
+  aliases:
+  - fenomenologi
+  - hegel
+  - phanomenologi
+  chapters:
+    detector: hegel
+de.hegel_werke05:
+  path: european_philosophy/hegel/hegel_werke_band05_wissenschaft_logik.pdf
+  group: european_philosophy
+  work_legacy: hegel werke band05 wissenschaft logik
+  title: Wissenschaft der Logik I (Werke 5)
+  name_cs: Hegel — Věda o logice (Werke 5)
+  author: Georg Wilhelm Friedrich Hegel
+  author_cs: G. W. F. Hegel
+  lang_original: de
+  lang_corpus: de
+  form: traktat
+  period: 1812–1832
+  edition: Suhrkamp Werke, Bd. 5
+  priority: 1
+  aliases:
+  - hegel
+  - veda o logice
+  - vede o logice
+  - wissenschaft der logik
+  chapters:
+    detector: hegel
+egy.pyramid_texts_allen:
+  path: egypt/pyramid_texts_allen.pdf
+  group: egypt
+  work_legacy: pyramid texts allen
+  title: The Ancient Egyptian Pyramid Texts
+  name_cs: Texty pyramid (překlad J. P. Allen)
+  author: anonym
+  lang_original: egy
+  lang_corpus: en
+  form: hymnus
+  period: 24.–22. stol. př. n. l.
+  edition: překlad James P. Allen, 2005
+  priority: 1
+  aliases:
+  - pyramid
+  chapters:
+    detector: pdf_bookmarks
+non.edda_poetic:
+  path: european/edda/poetic/pg73533.txt
+  group: european
+  work_legacy: The poetic Edda
+  title: The Poetic Edda (Sæmundar Edda)
+  name_cs: Starší (Poetická) Edda (překlad H. A. Bellows)
+  author: anonym
+  lang_original: non
+  lang_corpus: en
+  form: epos
+  period: 9.–13. stol.
+  edition: 'překlad Henry Adams Bellows, 1923 (Gutenberg #73533)'
+  priority: 1
+  aliases:
+  - edd
+  - poeticka edd
+  - starsi edd
+  - vedmin
+  - volusp
+  chapters:
+    detector: edda_poetic
+non.edda_prose:
+  path: european/edda/prose/pg18947.txt
+  group: european
+  work_legacy: The Younger Edda; Also called Snorre's Edda, or The Prose Edda
+  title: The Younger Edda (Snorra Edda)
+  name_cs: Mladší (Snorriho) Edda
+  author: Snorri Sturluson
+  author_cs: Snorri Sturluson
+  lang_original: non
+  lang_corpus: en
+  form: traktat
+  period: okolo 1220
+  edition: 'překlad Rasmus B. Anderson, 1880 (Gutenberg #18947)'
+  priority: 1
+  aliases:
+  - edd
+  - mladsi edd
+  - prozaicka edd
+  - snorri
+  chapters:
+    detector: edda_prose
+pi.abh.dhammasangani:
+  path: pali/tipitaka/Abhidhammapiṭaka/Dhammasaṅgaṇīpāḷi.pdf
+  group: pali
+  work_legacy: Dhammasaṅgaṇīpāḷi
+  title: Dhammasaṅgaṇīpāḷi
+  name_cs: Abhidhamma — Výčet jevů
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.dhatukatha:
+  path: pali/tipitaka/Abhidhammapiṭaka/Dhātukathāpāḷi.pdf
+  group: pali
+  work_legacy: Dhātukathāpāḷi
+  title: Dhātukathāpāḷi
+  name_cs: Abhidhamma — Rozprava o prvcích
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.kathavatthu:
+  path: pali/tipitaka/Abhidhammapiṭaka/Kathāvatthupāḷi.pdf
+  group: pali
+  work_legacy: Kathāvatthupāḷi
+  title: Kathāvatthupāḷi
+  name_cs: Abhidhamma — Body sporu
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.patthana-1:
+  path: pali/tipitaka/Abhidhammapiṭaka/Paṭṭhānapāḷi_1.pdf
+  group: pali
+  work_legacy: Paṭṭhānapāḷi 1
+  title: Paṭṭhānapāḷi 1
+  name_cs: Abhidhamma — Vztahy podmíněnosti 1
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.patthana-2:
+  path: pali/tipitaka/Abhidhammapiṭaka/Paṭṭhānapāḷi_2.pdf
+  group: pali
+  work_legacy: Paṭṭhānapāḷi 2
+  title: Paṭṭhānapāḷi 2
+  name_cs: Abhidhamma — Vztahy podmíněnosti 2
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.patthana-3:
+  path: pali/tipitaka/Abhidhammapiṭaka/Paṭṭhānapāḷi_3.pdf
+  group: pali
+  work_legacy: Paṭṭhānapāḷi 3
+  title: Paṭṭhānapāḷi 3
+  name_cs: Abhidhamma — Vztahy podmíněnosti 3
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.patthana-4:
+  path: pali/tipitaka/Abhidhammapiṭaka/Paṭṭhānapāḷi_4.pdf
+  group: pali
+  work_legacy: Paṭṭhānapāḷi 4
+  title: Paṭṭhānapāḷi 4
+  name_cs: Abhidhamma — Vztahy podmíněnosti 4
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.patthana-5:
+  path: pali/tipitaka/Abhidhammapiṭaka/Paṭṭhānapāḷi_5.pdf
+  group: pali
+  work_legacy: Paṭṭhānapāḷi 5
+  title: Paṭṭhānapāḷi 5
+  name_cs: Abhidhamma — Vztahy podmíněnosti 5
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.puggalapannatti:
+  path: pali/tipitaka/Abhidhammapiṭaka/Puggalapaññattipāḷi.pdf
+  group: pali
+  work_legacy: Puggalapaññattipāḷi
+  title: Puggalapaññattipāḷi
+  name_cs: Abhidhamma — Popis typů osob
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.vibhanga:
+  path: pali/tipitaka/Abhidhammapiṭaka/Vibhaṅgapāḷi.pdf
+  group: pali
+  work_legacy: Vibhaṅgapāḷi
+  title: Vibhaṅgapāḷi
+  name_cs: Abhidhamma — Rozbory
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.yamaka-1:
+  path: pali/tipitaka/Abhidhammapiṭaka/Yamakapāḷi_1.pdf
+  group: pali
+  work_legacy: Yamakapāḷi 1
+  title: Yamakapāḷi 1
+  name_cs: Abhidhamma — Dvojice 1
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.yamaka-2:
+  path: pali/tipitaka/Abhidhammapiṭaka/Yamakapāḷi_2.pdf
+  group: pali
+  work_legacy: Yamakapāḷi 2
+  title: Yamakapāḷi 2
+  name_cs: Abhidhamma — Dvojice 2
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.abh.yamaka-3:
+  path: pali/tipitaka/Abhidhammapiṭaka/Yamakapāḷi_3.pdf
+  group: pali
+  work_legacy: Yamakapāḷi 3
+  title: Yamakapāḷi 3
+  name_cs: Abhidhamma — Dvojice 3
+  subgroup: abhidhamma
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: abhidhamma
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - abhidham
+  chapters:
+    detector: pali_vagga
+pi.an.atthakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Aṭṭhakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Aṭṭhakanipātapāḷi
+  title: Aṭṭhakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha osmic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.catukkanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Catukkanipātapāḷi.pdf
+  group: pali
+  work_legacy: Catukkanipātapāḷi
+  title: Catukkanipātapāḷi
+  name_cs: Anguttara-nikája — kniha čtveřic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.chakkanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Chakkanipātapāḷi.pdf
+  group: pali
+  work_legacy: Chakkanipātapāḷi
+  title: Chakkanipātapāḷi
+  name_cs: Anguttara-nikája — kniha šestic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.dasakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Dasakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Dasakanipātapāḷi
+  title: Dasakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha desítek
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.dukanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Dukanipātapāḷi.pdf
+  group: pali
+  work_legacy: Dukanipātapāḷi
+  title: Dukanipātapāḷi
+  name_cs: Anguttara-nikája — kniha dvojic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.ekadasakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Ekādasakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Ekādasakanipātapāḷi
+  title: Ekādasakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha jedenáctek
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.ekakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Ekakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Ekakanipātapāḷi
+  title: Ekakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha jednotek
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.navakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Navakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Navakanipātapāḷi
+  title: Navakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha devítek
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.pancakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Pañcakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Pañcakanipātapāḷi
+  title: Pañcakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha pětic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.sattakanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Sattakanipātapāḷi.pdf
+  group: pali
+  work_legacy: Sattakanipātapāḷi
+  title: Sattakanipātapāḷi
+  name_cs: Anguttara-nikája — kniha sedmic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.an.tikanipata:
+  path: pali/tipitaka/Suttapiṭaka/Aṅguttaranikāyo/Tikanipātapāḷi.pdf
+  group: pali
+  work_legacy: Tikanipātapāḷi
+  title: Tikanipātapāḷi
+  name_cs: Anguttara-nikája — kniha trojic
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - anguttar
+  chapters:
+    detector: pali_vagga
+pi.dn.mahavagga:
+  path: pali/tipitaka/Suttapiṭaka/Dīghanikāyo/Mahāvaggapāḷi.pdf
+  group: pali
+  work_legacy: Mahāvaggapāḷi
+  title: Mahāvaggapāḷi
+  name_cs: Dígha-nikája — Velký oddíl
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - digha
+  - dighanikaj
+  chapters:
+    detector: pali_vagga
+pi.dn.pathikavagga:
+  path: pali/tipitaka/Suttapiṭaka/Dīghanikāyo/Pāthikavaggapāḷi.pdf
+  group: pali
+  work_legacy: Pāthikavaggapāḷi
+  title: Pāthikavaggapāḷi
+  name_cs: Dígha-nikája — Páthikův oddíl
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - digha
+  - dighanikaj
+  chapters:
+    detector: pali_vagga
+pi.dn.silakkhandhavagga:
+  path: pali/tipitaka/Suttapiṭaka/Dīghanikāyo/Sīlakkhandhavaggapāḷi.pdf
+  group: pali
+  work_legacy: Sīlakkhandhavaggapāḷi
+  title: Sīlakkhandhavaggapāḷi
+  name_cs: Dígha-nikája — Oddíl o mravnosti
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - digha
+  - dighanikaj
+  chapters:
+    detector: pali_vagga
+pi.kn.buddhavamsa:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Buddhavaṃsapāḷi.pdf
+  group: pali
+  work_legacy: Buddhavaṃsapāḷi
+  title: Buddhavaṃsapāḷi
+  name_cs: Khuddaka-nikája — Buddhavansa (rodokmen buddhů)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - buddhavams
+  - buddhavans
+  chapters:
+    detector: pali_vagga
+pi.kn.cariyapitaka:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Cariyāpiṭakapāḷi.pdf
+  group: pali
+  work_legacy: Cariyāpiṭakapāḷi
+  title: Cariyāpiṭakapāḷi
+  name_cs: Khuddaka-nikája — Čarijápitaka (koš chování)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.culaniddesa:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Cūḷaniddesapāḷi.pdf
+  group: pali
+  work_legacy: Cūḷaniddesapāḷi
+  title: Cūḷaniddesapāḷi
+  name_cs: Khuddaka-nikája — Malý výklad k Sutta-nipátě
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.dhammapada:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Dhammapadapāḷi.pdf
+  group: pali
+  work_legacy: Dhammapadapāḷi
+  title: Dhammapadapāḷi
+  name_cs: Khuddaka-nikája — Dhammapadam
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - dhammapad
+  chapters:
+    detector: pali_vagga
+pi.kn.itivuttaka:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Itivuttakapāḷi.pdf
+  group: pali
+  work_legacy: Itivuttakapāḷi
+  title: Itivuttakapāḷi
+  name_cs: Khuddaka-nikája — Itivuttaka („Tak bylo řečeno“)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - itivuttak
+  chapters:
+    detector: pali_vagga
+pi.kn.jataka-1:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Jātakapāḷi_1.pdf
+  group: pali
+  work_legacy: Jātakapāḷi 1
+  title: Jātakapāḷi 1
+  name_cs: Khuddaka-nikája — Džátaky (příběhy dřívějších zrození) 1
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - dzatak
+  - jatak
+  chapters:
+    detector: pali_vagga
+pi.kn.jataka-2:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Jātakapāḷi_2.pdf
+  group: pali
+  work_legacy: Jātakapāḷi 2
+  title: Jātakapāḷi 2
+  name_cs: Khuddaka-nikája — Džátaky (příběhy dřívějších zrození) 2
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - dzatak
+  - jatak
+  chapters:
+    detector: pali_vagga
+pi.kn.khuddakapatha:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Khuddakapāṭhapāḷi.pdf
+  group: pali
+  work_legacy: Khuddakapāṭhapāḷi
+  title: Khuddakapāṭhapāḷi
+  name_cs: Khuddaka-nikája — Krátké texty
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - khuddakapath
+  chapters:
+    detector: pali_vagga
+pi.kn.mahaniddesa:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Mahāniddesapāḷi.pdf
+  group: pali
+  work_legacy: Mahāniddesapāḷi
+  title: Mahāniddesapāḷi
+  name_cs: Khuddaka-nikája — Velký výklad k Sutta-nipátě
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.milindapanha:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Milindapañhapāḷi.pdf
+  group: pali
+  work_legacy: Milindapañhapāḷi
+  title: Milindapañhapāḷi
+  name_cs: Khuddaka-nikája — Otázky krále Milindy
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - milind
+  - nagasen
+  chapters:
+    detector: pali_vagga
+pi.kn.nettippakarana:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Nettippakaraṇapāḷi.pdf
+  group: pali
+  work_legacy: Nettippakaraṇapāḷi
+  title: Nettippakaraṇapāḷi
+  name_cs: Khuddaka-nikája — Netti (průvodce výkladem)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.patisambhidamagga:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Paṭisambhidāmaggapāḷi.pdf
+  group: pali
+  work_legacy: Paṭisambhidāmaggapāḷi
+  title: Paṭisambhidāmaggapāḷi
+  name_cs: Khuddaka-nikája — Cesta rozlišujícího poznání
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.petakopadesa:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Peṭakopadesapāḷi.pdf
+  group: pali
+  work_legacy: Peṭakopadesapāḷi
+  title: Peṭakopadesapāḷi
+  name_cs: Khuddaka-nikája — Petakopadésa (návod k výkladu koše)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.petavatthu:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Petavatthupāḷi.pdf
+  group: pali
+  work_legacy: Petavatthupāḷi
+  title: Petavatthupāḷi
+  name_cs: Khuddaka-nikája — Příběhy hladových duchů
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - petavatthu
+  chapters:
+    detector: pali_vagga
+pi.kn.suttanipata:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Suttanipātapāḷi.pdf
+  group: pali
+  work_legacy: Suttanipātapāḷi
+  title: Suttanipātapāḷi
+  name_cs: Khuddaka-nikája — Sutta-nipáta
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - sutta-nipat
+  - suttanipat
+  chapters:
+    detector: pali_vagga
+pi.kn.theragatha:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Theragāthāpāḷi.pdf
+  group: pali
+  work_legacy: Theragāthāpāḷi
+  title: Theragāthāpāḷi
+  name_cs: Khuddaka-nikája — Théragáthá (zpěvy starších mnichů)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - theragath
+  chapters:
+    detector: pali_vagga
+pi.kn.therapadana-1:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Therāpadānapāḷi_1.pdf
+  group: pali
+  work_legacy: Therāpadānapāḷi 1
+  title: Therāpadānapāḷi 1
+  name_cs: Khuddaka-nikája — Apadána (životopisy starších) 1
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - apadan
+  chapters:
+    detector: pali_vagga
+pi.kn.therapadana-2:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Therāpadānapāḷi_2.pdf
+  group: pali
+  work_legacy: Therāpadānapāḷi 2
+  title: Therāpadānapāḷi 2
+  name_cs: Khuddaka-nikája — Apadána (životopisy starších) 2
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - apadan
+  chapters:
+    detector: pali_vagga
+pi.kn.therigatha:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Therīgāthāpāḷi.pdf
+  group: pali
+  work_legacy: Therīgāthāpāḷi
+  title: Therīgāthāpāḷi
+  name_cs: Khuddaka-nikája — Thérígáthá (zpěvy starších mnišek)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - therigath
+  chapters:
+    detector: pali_vagga
+pi.kn.udana:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Udānapāḷi.pdf
+  group: pali
+  work_legacy: Udānapāḷi
+  title: Udānapāḷi
+  name_cs: Khuddaka-nikája — Udána (Buddhova zvolání)
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  chapters:
+    detector: pali_vagga
+pi.kn.vimanavatthu:
+  path: pali/tipitaka/Suttapiṭaka/Khuddakanikāyo/Vimānavatthupāḷi.pdf
+  group: pali
+  work_legacy: Vimānavatthupāḷi
+  title: Vimānavatthupāḷi
+  name_cs: Khuddaka-nikája — Příběhy nebeských paláců
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vimanavatthu
+  chapters:
+    detector: pali_vagga
+pi.mn.majjhimapannasa:
+  path: pali/tipitaka/Suttapiṭaka/Majjhimanikāyo/Majjhimapaṇṇāsapāḷi.pdf
+  group: pali
+  work_legacy: Majjhimapaṇṇāsapāḷi
+  title: Majjhimapaṇṇāsapāḷi
+  name_cs: Madždžhima-nikája — druhá padesátka
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - madzdzhim
+  - majjhim
+  chapters:
+    detector: pali_vagga
+pi.mn.mulapannasa:
+  path: pali/tipitaka/Suttapiṭaka/Majjhimanikāyo/Mūlapaṇṇāsapāḷi.pdf
+  group: pali
+  work_legacy: Mūlapaṇṇāsapāḷi
+  title: Mūlapaṇṇāsapāḷi
+  name_cs: Madždžhima-nikája — první padesátka
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - madzdzhim
+  - majjhim
+  chapters:
+    detector: pali_vagga
+pi.mn.uparipannasa:
+  path: pali/tipitaka/Suttapiṭaka/Majjhimanikāyo/Uparipaṇṇāsapāḷi.pdf
+  group: pali
+  work_legacy: Uparipaṇṇāsapāḷi
+  title: Uparipaṇṇāsapāḷi
+  name_cs: Madždžhima-nikája — třetí padesátka
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - madzdzhim
+  - majjhim
+  chapters:
+    detector: pali_vagga
+pi.sn.khandhavagga:
+  path: pali/tipitaka/Suttapiṭaka/Saṃyuttanikāyo/Khandhavaggo.pdf
+  group: pali
+  work_legacy: Khandhavaggo
+  title: Khandhavaggo
+  name_cs: Samjutta-nikája — Oddíl o složkách osobnosti
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - samjutt
+  - samyutt
+  chapters:
+    detector: pali_vagga
+pi.sn.mahavagga:
+  path: pali/tipitaka/Suttapiṭaka/Saṃyuttanikāyo/Mahāvaggo.pdf
+  group: pali
+  work_legacy: Mahāvaggo
+  title: Mahāvaggo
+  name_cs: Samjutta-nikája — Velký oddíl
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - samjutt
+  - samyutt
+  chapters:
+    detector: pali_vagga
+pi.sn.nidanavagga:
+  path: pali/tipitaka/Suttapiṭaka/Saṃyuttanikāyo/Nidānavaggo.pdf
+  group: pali
+  work_legacy: Nidānavaggo
+  title: Nidānavaggo
+  name_cs: Samjutta-nikája — Oddíl o příčinách
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - samjutt
+  - samyutt
+  chapters:
+    detector: pali_vagga
+pi.sn.sagathavagga:
+  path: pali/tipitaka/Suttapiṭaka/Saṃyuttanikāyo/Sagāthāvaggo.pdf
+  group: pali
+  work_legacy: Sagāthāvaggo
+  title: Sagāthāvaggo
+  name_cs: Samjutta-nikája — Oddíl s verši
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - samjutt
+  - samyutt
+  chapters:
+    detector: pali_vagga
+pi.sn.salayatanavagga:
+  path: pali/tipitaka/Suttapiṭaka/Saṃyuttanikāyo/Saḷāyatanavaggo.pdf
+  group: pali
+  work_legacy: Saḷāyatanavaggo
+  title: Saḷāyatanavaggo
+  name_cs: Samjutta-nikája — Oddíl o šesti smyslech
+  subgroup: sutta
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: sutta
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - samjutt
+  - samyutt
+  chapters:
+    detector: pali_vagga
+pi.vin.culavagga:
+  path: pali/tipitaka/Vinayapiṭaka/Cūḷavaggapāḷi.pdf
+  group: pali
+  work_legacy: Cūḷavaggapāḷi
+  title: Cūḷavaggapāḷi
+  name_cs: Vinaja — Malý oddíl
+  subgroup: vinaya
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: vinaya
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vinaj
+  - vinay
+  chapters:
+    detector: pali_vagga
+pi.vin.mahavagga:
+  path: pali/tipitaka/Vinayapiṭaka/Mahāvaggapāḷi.pdf
+  group: pali
+  work_legacy: Mahāvaggapāḷi
+  title: Mahāvaggapāḷi (Vinaya)
+  name_cs: Vinaja — Velký oddíl (Mahávagga)
+  subgroup: vinaya
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: vinaya
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vinaj
+  - vinay
+  chapters:
+    detector: pali_vagga
+pi.vin.pacittiya:
+  path: pali/tipitaka/Vinayapiṭaka/Pācittiyapāḷi.pdf
+  group: pali
+  work_legacy: Pācittiyapāḷi
+  title: Pācittiyapāḷi
+  name_cs: Vinaja — Pácittija (odčinitelné přestupky)
+  subgroup: vinaya
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: vinaya
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vinaj
+  - vinay
+  chapters:
+    detector: pali_vagga
+pi.vin.parajika:
+  path: pali/tipitaka/Vinayapiṭaka/Pārājikapāḷi.pdf
+  group: pali
+  work_legacy: Pārājikapāḷi
+  title: Pārājikapāḷi
+  name_cs: Vinaja — Párádžika (nejtěžší přestupky)
+  subgroup: vinaya
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: vinaya
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vinaj
+  - vinay
+  chapters:
+    detector: pali_vagga
+pi.vin.parivara:
+  path: pali/tipitaka/Vinayapiṭaka/Parivārapāḷi.pdf
+  group: pali
+  work_legacy: Parivārapāḷi
+  title: Parivārapāḷi
+  name_cs: Vinaja — Parivára (dodatek k řeholi)
+  subgroup: vinaya
+  author: (kánon Theravády)
+  lang_original: pi
+  lang_corpus: pi
+  form: vinaya
+  period: 5.–1. stol. př. n. l. (redakce)
+  edition: Vipassana Research Institute, Chaṭṭha Saṅgāyana (PDF)
+  priority: 1
+  aliases:
+  - vinaj
+  - vinay
+  chapters:
+    detector: pali_vagga
+sa.mbh01:
+  path: sanskrit/mahabharata/maha01.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 01 — Ádiparva
+  title: Mahábhárata 01 — Ádiparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - adiparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh02:
+  path: sanskrit/mahabharata/maha02.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 02 — Sabháparva
+  title: Mahábhárata 02 — Sabháparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - sabhaparv
+  chapters:
+    detector: mbh_section
+sa.mbh03:
+  path: sanskrit/mahabharata/maha03.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 03 — Vanaparva
+  title: Mahábhárata 03 — Vanaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - vanaparv
+  chapters:
+    detector: mbh_section
+sa.mbh04:
+  path: sanskrit/mahabharata/maha04.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 04 — Virátaparva
+  title: Mahábhárata 04 — Virátaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - virataparv
+  chapters:
+    detector: mbh_section
+sa.mbh05:
+  path: sanskrit/mahabharata/maha05.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 05 — Udjógaparva
+  title: Mahábhárata 05 — Udjógaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - udjogaparv
+  chapters:
+    detector: mbh_section
+sa.mbh06:
+  path: sanskrit/mahabharata/maha06.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 06 — Bhíšmaparva
+  title: Mahábhárata 06 — Bhíšmaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - bhagavad git
+  - bhagavadgit
+  - bhismaparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh07:
+  path: sanskrit/mahabharata/maha07.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 07 — Drónaparva
+  title: Mahábhárata 07 — Drónaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - dronaparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh08:
+  path: sanskrit/mahabharata/maha08.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 08 — Karnaparva
+  title: Mahábhárata 08 — Karnaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - karnaparv
+  - mahabharat
+  chapters:
+    detector: mbh_bare_number
+sa.mbh09:
+  path: sanskrit/mahabharata/maha09.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 09 — Šaljaparva
+  title: Mahábhárata 09 — Šaljaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - saljaparv
+  chapters:
+    detector: mbh_bare_number
+sa.mbh10:
+  path: sanskrit/mahabharata/maha10.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 10 — Sauptikaparva
+  title: Mahábhárata 10 — Sauptikaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - sauptikaparv
+  chapters:
+    detector: mbh_bare_number
+sa.mbh11:
+  path: sanskrit/mahabharata/maha11.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 11 — Stríparva
+  title: Mahábhárata 11 — Stríparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - striparv
+  chapters:
+    detector: mbh_bare_number
+sa.mbh12:
+  path: sanskrit/mahabharata/maha12.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 12 — Šántiparva
+  title: Mahábhárata 12 — Šántiparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - santiparv
+  chapters:
+    detector: mbh_section
+sa.mbh13:
+  path: sanskrit/mahabharata/maha13.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 13 — Anušásanaparva
+  title: Mahábhárata 13 — Anušásanaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - anusasanaparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh14:
+  path: sanskrit/mahabharata/maha14.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 14 — Ášvamédhikaparva
+  title: Mahábhárata 14 — Ášvamédhikaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - asvamedhikaparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh15:
+  path: sanskrit/mahabharata/maha15.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 15 — Ášramavásikaparva
+  title: Mahábhárata 15 — Ášramavásikaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - asramavasikaparv
+  - mahabharat
+  chapters:
+    detector: mbh_section
+sa.mbh16:
+  path: sanskrit/mahabharata/maha16.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 16 — Mausalaparva
+  title: Mahábhárata 16 — Mausalaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - mausalaparv
+  chapters:
+    detector: mbh_bare_number
+sa.mbh17:
+  path: sanskrit/mahabharata/maha17.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 17 — Maháprasthánikaparva
+  title: Mahábhárata 17 — Maháprasthánikaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - mahaprasthanikaparv
+  chapters:
+    detector: mbh_bare_number
+sa.mbh18:
+  path: sanskrit/mahabharata/maha18.txt
+  group: sanskrit
+  work_legacy: Mahábhárata 18 — Svargáróhanaparva
+  title: Mahábhárata 18 — Svargáróhanaparva
+  subgroup: mahabharata
+  author: Vyāsa (tradiční připsání)
+  author_cs: Vjása
+  lang_original: sa
+  lang_corpus: en
+  form: epos
+  period: 4. stol. př. n. l. – 4. stol. n. l.
+  edition: překlad Kisari Mohan Ganguli, 1883–1896
+  priority: 1
+  aliases:
+  - mahabharat
+  - svargarohanaparv
+  chapters:
+    detector: mbh_bare_number
+sa.rigveda_griffith:
+  path: sanskrit/vedy/rigveda_complete_sanskrit.pdf
+  group: sanskrit
+  work_legacy: rigveda complete sanskrit
+  title: The Hymns of the Rigveda
+  name_cs: Rgvéd (anglický překlad R. T. H. Griffith, OCR ze skenu)
+  author: anonym (ršiové)
+  lang_original: sa
+  lang_corpus: en
+  form: hymnus
+  period: 1500–1200 př. n. l.
+  edition: překlad Ralph T. H. Griffith, 1896 (OCR ze skenu)
+  priority: 1
+  aliases:
+  - rgved
+  - rigved
+  chapters:
+    detector: rigveda_hymn
+zh.daodejing:
+  path: chinese/laozi/dao_de_jing.txt
+  group: chinese
+  work_legacy: dao de jing
+  title: 道德經
+  name_cs: Tao te ťing — Lao-c'
+  author: Laozi (připisováno)
+  author_cs: Lao-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: aforismy
+  period: 4.–3. stol. př. n. l.
+  edition: Gutenberg, text Wang Bi
+  priority: 1
+  aliases:
+  - dao de jing
+  - daodejing
+  - lao-c
+  - laoc
+  - laozi
+  - tao te ting
+  - tao-te-ting
+  - taoteting
+  chapters:
+    detector: zh_zhang
+zh.lunyu:
+  path: chinese/konfucius/analects.txt
+  group: chinese
+  work_legacy: analects
+  title: 論語
+  name_cs: Hovory (Lun-jü) — Konfucius
+  author: Konfucius a žáci (Kongzi)
+  author_cs: Konfucius
+  lang_original: lzh
+  lang_corpus: lzh
+  form: dialog
+  period: 5.–3. stol. př. n. l.
+  edition: Gutenberg
+  priority: 1
+  aliases:
+  - analekt
+  - confuci
+  - hovorech
+  - hovory
+  - konfuci
+  - lun-ju
+  - lunju
+  chapters:
+    detector: zh_lunyu
+zh.mengzi:
+  path: chinese/mengzi/mengzi.txt
+  group: chinese
+  work_legacy: mengzi
+  title: 孟子
+  name_cs: Meng-c' (Mencius)
+  author: Mengzi (Mencius)
+  author_cs: Mencius
+  lang_original: lzh
+  lang_corpus: lzh
+  form: dialog
+  period: 4. stol. př. n. l.
+  edition: Gutenberg
+  priority: 1
+  aliases:
+  - menci
+  - mencius
+  - meng-c
+  - mengzi
+  chapters:
+    detector: zh_juan
+zh.zhuangzi:
+  path: chinese/zhuangzi/zhuangzi.txt
+  group: chinese
+  work_legacy: zhuangzi
+  title: 莊子 (Chuang Tzŭ)
+  name_cs: Čuang-c' (Zhuangzi, překlad H. A. Giles)
+  author: Zhuangzi (Zhuang Zhou)
+  author_cs: Čuang-c'
+  lang_original: lzh
+  lang_corpus: en
+  form: traktat
+  period: 4.–3. stol. př. n. l.
+  edition: překlad Herbert A. Giles, 1889 (Gutenberg)
+  priority: 1
+  aliases:
+  - chuang tzu
+  - cuang-c
+  - cuangc
+  - zhuangzi
+  chapters:
+    detector: en_chapter_roman

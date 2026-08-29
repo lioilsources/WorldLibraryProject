@@ -1,0 +1,1600 @@
+
+
+
+
+
+                                  THE
+                              POETIC EDDA
+
+                     TRANSLATED FROM THE ICELANDIC
+                     WITH AN INTRODUCTION AND NOTES
+
+
+                                   BY
+                          HENRY ADAMS BELLOWS
+
+
+                           TWO VOLUMES IN ONE
+
+
+                                NEW YORK
+                  THE AMERICAN-SCANDINAVIAN FOUNDATION
+
+                        LONDON: HUMPHREY MILFORD
+                        OXFORD UNIVERSITY PRESS
+
+                                  1923
+
+
+
+
+
+
+
+
+    This series of Scandinavian Classics is published by The American-
+    Scandinavian Foundation in the belief that greater familiarity with
+    the chief literary monuments of the North will help Americans to a
+    better understanding of Scandinavians, and thus serve to stimulate
+    their sympathetic coöperation to good ends.
+
+
+
+
+
+
+
+
+                       To George Lyman Kittredge
+
+
+
+
+
+
+
+
+                         SCANDINAVIAN CLASSICS
+                          VOLUMES XXI AND XXII
+
+                            THE POETIC EDDA
+
+
+
+
+
+
+
+
+                      ESTABLISHED BY NIELS POULSON
+
+    THIS VOLUME IS ENDOWED IN PART BY CHARLES S. PETERSON OF CHICAGO
+
+
+
+
+
+
+
+
+CONTENTS [1]
+
+
+    General Introduction                        xi
+
+    Lays of the Gods
+
+        Voluspo                                  1
+        Hovamol                                 28
+        Vafthruthnismol                         68
+        Grimnismol                              84
+        Skirnismol                             107
+        Harbarthsljoth                         121
+        Hymiskvitha                            138
+        Lokasenna                              151
+        Thrymskvitha                           174
+        Alvissmol                              183
+        Baldrs Draumar                         195
+        Rigsthula                              201
+        Hyndluljoth                            217
+        Svipdagsmol                            234
+
+    Lays of the Heroes
+
+        Völundarkvitha                         252
+        Helgakvitha Hjorvarthssonar            269
+        Helgakvitha Hundingsbana I             290
+        Helgakvitha Hundingsbana II            309
+        Fra Dautha Sinfjotla                   332
+        Gripisspo                              337
+        Reginsmol                              356
+        Fafnismol                              370
+        Sigrdrifumol                           386
+        Brot af Sigurtharkvithu                402
+        Guthrunarkvitha I                      411
+        Sigurtharkvitha en Skamma              420
+        Helreith Brynhildar                    442
+        Drap Niflunga                          447
+        Guthrunarkvitha II, en Forna           450
+        Guthrunarkvitha III                    465
+        Oddrunargratr                          469
+        Atlakvitha en Grönlenzka               480
+        Atlamol en Grönlenzku                  499
+        Guthrunarhvot                          536
+        Hamthesmol                             545
+
+
+
+
+NOTE
+
+[1] For the phonetic spellings of the proper names see the Pronouncing
+Index.
+
+
+
+
+
+
+
+
+ACKNOWLEDGEMENT
+
+
+The General Introduction mentions many of the scholars to whose work
+this translation owes a special debt. Particular reference, however,
+should here be made to the late William Henry Schofield, Professor of
+Comparative Literature in Harvard University and President of The
+American-Scandinavian Foundation, under whose guidance this translation
+was begun; to Henry Goddard Leach, for many years Secretary of The
+American-Scandinavian Foundation, and to William Witherle Lawrence,
+Professor of English in Columbia University and Chairman of the
+Foundation’s Committee on Publications, for their assistance with the
+manuscript and the proofs; and to Hanna Astrup Larsen, the Foundation’s
+literary secretary, for her efficient management of the complex details
+of publication.
+
+
+
+
+
+
+
+
+GENERAL INTRODUCTION
+
+
+There is scarcely any literary work of great importance which has been
+less readily available for the general reader, or even for the serious
+student of literature, than the Poetic Edda. Translations have been far
+from numerous, and only in Germany has the complete work of translation
+been done in the full light of recent scholarship. In English the only
+versions were long the conspicuously inadequate one made by Thorpe, and
+published about half a century ago, and the unsatisfactory prose
+translations in Vigfusson and Powell’s Corpus Poeticum Boreale,
+reprinted in the Norrœna collection. An excellent translation of the
+poems dealing with the gods, in verse and with critical and explanatory
+notes, made by Olive Bray, was, however, published by the Viking Club
+of London in 1908. In French there exist only partial translations,
+chief among them being those made by Bergmann many years ago. Among the
+seven or eight German versions, those by the Brothers Grimm and by Karl
+Simrock, which had considerable historical importance because of their
+influence on nineteenth century German literature and art, and
+particularly on the work of Richard Wagner, have been largely
+superseded by Hugo Gering’s admirable translation, published in 1892,
+and by the recent two-volume rendering by Genzmer, with excellent notes
+by Andreas Heusler, 1914–1920. There are competent translations in both
+Norwegian and Swedish. The lack of any complete and adequately
+annotated English rendering in metrical form, based on a critical text,
+and profiting by the cumulative labors of such scholars as Mogk,
+Vigfusson, Finnur Jonsson, Grundtvig, Bugge, Gislason, Hildebrand,
+Lüning, Sweet, Niedner, Ettmüller, Müllenhoff, Edzardi, B. M. Olsen,
+Sievers, Sijmons, Detter, Heinzel, Falk, Neckel, Heusler, and Gering,
+has kept this extraordinary work practically out of the reach of those
+who have had neither time nor inclination to master the intricacies of
+the original Old Norse.
+
+On the importance of the material contained in the Poetic Edda it is
+here needless to dwell at any length. We have inherited the Germanic
+traditions in our very speech, and the Poetic Edda is the original
+storehouse of Germanic mythology. It is, indeed, in many ways the
+greatest literary monument preserved to us out of the antiquity of the
+kindred races which we call Germanic. Moreover, it has a literary value
+altogether apart from its historical significance. The mythological
+poems include, in the Voluspo, one of the vastest conceptions of the
+creation and ultimate destruction of the world ever crystallized in
+literary form; in parts of the Hovamol, a collection of wise counsels
+that can bear comparison with most of the Biblical Book of Proverbs; in
+the Lokasenna, a comedy none the less full of vivid characterization
+because its humor is often broad; and in the Thrymskvitha, one of the
+finest ballads in the world. The hero poems give us, in its oldest and
+most vivid extant form, the story of Sigurth, Brynhild, and Atli, the
+Norse parallel to the German Nibelungenlied. The Poetic Edda is not
+only of great interest to the student of antiquity; it is a collection
+including some of the most remarkable poems which have been preserved
+to us from the period before the pen and the printing-press replaced
+the poet-singer and oral tradition. It is above all else the desire to
+make better known the dramatic force, the vivid and often tremendous
+imagery, and the superb conceptions embodied in these poems which has
+called forth the present translation.
+
+
+
+
+WHAT IS THE POETIC EDDA?
+
+Even if the poems of the so-called Edda were not so significant and
+intrinsically so valuable, the long series of scholarly struggles which
+have been going on over them for the better part of three centuries
+would in itself give them a peculiar interest. Their history is
+strangely mysterious. We do not know who composed them, or when or
+where they were composed; we are by no means sure who collected them or
+when he did so; finally, we are not absolutely certain as to what an
+“Edda” is, and the best guess at the meaning of the word renders its
+application to this collection of poems more or less misleading.
+
+A brief review of the chief facts in the history of the Poetic Edda
+will explain why this uncertainty has persisted. Preserved in various
+manuscripts of the thirteenth and early fourteenth centuries is a prose
+work consisting of a very extensive collection of mythological stories,
+an explanation of the important figures and tropes of Norse poetic
+diction,—the poetry of the Icelandic and Norwegian skalds was
+appallingly complex in this respect,—and a treatise on metrics. This
+work, clearly a handbook for poets, was commonly known as the “Edda” of
+Snorri Sturluson, for at the head of the copy of it in the Uppsalabok,
+a manuscript written presumably some fifty or sixty years after
+Snorri’s death, which was in 1241, we find: “This book is called Edda,
+which Snorri Sturluson composed.” This work, well known as the Prose
+Edda, Snorri’s Edda or the Younger Edda, has recently been made
+available to readers of English in the admirable translation by Arthur
+G. Brodeur, published by the American-Scandinavian Foundation in 1916.
+
+Icelandic tradition, however, persisted in ascribing either this Edda
+or one resembling it to Snorri’s much earlier compatriot, Sæmund the
+Wise (1056–1133). When, early in the seventeenth century, the learned
+Arngrimur Jonsson proved to everyone’s satisfaction that Snorri and
+nobody else must have been responsible for the work in question, the
+next thing to determine was what, if anything, Sæmund had done of the
+same kind. The nature of Snorri’s book gave a clue. In the mythological
+stories related a number of poems were quoted, and as these and other
+poems were to all appearances Snorri’s chief sources of information, it
+was assumed that Sæmund must have written or compiled a verse
+Edda—whatever an “Edda” might be—on which Snorri’s work was largely
+based.
+
+So matters stood when, in 1643, Brynjolfur Sveinsson, Bishop of
+Skalholt, discovered a manuscript, clearly written as early as 1300,
+containing twenty-nine poems, complete or fragmentary, and some of them
+with the very lines and stanzas used by Snorri. Great was the joy of
+the scholars, for here, of course, must be at least a part of the
+long-sought Edda of Sæmund the Wise. Thus the good bishop promptly
+labeled his find, and as Sæmund’s Edda, the Elder Edda or the Poetic
+Edda it has been known to this day.
+
+This precious manuscript, now in the Royal Library in Copenhagen, and
+known as the Codex Regius (R2365), has been the basis for all published
+editions of the Eddic poems. A few poems of similar character found
+elsewhere have subsequently been added to the collection, until now
+most editions include, as in this translation, a total of thirty-four.
+A shorter manuscript now in the Arnamagnæan collection in Copenhagen
+(AM748), contains fragmentary or complete versions of six of the poems
+in the Codex Regius, and one other, Baldrs Draumar, not found in that
+collection. Four other poems (Rigsthula, Hyndluljoth, Grougaldr and
+Fjolsvinnsmol, the last two here combined under the title of
+Svipdagsmol), from various manuscripts, so closely resemble in
+subject-matter and style the poems in the Codex Regius that they have
+been included by most editors in the collection. Finally, Snorri’s Edda
+contains one complete poem, the Grottasongr, which many editors have
+added to the poetic collection; it is, however, not included in this
+translation, as an admirable English version of it is available in Mr.
+Brodeur’s rendering of Snorri’s work.
+
+From all this it is evident that the Poetic Edda, as we now know it, is
+no definite and plainly limited work, but rather a more or less
+haphazard collection of separate poems, dealing either with Norse
+mythology or with hero-cycles unrelated to the traditional history of
+greater Scandinavia or Iceland. How many other similar poems, now lost,
+may have existed in such collections as were current in Iceland in the
+later twelfth and thirteenth centuries we cannot know, though it is
+evident that some poems of this type are missing. We can say only that
+thirty-four poems have been preserved, twenty-nine of them in a single
+manuscript collection, which differ considerably in subject-matter and
+style from all the rest of extant Old Norse poetry, and these we group
+together as the Poetic Edda.
+
+But what does the word “Edda” mean? Various guesses have been made. An
+early assumption was that the word somehow meant “Poetics,” which
+fitted Snorri’s treatise to a nicety, but which, in addition to the
+lack of philological evidence to support this interpretation, could by
+no stretch of scholarly subtlety be made appropriate to the collection
+of poems. Jacob Grimm ingeniously identified the word with the word
+“edda” used in one of the poems, the Rigsthula, where, rather
+conjecturally, it means “great-grandmother.” The word exists in this
+sense nowhere else in Norse literature, and Grimm’s suggestion of
+“Tales of a Grandmother,” though at one time it found wide acceptance,
+was grotesquely inappropriate to either the prose or the verse work.
+
+At last Eirikr Magnusson hit on what appears the likeliest solution of
+the puzzle: that “Edda” is simply the genitive form of the proper name
+“Oddi.” Oddi was a settlement in the southwest of Iceland, certainly
+the home of Snorri Sturluson for many years, and, traditionally at
+least, also the home of Sæmund the Wise. That Snorri’s work should have
+been called “The Book of Oddi” is altogether reasonable, for such a
+method of naming books was common—witness the “Book of the Flat Island”
+and other early manuscripts. That Sæmund may also have written or
+compiled another “Oddi-Book” is perfectly possible, and that tradition
+should have said he did so is entirely natural.
+
+It is, however, an open question whether or not Sæmund had anything to
+do with making the collection, or any part of it, now known as the
+Poetic Edda, for of course the seventeenth-century assignment of the
+work to him is negligible. We can say only that he may have made some
+such compilation, for he was a diligent student of Icelandic tradition
+and history, and was famed throughout the North for his learning. But
+otherwise no trace of his works survives, and as he was educated in
+Paris, it is probable that he wrote rather in Latin than in the
+vernacular.
+
+All that is reasonably certain is that by the middle or last of the
+twelfth century there existed in Iceland one or more written
+collections of Old Norse mythological and heroic poems, that the Codex
+Regius, a copy made a hundred years or so later, represents at least a
+considerable part of one of these, and that the collection of
+thirty-four poems which we now know as the Poetic or Elder Edda is
+practically all that has come down to us of Old Norse poetry of this
+type. Anything more is largely guesswork, and both the name of the
+compiler and the meaning of the title “Edda” are conjectural.
+
+
+
+
+THE ORIGIN OF THE EDDIC POEMS
+
+There is even less agreement about the birthplace, authorship and date
+of the Eddic poems themselves than about the nature of the existing
+collection. Clearly the poems were the work of many different men,
+living in different periods; clearly, too, most of them existed in oral
+tradition for generations before they were first committed to writing.
+In general the mythological poems are strongly heathen in character,
+and as Christianity became generally accepted throughout Norway and
+Iceland early in the eleventh century, it is altogether likely that
+most of the poems dealing with the Norse gods antedate the year 1000.
+On the other hand, Hoffory, Finnur Jonsson and others have shown pretty
+conclusively from linguistic evidence that these poems cannot have
+assumed anything like their present form before the ninth century. As
+for the poems belonging to the hero cycles, one or two of them appear
+to be as late as 1100, but most of them clearly belong to the hundred
+years following 950. It is a fairly safe guess that the years between
+900 and 1050 saw the majority of the Eddic poems put into shape, but it
+must be remembered that many changes took place during the long
+subsequent period of oral transmission, and also that many of the
+legends, both mythological and heroic, on which the poems were based,
+certainly existed in Norway, and quite possibly in verse form, long
+before the year 900. In considering such poems it is essential to
+forget the present mode of composition, whereby a poet at once fixes
+his thought and his style by means of writing, and to remember that for
+at least two centuries, and possibly much longer, the correct
+transmission of many of the Eddic poems depended solely on accurate
+hearing and retentive memory.
+
+As to the origin of the legends on which the poems are based, the whole
+question, at least so far as the stories of the gods are concerned, is
+much too complex for discussion here. How much of the actual narrative
+material of the mythological lays is properly to be called Scandinavian
+is a matter for students of comparative mythology to guess at. The
+tales underlying the heroic lays are clearly of foreign origin: the
+Helgi story comes from Denmark, and that of Völund from Germany, as
+also the great mass of traditions centering around Sigurth (Siegfried),
+Brynhild, the sons of Gjuki, Atli (Attila), and Jormunrek (Ermanarich).
+The introductory notes to the various poems deal with the more
+important of these questions of origin.
+
+Of the men who composed these poems,—“wrote” is obviously the wrong
+word,—we know absolutely nothing, save that some of them must have been
+literary artists with a high degree of conscious skill. The Eddic poems
+are “folk-poetry,”—whatever that may be,—only in the sense that some of
+them strongly reflect racial feelings and beliefs; they are anything
+but crude or primitive in workmanship, and they show that not only the
+poets themselves, but also many of their hearers, must have made a
+careful study of the art of poetry.
+
+Where the poems were composed is almost equally uncertain. The claims
+of Norway have been extensively advanced, but the great literary
+activity of Iceland after the settlement of the island by Norwegian
+emigrants late in the ninth century makes the theory of an Icelandic
+source for most of the poems plausible. The two Atli lays, with what
+authority we do not know, bear in the Codex Regius the superscription
+“the Greenland poem,” and internal evidence indicates that this
+statement is correct. Certainly in one poem, the Rigsthula, and
+probably in several others, there are marks of Celtic influence. During
+a considerable part of the ninth and tenth centuries, Scandinavians
+were active in Ireland and in most of the western islands inhabited by
+branches of the Celtic race. Some scholars claim nearly all the Eddic
+poems for these “Western Isles,” in sharp distinction from Iceland;
+their arguments are commented on in the introductory note to the
+Rigsthula. However, as Iceland early came to be the true center of this
+Scandinavian island world, it may be said that most of the evidence
+concerning the birthplace of the Eddic poems in anything like their
+present form points in that direction, and certainly it was in Iceland
+that they were chiefly preserved.
+
+
+
+
+THE EDDA AND OLD NORSE LITERATURE
+
+Within the proper limits of an introduction it would be impossible to
+give any adequate summary of the history and literature with which the
+Eddic poems are indissolubly connected, but a mere mention of a few of
+the salient facts may be of some service to those who are unfamiliar
+with the subject. Old Norse literature covers approximately the period
+between 850 and 1300. During the first part of that period occurred the
+great wanderings of the Scandinavian peoples, and particularly the
+Norwegians. A convenient date to remember is that of the sea-fight of
+Hafrsfjord, 872, when Harald the Fair-Haired broke the power of the
+independent Norwegian nobles, and made himself overlord of nearly all
+the country. Many of the defeated nobles fled overseas, where inviting
+refuges had been found for them by earlier wanderers and
+plunder-seeking raiders. This was the time of the inroads of the
+dreaded Northmen in France, and in 885 Hrolf Gangr (Rollo) laid siege
+to Paris itself. Many Norwegians went to Ireland, where their
+compatriots had already built Dublin, and where they remained in
+control of most of the island till Brian Boru shattered their power at
+the battle of Clontarf in 1014.
+
+Of all the migrations, however, the most important were those to
+Iceland. Here grew up an active civilization, fostered by absolute
+independence and by remoteness from the wars which wracked Norway, yet
+kept from degenerating into provincialism by the roving life of the
+people, which brought them constantly in contact with the culture of
+the South. Christianity, introduced throughout the Norse world about
+the year 1000, brought with it the stability of learning, and the
+Icelanders became not only the makers but also the students and
+recorders of history.
+
+The years between 875 and 1100 were the great spontaneous period of
+oral literature. Most of the military and political leaders were also
+poets, and they composed a mass of lyric poetry concerning the
+authorship of which we know a good deal, and much of which has been
+preserved. Narrative prose also flourished, for the Icelander had a
+passion for story-telling and story-hearing. After 1100 came the day of
+the writers. These sagamen collected the material that for generations
+had passed from mouth to mouth, and gave it permanent form in writing.
+The greatest bulk of what we now have of Old Norse literature,—and the
+published part of it makes a formidable library,—originated thus in the
+earlier period before the introduction of writing, and was put into
+final shape by the scholars, most of them Icelanders, of the hundred
+years following 1150.
+
+After 1250 came a rapid and tragic decline. Iceland lost its
+independence, becoming a Norwegian province. Later Norway too fell
+under alien rule, a Swede ascending the Norwegian throne in 1320.
+Pestilence and famine laid waste the whole North; volcanic disturbances
+worked havoc in Iceland. Literature did not quite die, but it fell upon
+evil days; for the vigorous native narratives and heroic poems of the
+older period were substituted translations of French romances. The
+poets wrote mostly doggerel; the prose writers were devoid of national
+or racial inspiration.
+
+The mass of literature thus collected and written down largely between
+1150 and 1250 may be roughly divided into four groups. The greatest in
+volume is made up of the sagas: narratives mainly in prose, ranging all
+the way from authentic history of the Norwegian kings and the early
+Icelandic settlements to fairy-tales. Embodied in the sagas is found
+the material composing the second group: the skaldic poetry, a vast
+collection of songs of praise, triumph, love, lamentation, and so on,
+almost uniformly characterized by an appalling complexity of figurative
+language. There is no absolute line to be drawn between the poetry of
+the skalds and the poems of the Edda, which we may call the third
+group; but in addition to the remarkable artificiality of style which
+marks the skaldic poetry, and which is seldom found in the poems of the
+Edda, the skalds dealt almost exclusively with their own emotions,
+whereas the Eddic poems are quite impersonal. Finally, there is the
+fourth group, made up of didactic works, religious and legal treatises,
+and so on, studies which originated chiefly in the later period of
+learned activity.
+
+
+
+
+PRESERVATION OF THE EDDIC POEMS
+
+Most of the poems of the Poetic Edda have unquestionably reached us in
+rather bad shape. During the long period of oral transmission they
+suffered all sorts of interpolations, omissions and changes, and some
+of them, as they now stand, are a bewildering hodge-podge of
+little-related fragments. To some extent the diligent twelfth century
+compiler to whom we owe the Codex Regius—Sæmund or another—was himself
+doubtless responsible for the patchwork process, often supplemented by
+narrative prose notes of his own; but in the days before written
+records existed, it was easy to lose stanzas and longer passages from
+their context, and equally easy to interpolate them where they did not
+by any means belong. Some few of the poems, however, appear to be
+virtually complete and unified as we now have them.
+
+Under such circumstances it is clear that the establishment of a
+satisfactory text is a matter of the utmost difficulty. As the basis
+for this translation I have used the text prepared by Karl Hildebrand
+(1876) and revised by Hugo Gering (1904). Textual emendation has,
+however, been so extensive in every edition of the Edda, and has
+depended so much on the theories of the editor, that I have also made
+extensive use of many other editions, notably those by Finnur Jonsson,
+Neckel, Sijmons, and Detter and Heinzel, together with numerous
+commentaries. The condition of the text in both the principal codices
+is such that no great reliance can be placed on the accuracy of the
+copyists, and frequently two editions will differ fundamentally as to
+their readings of a given passage or even of an entire poem. For this
+reason, and because guesswork necessarily plays so large a part in any
+edition or translation of the Eddic poems, I have risked overloading
+the pages with textual notes in order to show, as nearly as possible,
+the exact state of the original together with all the more significant
+emendations. I have done this particularly in the case of
+transpositions, many of which appear absolutely necessary, and in the
+indication of passages which appear to be interpolations.
+
+
+
+
+THE VERSE-FORMS OF THE EDDIC POEMS
+
+The many problems connected with the verse-forms found in the Eddic
+poems have been analyzed in great detail by Sievers, Neckel, and
+others. The three verse-forms exemplified in the poems need only a
+brief comment here, however, in order to make clear the method used in
+this translation. All of these forms group the lines normally in
+four-line stanzas. In the so-called Fornyrthislag (“Old Verse”), for
+convenience sometimes referred to in the notes as four-four measure,
+these lines have all the same structure, each line being sharply
+divided by a cæsural pause into two half-lines, and each half-line
+having two accented syllables and two (sometimes three) unaccented
+ones. The two half-lines forming a complete line are bound together by
+the alliteration, or more properly initial-rhyme, of three (or two) of
+the accented syllables. The following is an example of the
+Fornyrthislag stanza, the accented syllables being in italics:
+
+
+    Vreiþr vas Vingþórr,   |   es vaknaþi
+    ok síns hamars   |   of saknaþi;
+    skegg nam hrista,   |   skǫr nam dýja,
+    réþ Jarþar burr   |   umb at þreifask.
+
+
+In the second form, the Ljothahattr (“Song Measure”), the first and
+third line of each stanza are as just described, but the second and
+fourth are shorter, have no cæsural pause, have three accented
+syllables, and regularly two initial-rhymed accented syllables, for
+which reason I have occasionally referred to Ljothahattr as four-three
+measure. The following is an example:
+
+
+    Ar skal rísa   |   sás annars vill
+            fé eþa fjǫr hafa;
+    liggjandi ulfr   |   sjaldan láer of getr
+            né sofandi maþr sigr.
+
+
+In the third and least commonly used form, the Malahattr (“Speech
+Measure”), a younger verse-form than either of the other two, each line
+of the four-line stanza is divided into two half-lines by a cæsural
+pause, each half-line having two accented syllables and three
+(sometimes four) unaccented ones; the initial rhyme is as in the
+Fornyrthislag. The following is an example:
+
+
+    Horsk vas húsfreyja,   |   hugþi at mannviti,
+    lag heyrþi orþa,   |   hvat á laun máeltu;
+    þá vas vant vitri,   |   vildi þeim hjalpa:
+    skyldu of sáe sigla,   |   en sjǫlf né kvamskat.
+
+
+A poem in Fornyrthislag is normally entitled -kvitha (Thrymskvitha,
+Guthrunarkvitha, etc.), which for convenience I have rendered as “lay,”
+while a poem in Ljothahattr is entitled -mol (Grimnismol, Skirnismol,
+etc.), which I have rendered as “ballad.” It is difficult to find any
+distinction other than metrical between the two terms, although it is
+clear that one originally existed.
+
+Variations frequently appear in all three kinds of verse, and these I
+have attempted to indicate through the rhythm of the translation. In
+order to preserve so far as possible the effect of the Eddic verse, I
+have adhered, in making the English version, to certain of the
+fundamental rules governing the Norse line and stanza formations. The
+number of lines to each stanza conforms to what seems the best guess as
+to the original, and I have consistently retained the number of
+accented syllables. In translating from a highly inflected language
+into one depending largely on the use of subsidiary words, it has,
+however, been necessary to employ considerable freedom as to the number
+of unaccented syllables in a line. The initial-rhyme is generally
+confined to two accented syllables in each line. As in the original,
+all initial vowels are allowed to rhyme interchangeably, but I have
+disregarded the rule which lets certain groups of consonants rhyme only
+with themselves (e.g., I have allowed initial s or st to rhyme with sk
+or sl). In general, I have sought to preserve the effect of the
+original form whenever possible without an undue sacrifice of accuracy.
+For purposes of comparison, the translations of the three stanzas just
+given are here included:
+
+Fornyrthislag:
+
+
+    Wild was Vingthor   |   when he awoke,
+    And when his mighty   |   hammer he missed;
+    He shook his beard,   |   his hair was bristling,
+    To groping set   |   the son of Jorth.
+
+
+Ljothahattr:
+
+
+    He must early go forth   |   who fain the blood
+      Or the goods of another would get;
+    The wolf that lies idle   |   shall win little meat,
+      Or the sleeping man success.
+
+
+Malahattr:
+
+
+    Wise was the woman,   |   she fain would use wisdom,
+    She saw well what meant   |   all they said in secret;
+    From her heart it was hid   |   how help she might render,
+    The sea they should sail,   |   while herself she should go not.
+
+
+
+
+PROPER NAMES
+
+The forms in which the proper names appear in this translation will
+undoubtedly perplex and annoy those who have become accustomed to one
+or another of the current methods of anglicising old Norse names. The
+nominative ending -r it has seemed best to omit after consonants,
+although it has been retained after vowels; in Baldr the final -r is a
+part of the stem and is of course retained. I have rendered the Norse þ
+by “th” throughout, instead of spasmodically by “d,” as in many texts:
+e.g., Othin instead of Odin. For the Norse ø I have used its
+equivalent, “ö,” e.g., Völund; for the ǫ I have used “o” and not “a,”
+e.g., Voluspo, not Valuspa or Voluspa. To avoid confusion with accents
+the long vowel marks of the Icelandic are consistently omitted, as
+likewise in modern Icelandic proper names. The index at the end of the
+book indicates the pronunciation in each case.
+
+
+
+
+CONCLUSION
+
+That this translation may be of some value to those who can read the
+poems of the Edda in the original language I earnestly hope. Still more
+do I wish that it may lead a few who hitherto have given little thought
+to the Old Norse language and literature to master the tongue for
+themselves. But far above either of these I place the hope that this
+English version may give to some, who have known little of the ancient
+traditions of what is after all their own race, a clearer insight into
+the glories of that extraordinary past, and that I may through this
+medium be able to bring to others a small part of the delight which I
+myself have found in the poems of the Poetic Edda.
+
+
+
+
+
+
+
+
+PART I
+
+THE POETIC EDDA
+
+
+VOLUME I
+
+LAYS OF THE GODS
+
+
+
+
+
+
+
+
+VOLUSPO
+
+THE WISE-WOMAN’S PROPHECY
+
+
+INTRODUCTORY NOTE
+
+At the beginning of the collection in the Codex Regius stands the
+Voluspo, the most famous and important, as it is likewise the most
+debated, of all the Eddic poems. Another version of it is found in a
+huge miscellaneous compilation of about the year 1300, the Hauksbok,
+and many stanzas are included in the Prose Edda of Snorri Sturluson.
+The order of the stanzas in the Hauksbok version differs materially
+from that in the Codex Regius, and in the published editions many
+experiments have been attempted in further rearrangements. On the
+whole, however, and allowing for certain interpolations, the order of
+the stanzas in the Codex Regius seems more logical than any of the
+wholesale “improvements” which have been undertaken.
+
+The general plan of the Voluspo is fairly clear. Othin, chief of the
+gods, always conscious of impending disaster and eager for knowledge,
+calls on a certain “Volva,” or wise-woman, presumably bidding her rise
+from the grave. She first tells him of the past, of the creation of the
+world, the beginning of years, the origin of the dwarfs (at this point
+there is a clearly interpolated catalogue of dwarfs’ names, stanzas
+10–16), of the first man and woman, of the world-ash Yggdrasil, and of
+the first war, between the gods and the Vanir, or, in Anglicized form,
+the Wanes. Then, in stanzas 27–29, as a further proof of her wisdom,
+she discloses some of Othin’s own secrets and the details of his search
+for knowledge. Rewarded by Othin for what she has thus far told (stanza
+30), she then turns to the real prophesy, the disclosure of the final
+destruction of the gods. This final battle, in which fire and flood
+overwhelm heaven and earth as the gods fight with their enemies, is the
+great fact in Norse mythology; the phrase describing it, ragna rök,
+“the fate of the gods,” has become familiar, by confusion with the word
+rökkr, “twilight,” in the German Götterdämmerung. The wise-woman tells
+of the Valkyries who bring the slain warriors to support Othin and the
+other gods in the battle, of the slaying of Baldr, best and fairest of
+the gods, through the wiles of Loki, of the enemies of the gods, of the
+summons to battle on both sides, and of the mighty struggle, till Othin
+is slain, and “fire leaps high about heaven itself” (stanzas 31–58).
+But this is not all. A new and beautiful world is to rise on the ruins
+of the old; Baldr comes back, and “fields unsowed bear ripened fruit”
+(stanzas 59–66).
+
+This final passage, in particular, has caused wide differences of
+opinion as to the date and character of the poem. That the poet was
+heathen and not Christian seems almost beyond dispute; there is an
+intensity and vividness in almost every stanza which no archaizing
+Christian could possibly have achieved. On the other hand, the
+evidences of Christian influence are sufficiently striking to outweigh
+the arguments of Finnur Jonsson, Müllenhoff and others who maintain
+that the Voluspo is purely a product of heathendom. The roving Norsemen
+of the tenth century, very few of whom had as yet accepted
+Christianity, were nevertheless in close contact with Celtic races
+which had already been converted, and in many ways the Celtic influence
+was strongly felt. It seems likely, then, that the Voluspo was the work
+of a poet living chiefly in Iceland, though possibly in the “Western
+Isles,” in the middle of the tenth century, a vigorous believer in the
+old gods, and yet with an imagination active enough to be touched by
+the vague tales of a different religion emanating from his neighbor
+Celts.
+
+How much the poem was altered during the two hundred years between its
+composition and its first being committed to writing is largely a
+matter of guesswork, but, allowing for such an obvious interpolation as
+the catalogue of dwarfs, and for occasional lesser errors, it seems
+quite needless to assume such great changes as many editors do. The
+poem was certainly not composed to tell a story with which its early
+hearers were quite familiar; the lack of continuity which baffles
+modern readers presumably did not trouble them in the least. It is, in
+effect, a series of gigantic pictures, put into words with a directness
+and sureness which bespeak the poet of genius. It is only after the
+reader, with the help of the many notes, has familiarized himself with
+the names and incidents involved that he can begin to understand the
+effect which this magnificent poem must have produced on those who not
+only understood but believed it.
+
+
+
+
+
+1.  Hearing I ask   |   from the holy races,
+    From Heimdall’s sons,   |   both high and low;
+    Thou wilt, Valfather,   |   that well I relate
+    Old tales I remember   |   of men long ago.
+
+2.  I remember yet   |   the giants of yore,
+    Who gave me bread   |   in the days gone by;
+    Nine worlds I knew,   |   the nine in the tree
+    With mighty roots   |   beneath the mold.
+
+3.  Of old was the age   |   when Ymir lived;
+    Sea nor cool waves   |   nor sand there were;
+    Earth had not been,   |   nor heaven above,
+    But a yawning gap,   |   and grass nowhere.
+
+4.  Then Bur’s sons lifted   |   the level land,
+    Mithgarth the mighty   |   there they made;
+    The sun from the south   |   warmed the stones of earth,
+    And green was the ground   |   with growing leeks.
+
+5.  The sun, the sister   |   of the moon, from the south
+    Her right hand cast   |   over heaven’s rim;
+    No knowledge she had   |   where her home should be,
+    The moon knew not   |   what might was his,
+    The stars knew not   |   where their stations were.
+
+6.  Then sought the gods   |   their assembly-seats,
+    The holy ones,   |   and council held;
+    Names then gave they   |   to noon and twilight,
+    Morning they named,   |   and the waning moon,
+    Night and evening,   |   the years to number.
+
+7.  At Ithavoll met   |   the mighty gods,
+    Shrines and temples   |   they timbered high;
+    Forges they set,   |   and they smithied ore,
+    Tongs they wrought,   |   and tools they fashioned.
+
+8.  In their dwellings at peace   |   they played at tables,
+    Of gold no lack   |   did the gods then know,—
+    Till thither came up   |   giant-maids three,
+    Huge of might,   |   out of Jotunheim.
+
+9.  Then sought the gods   |   their assembly-seats,
+    The holy ones,   |   and council held,
+    To find who should raise   |   the race of dwarfs
+    Out of Brimir’s blood   |   and the legs of Blain.
+
+10. There was Motsognir   |   the mightiest made
+    Of all the dwarfs,   |   and Durin next;
+    Many a likeness   |   of men they made,
+    The dwarfs in the earth,   |   as Durin said.
+
+11. Nyi and Nithi,   |   Northri and Suthri,
+    Austri and Vestri,   |   Althjof, Dvalin,
+    Nar and Nain,   |   Niping, Dain,
+    Bifur, Bofur,   |   Bombur, Nori,
+    An and Onar,   |   Ai, Mjothvitnir.
+
+12. Vigg and Gandalf,   |   Vindalf, Thrain,
+    Thekk and Thorin,   |   Thror, Vit and Lit,
+    Nyr and Nyrath,—   |   now have I told—
+    Regin and Rathsvith—   |   the list aright.
+
+13. Fili, Kili,   |   Fundin, Nali,
+    Heptifili,   |   Hannar, Sviur,
+    Frar, Hornbori,   |   Fræg and Loni,
+    Aurvang, Jari,   |   Eikinskjaldi.
+
+14. The race of the dwarfs   |   in Dvalin’s throng
+    Down to Lofar   |   the list must I tell;
+    The rocks they left,   |   and through wet lands
+    They sought a home   |   in the fields of sand.
+
+15. There were Draupnir   |   and Dolgthrasir,
+    Hor, Haugspori,   |   Hlevang, Gloin,
+    Dori, Ori,   |   Duf, Andvari,
+    Skirfir, Virfir,   |   Skafith, Ai.
+
+16. Alf and Yngvi,   |   Eikinskjaldi,
+    Fjalar and Frosti,   |   Fith and Ginnar;
+    So for all time   |   shall the tale be known,
+    The list of all   |   the forbears of Lofar.
+
+17. Then from the throng   |   did three come forth,
+    From the home of the gods,   |   the mighty and gracious;
+    Two without fate   |   on the land they found,
+    Ask and Embla,   |   empty of might.
+
+18. Soul they had not,   |   sense they had not,
+    Heat nor motion,   |   nor goodly hue;
+    Soul gave Othin,   |   sense gave Hönir,
+    Heat gave Lothur   |   and goodly hue.
+
+19. An ash I know,   |   Yggdrasil its name,
+    With water white   |   is the great tree wet;
+    Thence come the dews   |   that fall in the dales,
+    Green by Urth’s well   |   does it ever grow.
+
+20. Thence come the maidens   |   mighty in wisdom,
+    Three from the dwelling   |   down ’neath the tree;
+    Urth is one named,   |   Verthandi the next,—
+    On the wood they scored,—   |   and Skuld the third.
+    Laws they made there,   |   and life allotted
+    To the sons of men,   |   and set their fates.
+
+21. The war I remember,   |   the first in the world,
+    When the gods with spears   |   had smitten Gollveig,
+    And in the hall   |   of Hor had burned her,—
+    Three times burned,   |   and three times born,
+    Oft and again,   |   yet ever she lives.
+
+22. Heith they named her   |   who sought their home,
+    The wide-seeing witch,   |   in magic wise;
+    Minds she bewitched   |   that were moved by her magic,
+    To evil women   |   a joy she was.
+
+23. On the host his spear   |   did Othin hurl,
+    Then in the world   |   did war first come;
+    The wall that girdled   |   the gods was broken,
+    And the field by the warlike   |   Wanes was trodden.
+
+24. Then sought the gods   |   their assembly-seats,
+    The holy ones,   |   and council held,
+    Whether the gods   |   should tribute give,
+    Or to all alike   |   should worship belong.
+
+25. Then sought the gods   |   their assembly-seats,
+    The holy ones,   |   and council held,
+    To find who with venom   |   the air had filled,
+    Or had given Oth’s bride   |   to the giants’ brood.
+
+26. In swelling rage   |   then rose up Thor,—
+    Seldom he sits   |   when he such things hears,—
+    And the oaths were broken,   |   the words and bonds,
+    The mighty pledges   |   between them made.
+
+27. I know of the horn   |   of Heimdall, hidden
+    Under the high-reaching   |   holy tree;
+    On it there pours   |   from Valfather’s pledge
+    A mighty stream:   |   would you know yet more?
+
+28. Alone I sat   |   when the Old One sought me,
+    The terror of gods,   |   and gazed in mine eyes:
+    “What hast thou to ask?   |   why comest thou hither?
+    Othin, I know   |   where thine eye is hidden.”
+
+29. I know where Othin’s   |   eye is hidden,
+    Deep in the wide-famed   |   well of Mimir;
+    Mead from the pledge   |   of Othin each morn
+    Does Mimir drink:   |   would you know yet more?
+
+30. Necklaces had I   |   and rings from Heerfather,
+    Wise was my speech   |   and my magic wisdom;
+    .   .   .   .   .   .   .   .   .   .
+    Widely I saw   |   over all the worlds.
+
+31. On all sides saw I   |   Valkyries assemble,
+    Ready to ride   |   to the ranks of the gods;
+    Skuld bore the shield,   |   and Skogul rode next,
+    Guth, Hild, Gondul,   |   and Geirskogul.
+    Of Herjan’s maidens   |   the list have ye heard,
+    Valkyries ready   |   to ride o’er the earth.
+
+32. I saw for Baldr,   |   the bleeding god,
+    The son of Othin,   |   his destiny set:
+    Famous and fair   |   in the lofty fields,
+    Full grown in strength   |   the mistletoe stood.
+
+33. From the branch which seemed   |   so slender and fair
+    Came a harmful shaft   |   that Hoth should hurl;
+    But the brother of Baldr   |   was born ere long,
+    And one night old   |   fought Othin’s son.
+
+34. His hands he washed not,   |   his hair he combed not,
+    Till he bore to the bale-blaze   |   Baldr’s foe.
+    But in Fensalir   |   did Frigg weep sore
+    For Valhall’s need:   |   would you know yet more?
+
+35. One did I see   |   in the wet woods bound,
+    A lover of ill,   |   and to Loki like;
+    By his side does Sigyn   |   sit, nor is glad
+    To see her mate:   |   would you know yet more?
+
+36. From the east there pours   |   through poisoned vales
+    With swords and daggers   |   the river Slith.
+    .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .
+
+37. Northward a hall   |   in Nithavellir
+    Of gold there rose   |   for Sindri’s race;
+    And in Okolnir   |   another stood,
+    Where the giant Brimir   |   his beer-hall had.
+
+38. A hall I saw,   |   far from the sun,
+    On Nastrond it stands,   |   and the doors face north;
+    Venom drops   |   through the smoke-vent down,
+    For around the walls   |   do serpents wind.
+
+39. I saw there wading   |   through rivers wild
+    Treacherous men   |   and murderers too,
+    And workers of ill   |   with the wives of men;
+    There Nithhogg sucked   |   the blood of the slain,
+    And the wolf tore men;   |   would you know yet more?
+
+40. The giantess old   |   in Ironwood sat,
+    In the east, and bore   |   the brood of Fenrir;
+    Among these one   |   in monster’s guise
+    Was soon to steal   |   the sun from the sky.
+
+41. There feeds he full   |   on the flesh of the dead,
+    And the home of the gods   |   he reddens with gore;
+    Dark grows the sun,   |   and in summer soon
+    Come mighty storms:   |   would you know yet more?
+
+42. On a hill there sat,   |   and smote on his harp,
+    Eggther the joyous,   |   the giants’ warder;
+    Above him the cock   |   in the bird-wood crowed,
+    Fair and red   |   did Fjalar stand.
+
+43. Then to the gods   |   crowed Gollinkambi,
+    He wakes the heroes   |   in Othin’s hall;
+    And beneath the earth   |   does another crow,
+    The rust-red bird   |   at the bars of Hel.
+
+44. Now Garm howls loud   |   before Gnipahellir,
+    The fetters will burst,   |   and the wolf run free;
+    Much do I know,   |   and more can see
+    Of the fate of the gods,   |   the mighty in fight.
+
+45. Brothers shall fight   |   and fell each other,
+    And sisters’ sons   |   shall kinship stain;
+    Hard is it on earth,   |   with mighty whoredom;
+    Axe-time, sword-time,   |   shields are sundered,
+    Wind-time, wolf-time,   |   ere the world falls;
+    Nor ever shall men   |   each other spare.
+
+46. Fast move the sons   |   of Mim, and fate
+    Is heard in the note   |   of the Gjallarhorn;
+    Loud blows Heimdall,   |   the horn is aloft,
+    In fear quake all   |   who on Hel-roads are.
+
+47. Yggdrasil shakes,   |   and shiver on high
+    The ancient limbs,   |   and the giant is loose;
+    To the head of Mim   |   does Othin give heed,
+    But the kinsman of Surt   |   shall slay him soon.
+
+48. How fare the gods?   |   how fare the elves?
+    All Jotunheim groans,   |   the gods are at council;
+    Loud roar the dwarfs   |   by the doors of stone,
+    The masters of the rocks:   |   would you know yet more?
+
+49. Now Garm howls loud   |   before Gnipahellir,
+    The fetters will burst,   |   and the wolf run free;
+    Much do I know,   |   and more can see
+    Of the fate of the gods,   |   the mighty in fight.
+
+50. From the east comes Hrym   |   with shield held high;
+    In giant-wrath   |   does the serpent writhe;
+    O’er the waves he twists,   |   and the tawny eagle
+    Gnaws corpses screaming;   |   Naglfar is loose.
+
+51. O’er the sea from the north   |   there sails a ship
+    With the people of Hel,   |   at the helm stands Loki;
+    After the wolf   |   do wild men follow,
+    And with them the brother   |   of Byleist goes.
+
+52. Surt fares from the south   |   with the scourge of branches,
+    The sun of the battle-gods   |   shone from his sword;
+    The crags are sundered,   |   the giant-women sink,
+    The dead throng Hel-way,   |   and heaven is cloven.
+
+53. Now comes to Hlin   |   yet another hurt,
+    When Othin fares   |   to fight with the wolf,
+    And Beli’s fair slayer   |   seeks out Surt,
+    For there must fall   |   the joy of Frigg.
+
+54. Then comes Sigfather’s   |   mighty son,
+    Vithar, to fight   |   with the foaming wolf;
+    In the giant’s son   |   does he thrust his sword
+    Full to the heart:   |   his father is avenged.
+
+55. Hither there comes   |   the son of Hlothyn,
+    The bright snake gapes   |   to heaven above;
+    .   .   .   .   .   .   .   .   .   .
+    Against the serpent   |   goes Othin’s son.
+
+56. In anger smites   |   the warder of earth,—
+    Forth from their homes   |   must all men flee;—
+    Nine paces fares   |   the son of Fjorgyn,
+    And, slain by the serpent,   |   fearless he sinks.
+
+57. The sun turns black,   |   earth sinks in the sea,
+    The hot stars down   |   from heaven are whirled;
+    Fierce grows the steam   |   and the life-feeding flame,
+    Till fire leaps high   |   about heaven itself.
+
+58. Now Garm howls loud   |   before Gnipahellir,
+    The fetters will burst,   |   and the wolf run free;
+    Much do I know,   |   and more can see
+    Of the fate of the gods,   |   the mighty in fight.
+
+59. Now do I see   |   the earth anew
+    Rise all green   |   from the waves again;
+    The cataracts fall,   |   and the eagle flies,
+    And fish he catches   |   beneath the cliffs.
+
+60. The gods in Ithavoll   |   meet together,
+    Of the terrible girdler   |   of earth they talk,
+    And the mighty past   |   they call to mind,
+    And the ancient runes   |   of the Ruler of Gods.
+
+61. In wondrous beauty   |   once again
+    Shall the golden tables   |   stand mid the grass,
+    Which the gods had owned   |   in the days of old,
+    .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .
+
+62. Then fields unsowed   |   bear ripened fruit,
+    All ills grow better,   |   and Baldr comes back;
+    Baldr and Hoth dwell   |   in Hropt’s battle-hall,
+    And the mighty gods:   |   would you know yet more?
+
+63. Then Hönir wins   |   the prophetic wand,
+    .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .
+    And the sons of the brothers   |   of Tveggi abide
+    In Vindheim now:   |   would you know yet more?
+
+64. More fair than the sun,   |   a hall I see,
+    Roofed with gold,   |   on Gimle it stands;
+    There shall the righteous   |   rulers dwell,
+    And happiness ever   |   there shall they have.
+
+65. There comes on high,   |   all power to hold,
+    A mighty lord,   |   all lands he rules.
+    .  .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .   |   .  .  .  .  .  .  .  .  .
+
+66. From below the dragon   |   dark comes forth,
+    Nithhogg flying   |   from Nithafjoll;
+    The bodies of men   |   on his wings he bears,
+    The serpent bright:   |   but now must I sink.
+
+
+
+
+
+
+
+
+NOTES
+
+
+1. A few editors, following Bugge, in an effort to clarify the poem,
+place stanzas 22, 28 and 30 before stanzas 1–20, but the arrangement in
+both manuscripts, followed here, seems logical. In stanza 1 the Volva,
+or wise-woman, called upon by Othin, answers him and demands a hearing.
+Evidently she belongs to the race of the giants (cf. stanza 2), and
+thus speaks to Othin unwillingly, being compelled to do so by his magic
+power. Holy: omitted in Regius; the phrase “holy races” probably means
+little more than mankind in general. Heimdall: the watchman of the
+gods; cf. stanza 46 and note. Why mankind should be referred to as
+Heimdall’s sons is uncertain, and the phrase has caused much
+perplexity. Heimdall seems to have had various attributes, and in the
+Rigsthula, wherein a certain Rig appears as the ancestor of the three
+great classes of men, a fourteenth century annotator identifies Rig
+with Heimdall, on what authority we do not know, for the Rig of the
+poem seems much more like Othin (cf. Rigsthula, introductory prose and
+note). Valfather (“Father of the Slain”): Othin, chief of the gods, so
+called because the slain warriors were brought to him at Valhall (“Hall
+of the Slain”) by the Valkyries (“Choosers of the Slain”).
+
+2. Nine worlds: the worlds of the gods (Asgarth), of the Wanes
+(Vanaheim, cf. stanza 21 and note), of the elves (Alfheim), of men
+(Mithgarth), of the giants (Jotunheim), of fire (Muspellsheim, cf.
+stanza 47 and note), of the dark elves (Svartalfaheim), of the dead
+(Niflheim), and presumably of the dwarfs (perhaps Nithavellir, cf.
+stanza 37 and note, but the ninth world is uncertain). The tree: the
+world-ash Yggdrasil, symbolizing the universe; cf. Grimnismol, 29–35
+and notes, wherein Yggdrasil is described at length.
+
+3. Ymir: the giant out of whose body the gods made the world; cf.
+Vafthruthnismol, 21. In this stanza as quoted in Snorri’s Edda the
+first line runs: “Of old was the age   |   ere aught there was.”
+Yawning gap: this phrase, “Ginnunga-gap,” is sometimes used as a proper
+name.
+
+4. Bur’s sons: Othin, Vili, and Ve. Of Bur we know only that his wife
+was Bestla, daughter of Bolthorn; cf. Hovamol, 141. Vili and Ve are
+mentioned by name in the Eddic poems only in Lokasenna, 26. Mithgarth
+(“Middle Dwelling”): the world of men. Leeks: the leek was often used
+as the symbol of fine growth (cf. Guthrunarkvitha I, 17), and it was
+also supposed to have magic power (cf. Sigrdrifumol, 7).
+
+5. Various editors have regarded this stanza as interpolated; Hoffory
+thinks it describes the northern summer night in which the sun does not
+set. Lines 3–5 are quoted by Snorri. In the manuscripts line 4 follows
+line 5. Regarding the sun and moon as daughter and son of Mundilferi,
+cf. Vafthruthnismol, 23 and note, and Grimnismol, 37 and note.
+
+6. Possibly an interpolation, but there seems no strong reason for
+assuming this. Lines 1–2 are identical with lines 1–2 of stanza 9, and
+line 2 may have been inserted here from that later stanza.
+
+7. Ithavoll (“Field of Deeds”?): mentioned only here and in stanza 60
+as the meeting-place of the gods; it appears in no other connection.
+
+8. Tables: the exact nature of this game, and whether it more closely
+resembled chess or checkers, has been made the subject of a 400-page
+treatise, Willard Fiske’s “Chess in Iceland.” Giant-maids: perhaps the
+three great Norns, corresponding to the three fates; cf. stanza 20 and
+note. Possibly, however, something has been lost after this stanza, and
+the missing passage, replaced by the catalogue of the dwarfs (stanzas
+9–16), may have explained the “giant-maids” otherwise than as Norns. In
+Vafthruthnismol, 49, the Norns (this time “three throngs” instead of
+simply “three”) are spoken of as giant-maidens; Fafnismol, 13,
+indicates the existence of many lesser Norns, belonging to various
+races. Jotunheim: the world of the giants.
+
+9. Here apparently begins the interpolated catalogue of the dwarfs,
+running through stanza 16; possibly, however, the interpolated section
+does not begin before stanza 11. Snorri quotes practically the entire
+section, the names appearing in a somewhat changed order. Brimir and
+Blain: nothing is known of these two giants, and it has been suggested
+that both are names for Ymir (cf. stanza 3). Brimir, however, appears
+in stanza 37 in connection with the home of the dwarfs. Some editors
+treat the words as common rather than proper nouns, Brimir meaning “the
+bloody moisture” and Blain being of uncertain significance.
+
+10. Very few of the dwarfs named in this and the following stanzas are
+mentioned elsewhere. It is not clear why Durin should have been singled
+out as authority for the list. The occasional repetitions suggest that
+not all the stanzas of the catalogue came from the same source. Most of
+the names presumably had some definite significance, as Northri,
+Suthri, Austri, and Vestri (“North,” “South,” “East,” and “West”),
+Althjof (“Mighty Thief”), Mjothvitnir (“Mead-Wolf”), Gandalf (“Magic
+Elf”), Vindalf (“Wind Elf”), Rathsvith (“Swift in Counsel”),
+Eikinskjaldi (“Oak Shield”), etc., but in many cases the
+interpretations are sheer guesswork.
+
+12. The order of the lines in this and the succeeding four stanzas
+varies greatly in the manuscripts and editions, and the names likewise
+appear in many forms. Regin: probably not identical with Regin the son
+of Hreithmar, who plays an important part in the Reginsmol and
+Fafnismol, but cf. note on Reginsmol, introductory prose.
+
+14. Dvalin: in Hovamol, 144, Dvalin seems to have given magic runes to
+the dwarfs, probably accounting for their skill in craftsmanship, while
+in Fafnismol, 13, he is mentioned as the father of some of the lesser
+Norns. The story that some of the dwarfs left the rocks and mountains
+to find a new home on the sands is mentioned, but unexplained, in
+Snorri’s Edda; of Lofar we know only that he was descended from these
+wanderers.
+
+15. Andvari: this dwarf appears prominently in the Reginsmol, which
+tells how the god Loki treacherously robbed him of his wealth; the
+curse which he laid on his treasure brought about the deaths of
+Sigurth, Gunnar, Atli, and many others.
+
+17. Here the poem resumes its course after the interpolated section.
+Probably, however, something has been lost, for there is no apparent
+connection between the three giant-maids of stanza 8 and the three
+gods, Othin, Hönir and Lothur, who in stanza 17 go forth to create man
+and woman. The word “three” in stanzas 8 and 17 very likely confused
+some early reciter, or perhaps the compiler himself. Ask and Embla: ash
+and elm; Snorri gives them simply as the names of the first man and
+woman, but says that the gods made this pair out of trees.
+
+18. Hönir: little is known of this god, save that he occasionally
+appears in the poems in company with Othin and Loki, and that he
+survives the destruction, assuming in the new age the gift of prophesy
+(cf. stanza 63). He was given by the gods as a hostage to the Wanes
+after their war, in exchange for Njorth (cf. stanza 21 and note).
+Lothur: apparently an older name for Loki, the treacherous but
+ingenious son of Laufey, whose divinity Snorri regards as somewhat
+doubtful. He was adopted by Othin, who subsequently had good reason to
+regret it. Loki probably represents the blending of two originally
+distinct figures, one of them an old fire-god, hence his gift of heat
+to the newly created pair.
+
+19. Yggdrasil: cf. stanza 2 and note, and Grimnismol, 29–35 and notes.
+Urth (“The Past”): one of the three great Norns. The world-ash is kept
+green by being sprinkled with the marvelous healing water from her
+well.
+
+20. The maidens: the three Norns; possibly this stanza should follow
+stanza 8. Dwelling: Regius has “sæ” (sea) instead of “sal” (hall,
+home), and many editors have followed this reading, although Snorri’s
+prose paraphrase indicates “sal.” Urth, Verthandi and Skuld: “Past,”
+“Present” and “Future.” Wood, etc.: the magic signs (runes) controlling
+the destinies of men were cut on pieces of wood. Lines 3–4 are probably
+interpolations from some other account of the Norns.
+
+21. This follows stanza 20 in Regius; in the Hauksbok version stanzas
+25, 26, 27, 40 and 41 come between stanzas 20 and 21. Editors have
+attempted all sorts of rearrangements. The war: the first war was that
+between the gods and the Wanes. The cult of the Wanes (Vanir) seems to
+have originated among the seafaring folk of the Baltic and the southern
+shores of the North Sea, and to have spread thence into Norway in
+opposition to the worship of the older gods; hence the “war.” Finally
+the two types of divinities were worshipped in common; hence the treaty
+which ended the war with the exchange of hostages. Chief among the
+Wanes were Njorth and his children, Freyr and Freyja, all of whom
+became conspicuous among the gods. Beyond this we know little of the
+Wanes, who seem originally to have been water-deities. I remember: the
+manuscripts have “she remembers,” but the Volva is apparently still
+speaking of her own memories, as in stanza 2. Gollveig (“Gold-Might”):
+apparently the first of the Wanes to come among the gods, her
+ill-treatment being the immediate cause of the war. Müllenhoff
+maintains that Gollveig is another name for Freyja. Lines 5–6, one or
+both of them probably interpolated, seem to symbolize the refining of
+gold by fire. Hor (“The High One”): Othin.
+
+22. Heith (“Shining One”?): a name often applied to wise-women and
+prophetesses. The application of this stanza to Gollveig is far from
+clear, though the reference may be to the magic and destructive power
+of gold. It is also possible that the stanza is an interpolation. Bugge
+maintains that it applies to the Volva who is reciting the poem, and
+makes it the opening stanza, following it with stanzas 28 and 30, and
+then going on with stanzas 1 ff. The text of line 2 is obscure, and has
+been variously emended.
+
+23. This stanza and stanza 24 have been transposed from the order in
+the manuscripts, for the former describes the battle and the victory of
+the Wanes, after which the gods took council, debating whether to pay
+tribute to the victors, or to admit them, as was finally done, to equal
+rights of worship.
+
+25. Possibly, as Finn Magnusen long ago suggested, there is something
+lost after stanza 24, but it was not the custom of the Eddic poets to
+supply transitions which their hearers could generally be counted on to
+understand. The story referred to in stanzas 25–26 (both quoted by
+Snorri) is that of the rebuilding of Asgarth after its destruction by
+the Wanes. The gods employed a giant as builder, who demanded as his
+reward the sun and moon, and the goddess Freyja for his wife. The gods,
+terrified by the rapid progress of the work, forced Loki, who had
+advised the bargain, to delay the giant by a trick, so that the work
+was not finished in the stipulated time (cf. Grimnismol, 44, note). The
+enraged giant then threatened the gods, whereupon Thor slew him. Oth’s
+bride: Freyja; of Oth little is known beyond the fact that Snorri
+refers to him as a man who “went away on long journeys.”
+
+26. Thor: the thunder-god, son of Othin and Jorth (Earth); cf.
+particularly Harbarthsljoth and Thrymskvitha, passim. Oaths, etc.: the
+gods, by violating their oaths to the giant who rebuilt Asgarth,
+aroused the undying hatred of the giants’ race, and thus the giants
+were among their enemies in the final battle.
+
+27. Here the Volva turns from her memories of the past to a statement
+of some of Othin’s own secrets in his eternal search for knowledge
+(stanzas 27–29). Bugge puts this stanza after stanza 29. The horn of
+Heimdall: the Gjallarhorn (“Shrieking Horn”), with which Heimdall,
+watchman of the gods, will summon them to the last battle. Till that
+time the horn is buried under Yggdrasil. Valfather’s pledge: Othin’s
+eye (the sun?), which he gave to the water-spirit Mimir (or Mim) in
+exchange for the latter’s wisdom. It appears here and in stanza 29 as a
+drinking-vessel, from which Mimir drinks the magic mead, and from which
+he pours water on the ash Yggdrasil. Othin’s sacrifice of his eye in
+order to gain knowledge of his final doom is one of the series of
+disasters leading up to the destruction of the gods. There were several
+differing versions of the story of Othin’s relations with Mimir;
+another one, quite incompatible with this, appears in stanza 47. In the
+manuscripts I know and I see appear as “she knows” and “she sees” (cf.
+note on 21).
+
+28. The Hauksbok version omits all of stanzas 28–34, stanza 27 being
+there followed by stanzas 40 and 41. Regius indicates stanzas 28 and 29
+as a single stanza. Bugge puts stanza 28 after stanza 22, as the second
+stanza of his reconstructed poem. The Volva here addresses Othin
+directly, intimating that, although he has not told her, she knows why
+he has come to her, and what he has already suffered in his search for
+knowledge regarding his doom. Her reiterated “would you know yet more?”
+seems to mean: “I have proved my wisdom by telling of the past and of
+your own secrets; is it your will that I tell likewise of the fate in
+store for you?” The Old One: Othin.
+
+29. The first line, not in either manuscript, is a conjectural
+emendation based on Snorri’s paraphrase. Bugge puts this stanza after
+stanza 20.
+
+30. This is apparently the transitional stanza, in which the Volva,
+rewarded by Othin for her knowledge of the past (stanzas 1–29), is
+induced to proceed with her real prophecy (stanzas 31–66). Some editors
+turn the stanza into the third person, making it a narrative link.
+Bugge, on the other hand, puts it after stanza 28 as the third stanza
+of the poem. No lacuna is indicated in the manuscripts, and editors
+have attempted various emendations. Heerfather (“Father of the Host”):
+Othin.
+
+31. Valkyries: these “Choosers of the Slain” (cf. stanza 1, note) bring
+the bravest warriors killed in battle to Valhall, in order to
+re-enforce the gods for their final struggle. They are also called
+“Wish-Maidens,” as the fulfillers of Othin’s wishes. The conception of
+the supernatural warrior-maiden was presumably brought to Scandinavia
+in very early times from the South-Germanic races, and later it was
+interwoven with the likewise South-Germanic tradition of the
+swan-maiden. A third complication developed when the originally quite
+human women of the hero-legends were endowed with the qualities of both
+Valkyries and swan-maidens, as in the cases of Brynhild (cf. Gripisspo,
+introductory note), Svava (cf. Helgakvitha Hjorvarthssonar, prose after
+stanza 5 and note) and Sigrun (cf. Helgakvitha Hundingsbana I, 17 and
+note). The list of names here given may be an interpolation; a quite
+different list is given in Grimnismol, 36. Ranks of the gods: some
+editors regard the word thus translated as a specific place name.
+Herjan (“Leader of Hosts”): Othin. It is worth noting that the name
+Hild (“Warrior”) is the basis of Bryn-hild (“Warrior in Mail-Coat”).
+
+32. Baldr: The death of Baldr, the son of Othin and Frigg, was the
+first of the great disasters to the gods. The story is fully told by
+Snorri. Frigg had demanded of all created things, saving only the
+mistletoe, which she thought too weak to be worth troubling about, an
+oath that they would not harm Baldr. Thus it came to be a sport for the
+gods to hurl weapons at Baldr, who, of course, was totally unharmed
+thereby. Loki, the trouble-maker, brought the mistletoe to Baldr’s
+blind brother, Hoth, and guided his hand in hurling the twig. Baldr was
+slain, and grief came upon all the gods. Cf. Baldrs Draumar.
+
+33. The lines in this and the following stanza have been combined in
+various ways by editors, lacunæ having been freely conjectured, but the
+manuscript version seems clear enough. The brother of Baldr: Vali, whom
+Othin begot expressly to avenge Baldr’s death. The day after his birth
+he fought and slew Hoth.
+
+34. Frigg: Othin’s wife. Some scholars have regarded her as a solar
+myth, calling her the sun-goddess, and pointing out that her home in
+Fensalir (“the sea-halls”) symbolizes the daily setting of the sun
+beneath the ocean horizon.
+
+35. The translation here follows the Regius version. The Hauksbok has
+the same final two lines, but in place of the first pair has, “I know
+that Vali   |   his brother gnawed, / With his bowels then   |   was
+Loki bound.” Many editors have followed this version of the whole
+stanza or have included these two lines, often marking them as
+doubtful, with the four from Regius. After the murder of Baldr, the
+gods took Loki and bound him to a rock with the bowels of his son
+Narfi, who had just been torn to pieces by Loki’s other son, Vali. A
+serpent was fastened above Loki’s head, and the venom fell upon his
+face. Loki’s wife, Sigyn, sat by him with a basin to catch the venom,
+but whenever the basin was full, and she went away to empty it, then
+the venom fell on Loki again, till the earth shook with his struggles.
+“And there he lies bound till the end.” Cf. Lokasenna, concluding
+prose.
+
+36. Stanzas 36–39 describe the homes of the enemies of the gods: the
+giants (36), the dwarfs (37), and the dead in the land of the goddess
+Hel (38–39). The Hauksbok version omits stanzas 36 and 37. Regius
+unites 36 with 37, but most editors have assumed a lacuna. Slith (“the
+Fearful”): a river in the giants’ home. The “swords and daggers” may
+represent the icy cold.
+
+37. Nithavellir (“the Dark Fields”): a home of the dwarfs. Perhaps the
+word should be “Nithafjoll” (“the Dark Crags”). Sindri: the great
+worker in gold among the dwarfs. Okolnir (“the Not Cold”): possibly a
+volcano. Brimir: the giant (possibly Ymir) out of whose blood,
+according to stanza 9, the dwarfs were made; the name here appears to
+mean simply the leader of the dwarfs.
+
+38. Stanzas 38 and 39 follow stanza 43 in the Hauksbok version. Snorri
+quotes stanzas 38, 39, 40 and 41, though not consecutively. Nastrond
+(“Corpse-Strand”): the land of the dead, ruled by the goddess Hel. Here
+the wicked undergo tortures. Smoke-vent: the phrase gives a picture of
+the Icelandic house, with its opening in the roof serving instead of a
+chimney.
+
+39. The stanza is almost certainly in corrupt form. The third line is
+presumably an interpolation, and is lacking in most of the late paper
+manuscripts. Some editors, however, have called lines 1–3 the remains
+of a full stanza, with the fourth line lacking, and lines 4–5 the
+remains of another. The stanza depicts the torments of the two worst
+classes of criminals known to Old Norse morality—oath-breakers and
+murderers. Nithhogg (“the Dread Biter”): the dragon that lies beneath
+the ash Yggdrasil and gnaws at its roots, thus symbolizing the
+destructive elements in the universe; cf. Grimnismol, 32, 35. The wolf:
+presumably the wolf Fenrir, one of the children of Loki and the
+giantess Angrbotha (the others being Mithgarthsorm and the goddess
+Hel), who was chained by the gods with the marvelous chain Gleipnir,
+fashioned by a dwarf “out of six things: the noise of a cat’s step, the
+beards of women, the roots of mountains, the nerves of bears, the
+breath of fishes, and the spittle of birds.” The chaining of Fenrir
+cost the god Tyr his right hand; cf. stanza 44.
+
+40. The Hauksbok version inserts after stanza 39 the refrain-stanza
+(44), and puts stanzas 40 and 41 between 27 and 21. With this stanza
+begins the account of the final struggle itself. The giantess: her name
+is nowhere stated, and the only other reference to Ironwood is in
+Grimnismol, 39, in this same connection. The children of this giantess
+and the wolf Fenrir are the wolves Skoll and Hati, the first of whom
+steals the sun, the second the moon. Some scholars naturally see here
+an eclipse-myth.
+
+41. In the third line many editors omit the comma after “sun,” and put
+one after “soon,” making the two lines run: “Dark grows the sun   |
+in summer soon, / Mighty storms—” etc. Either phenomenon in summer
+would be sufficiently striking.
+
+42. In the Hauksbok version stanzas 42 and 43 stand between stanzas 44
+and 38. Eggther: this giant, who seems to be the watchman of the
+giants, as Heimdall is that of the gods and Surt of the dwellers in the
+fire-world, is not mentioned elsewhere in the poems. Fjalar, the cock
+whose crowing wakes the giants for the final struggle.
+
+43. Gollinkambi (“Gold-Comb”): the cock who wakes the gods and heroes,
+as Fjalar does the giants. The rust-red bird: the name of this bird,
+who wakes the people of Hel’s domain, is nowhere stated.
+
+44. This is a refrain-stanza. In Regius it appears in full only at this
+point, but is repeated in abbreviated form before stanzas 50 and 59. In
+the Hauksbok version the full stanza comes first between stanzas 35 and
+42, then, in abbreviated form, it occurs four times: before stanzas 45,
+50, 55, and 59. In the Hauksbok line 3 runs: “Farther I see   |   and
+more can say.” Garm: the dog who guards the gates of Hel’s kingdom; cf.
+Baldrs Draumar, 2 ff, and Grimnismol, 44. Gnipahellir (“the
+Cliff-Cave”): the entrance to the world of the dead. The wolf: Fenrir;
+cf. stanza 39 and note.
+
+45. From this point on through stanza 57 the poem is quoted by Snorri,
+stanza 49 alone being omitted. There has been much discussion as to the
+status of stanza 45. Lines 4 and 5 look like an interpolation. After
+line 5 the Hauksbok has a line running: “The world resounds,   |   the
+witch is flying.” Editors have arranged these seven lines in various
+ways, with lacunæ freely indicated. Sisters’ sons: in all Germanic
+countries the relations between uncle and nephew were felt to be
+particularly close.
+
+46. Regius combines the first three lines of this stanza with lines 3,
+2, and 1 of stanza 47 as a single stanza. Line 4, not found in Regius,
+is introduced from the Hauksbok version, where it follows line 2 of
+stanza 47. The sons of Mim: the spirits of the water. On Mim (or Mimir)
+cf. stanza 27 and note. Gjallarhorn: the “Shrieking Horn” with which
+Heimdall, the watchman of the gods, calls them to the last battle.
+
+47. In Regius lines 3, 2, and 1, in that order, follow stanza 46
+without separation. Line 4 is not found in Regius, but is introduced
+from the Hauksbok version. Yggdrasil: cf. stanza 19 and note, and
+Grimnismol, 29–35. The giant: Fenrir. The head of Mim: various myths
+were current about Mimir. This stanza refers to the story that he was
+sent by the gods with Hönir as a hostage to the Wanes after their war
+(cf. stanza 21 and note), and that the Wanes cut off his head and
+returned it to the gods. Othin embalmed the head, and by magic gave it
+the power of speech, thus making Mimir’s noted wisdom always available.
+Of course this story does not fit with that underlying the references
+to Mimir in stanzas 27 and 29. The kinsman of Surt: the wolf Fenrir,
+who slays Othin in the final struggle; cf. stanza 53. Surt is the giant
+who rules the fire-world, Muspellsheim; cf. stanza 52.
+
+48. This stanza in Regius follows stanza 51; in the Hauksbok it stands,
+as here, after 47. Jotunheim: the land of the giants.
+
+49. Identical with stanza 44. In the manuscripts it is here
+abbreviated.
+
+50. Hrym: the leader of the giants, who comes as the helmsman of the
+ship Naglfar (line 4). The serpent: Mithgarthsorm, one of the children
+of Loki and Angrbotha (cf. stanza 39, note). The serpent was cast into
+the sea, where he completely encircles the land; cf. especially
+Hymiskvitha, passim. The eagle: the giant Hræsvelg, who sits at the
+edge of heaven in the form of an eagle, and makes the winds with his
+wings; cf. Vafthruthnismol, 37, and Skirnismol, 27. Naglfar: the ship
+which was made out of dead men’s nails to carry the giants to battle.
+
+51. North: a guess; the manuscripts have “east,” but there seems to be
+a confusion with stanza 50, line 1. People of Hel: the manuscripts have
+“people of Muspell,” but these came over the bridge Bifrost (the
+rainbow), which broke beneath them, whereas the people of Hel came in a
+ship steered by Loki. The wolf: Fenrir. The brother of Byleist: Loki.
+Of Byleist (or Byleipt) no more is known.
+
+52. Surt: the ruler of the fire-world. The scourge of branches: fire.
+This is one of the relatively rare instances in the Eddic poems of the
+type of poetic diction which characterizes the skaldic verse.
+
+53. Hlin: apparently another name for Frigg, Othin’s wife. After losing
+her son Baldr, she is fated now to see Othin slain by the wolf Fenrir.
+Beli’s slayer: the god Freyr, who killed the giant Beli with his fist;
+cf. Skirnismol, 16 and note. On Freyr, who belonged to the race of the
+Wanes, and was the brother of Freyja, see especially Skirnismol,
+passim. The joy of Frigg: Othin.
+
+54. As quoted by Snorri the first line of this stanza runs: “Fares
+Othin’s son   |   to fight with the wolf.” Sigfather (“Father of
+Victory”): Othin. His son, Vithar, is the silent god, famed chiefly for
+his great shield, and his strength, which is little less than Thor’s.
+He survives the destruction. The giant’s son: Fenrir.
+
+55. This and the following stanza are clearly in bad shape. In Regius
+only lines 1 and 4 are found, combined with stanza 56 as a single
+stanza. Line 1 does not appear in the Hauksbok version, the stanza
+there beginning with line 2. Snorri, in quoting these two stanzas,
+omits 55, 2–4, and 56, 3, making a single stanza out of 55, 1, and 56,
+4, 2, 1, in that order. Moreover, the Hauksbok manuscript at this point
+is practically illegible. The lacuna (line 3) is, of course, purely
+conjectural, and all sorts of arrangements of the lines have been
+attempted by editors. Hlothyn: another name for Jorth (“Earth”), Thor’s
+mother; his father was Othin. The snake: Mithgarthsorm; cf. stanza 5c
+and note. Othin’s son: Thor. The fourth line in Regius reads “against
+the wolf,” but if this line refers to Thor at all, and not to Vithar,
+the Hauksbok reading, “serpent,” is correct.
+
+56. The warder of earth: Thor. The son of Fjorgyn: again Thor, who,
+after slaying the serpent, is overcome by his venomous breath, and
+dies. Fjorgyn appears in both a masculine and a feminine form. In the
+masculine it is a name for Othin; in the feminine, as here and in
+Harbarthsljoth, 56, it apparently refers to Jorth.
+
+57. With this stanza ends the account of the destruction.
+
+58. Again the refrain-stanza (cf. stanza 44 and note), abbreviated in
+both manuscripts, as in the case of stanza 49. It is probably misplaced
+here.
+
+59. Here begins the description of the new world which is to rise out
+of the wreck of the old one. It is on this passage that a few critics
+have sought to base their argument that the poem is later than the
+introduction of Christianity (circa 1000), but this theory has never
+seemed convincing (cf. introductory note).
+
+60. The third line of this stanza is not found in Regius. Ithavoll: cf.
+stanza 7 and note. The girdler of earth: Mithgarthsorm, who, lying in
+the sea, surrounded the land. The Ruler of Gods: Othin. The runes were
+both magic signs, generally carved on wood, and sung or spoken charms.

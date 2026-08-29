@@ -1,0 +1,106 @@
+# Taxonomie témat pro katalog. Kurátorská, malá a stabilní — LLM při
+# obohacování smí vracet JEN tyhle slugy (cizí se zahodí), takže grupování
+# a filtr v chatu mají pevnou osu. description_cs jde doslova do promptu:
+# první věta říká, kdy téma použít, druhá kdy ne.
+#
+# Slug se nikdy nemění (je v DB jako klíč); název a popis ano.
+
+- id: kosmologie_stvoreni
+  name_cs: Kosmologie a stvoření
+  description_cs: Vznik světa, uspořádání kosmu, počátky bohů a lidí, prvotní chaos a řád. Ne pro popis přírody v běžném vyprávění.
+- id: bozstva_mytologie
+  name_cs: Bohové a mýty
+  description_cs: Jednání a povaha bohů, mytické příběhy, hierofanie, theogonie. Ne pro rituál (ten má vlastní téma).
+- id: hrdinsky_epos_valka
+  name_cs: Hrdinský epos a válka
+  description_cs: Boj, bitvy, hrdinské činy, zbraně, válečná čest a její cena. Ne pro politické úvahy o válce bez děje.
+- id: osud_prozretelnost
+  name_cs: Osud a prozřetelnost
+  description_cs: Nutnost, sudba, boží záměr, předurčení versus svoboda. Ne pro věštby a znamení (vlastní téma).
+- id: smrt_nesmrtelnost
+  name_cs: Smrt a posmrtný život
+  description_cs: Umírání, podsvětí, duše po smrti, nesmrtelnost, pohřeb a smutek. Ne pro znovuzrození jako nauku o karmě (vlastní téma).
+- id: ritual_obet
+  name_cs: Rituál, oběť a kult
+  description_cs: Obřady, oběti, liturgie, kněžství, čistota a znečištění, posvátná místa. Ne pro hymny samotné.
+- id: hymnus_modlitba
+  name_cs: Hymny a modlitby
+  description_cs: Text, který je sám chvalozpěvem, vzýváním nebo modlitbou. Ne pro popis, jak se rituál koná.
+- id: etika_ctnost
+  name_cs: Etika a ctnost
+  description_cs: Co je správné jednání, ctnosti a neřesti, charakter, svědomí, dobrý život. Ne pro právní normy a tresty.
+- id: spravedlnost_pravo
+  name_cs: Spravedlnost a právo
+  description_cs: Zákony, soudy, tresty, smlouvy, právní řád obce. Ne pro mnišskou řeholi (vlastní téma).
+- id: vladnuti_politika
+  name_cs: Vláda a politika
+  description_cs: Ideální vládce, státní zřízení, moc, rady panovníkovi, obec. Ne pro rodinné a společenské povinnosti jednotlivce.
+- id: rodina_spolecnost
+  name_cs: Rodina a společenský řád
+  description_cs: Rod, příbuzenství, povinnosti dětí a rodičů, stavy a role ve společnosti, pohostinnost. Ne pro milostné vztahy.
+- id: laska_touha
+  name_cs: Láska, touha a manželství
+  description_cs: Milostný cit, erotika, námluvy, manželství, žárlivost. Ne pro přátelství.
+- id: pratelstvi
+  name_cs: Přátelství a věrnost
+  description_cs: Přátelství, věrnost, zrada, pohostinnost mezi přáteli. Ne pro manželskou nebo rodičovskou lásku.
+- id: utrpeni_osvobozeni
+  name_cs: Utrpení a osvobození
+  description_cs: Povaha utrpení (dukkha), jeho příčiny a cesta k jeho ukončení, vysvobození, nibbána, mókša. Ne pro techniku meditace jako takovou.
+- id: meditace_askeze
+  name_cs: Meditace a askeze
+  description_cs: Cvičení mysli, pohroužení, dech, odříkání, kázeň těla, poustevnictví. Ne pro pravidla mnišského řádu.
+- id: mnisska_kazen
+  name_cs: Mnišská kázeň a řehole
+  description_cs: Pravidla řádu, přestupky a jejich odčinění, život sanghy, vinaja. Ne pro světské právo.
+- id: vedomi_mysl
+  name_cs: Vědomí a mysl
+  description_cs: Jak funguje mysl, vnímání, pozornost, city, rozbor duševních stavů, psychologie. Ne pro otázku, co je já nebo duše.
+- id: ja_duse
+  name_cs: Já a duše
+  description_cs: Co je já, duše, átman, anattá, osobní totožnost, vztah těla a duše. Ne pro obecnou psychologii vnímání.
+- id: karma_znovuzrozeni
+  name_cs: Karma a znovuzrození
+  description_cs: Zákon činu a následku, koloběh zrození, minulé a budoucí životy. Ne pro smrt a podsvětí bez nauky o návratu.
+- id: poznani_pravda
+  name_cs: Poznání a pravda
+  description_cs: Co lze vědět, pravda a klam, pochybnost, zdroje poznání, moudrost versus mínění. Ne pro formální logiku.
+- id: logika_dialektika
+  name_cs: Logika a dialektika
+  description_cs: Argumentace, důkaz, pojmy a jejich vymezení, dialektický postup, rozpor. Ne pro obecnou úvahu o poznání.
+- id: byti_metafyzika
+  name_cs: Bytí a metafyzika
+  description_cs: Bytí a nic, podstata, jedno a mnohé, změna a stálost, první příčiny. Ne pro kosmologické mýty o stvoření.
+- id: priroda_cesta
+  name_cs: Příroda a Cesta
+  description_cs: Řád přírody, tao, živly, roční doby, přirozenost věcí, soulad s ní, nečinnost (wu-wej). Ne pro stvoření světa.
+- id: jazyk_retorika
+  name_cs: Jazyk, řeč a poetika
+  description_cs: Moc slova, řečnictví, jména a věci, básnické umění, výklad textu. Ne pro logickou argumentaci.
+- id: vychova_uceni
+  name_cs: Výchova a učení
+  description_cs: Učitel a žák, vzdělání, předávání nauky, výchova mladých. Ne pro obecnou etiku.
+- id: majetek_hospodarstvi
+  name_cs: Práce, majetek a bohatství
+  description_cs: Hospodaření, bohatství a chudoba, řemesla, obchod, dary a almužna. Ne pro stát a daně jako politiku.
+- id: telo_lekarstvi
+  name_cs: Tělo a lékařství
+  description_cs: Zdraví, nemoc, léčení, strava, tělesnost. Ne pro askezi jako duchovní cvičení.
+- id: dejiny_kronika
+  name_cs: Dějiny a kronika
+  description_cs: Vyprávění o skutečných událostech, rodokmeny, kroniky, letopisy, historické postavy. Ne pro mytické příběhy bohů.
+- id: proroctvi_sny
+  name_cs: Proroctví, věštby a sny
+  description_cs: Věštění, znamení, sny a jejich výklad, proroci, orákula. Ne pro osud jako filosofický pojem.
+- id: moudrost_aforismy
+  name_cs: Mudrosloví a aforismy
+  description_cs: Krátké průpovědi, přísloví, praktická životní moudrost, rady. Ne pro souvislý filosofický výklad.
+- id: tragedie_drama
+  name_cs: Tragédie a drama
+  description_cs: Dramatický text vážného ladění, tragický konflikt, chór, divadlo. Ne pro komedii.
+- id: komedie_satira
+  name_cs: Komedie a satira
+  description_cs: Humor, výsměch, parodie, satira na obec a mravy. Ne pro tragédii.
+- id: cesty_narody
+  name_cs: Cesty, země a národy
+  description_cs: Popis zemí, cizích národů a zvyků, cestování, zeměpis. Ne pro válečná tažení jako epos.

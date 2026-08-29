@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 books.jsonl
 deploy/joda/chroma-data/
+.env
+logs/
+works.jsonl
+chapters.jsonl
+tests/fixtures/*.tmp

@@ -1,0 +1,75 @@
+# Postgres pro knihovní katalog a fulltext (RAG, 2. vlna). Běží na JODA
+# vedle Chromy — JODA je storage, SPARK je LLM.
+#
+# Nasazení z M2 (rag/Makefile: make deploy-joda):
+#   rsync -a --exclude .env deploy/joda/ joda:~/deploy/WorldLibraryProject/deploy/joda/
+#   ssh joda "cd ~/deploy/WorldLibraryProject/deploy/joda \
+#             && cp -n .env.example .env \
+#             && docker compose -f docker-compose.library.yaml --env-file .env up -d"
+#
+# Proč tak, jak to je:
+# - data pod /media/storage: snap docker na JODA vidí jen /home a /media,
+#   /pool mountovat nejde; root disk má 15 GB volných, /media 1,2 TB
+# - port 5433: 5432 drží bipolar_postgres (jiný projekt)
+# - bind 0.0.0.0: na PG sahá server na SPARKu a loader z M2 po LAN;
+#   JODA není vystavená ven (žádný cloudflared pro tenhle stack)
+# - mem_limit 768m a shared_buffers 256MB: stroj má 3,8 GB RAM a 2 CPU
+#   a dělí se o ně s Chromou, bipolar Postgresem, MinIO a media stackem
+# - maintenance_work_mem 192MB kvůli stavbě GIN indexů — ty se tvoří až
+#   PO načtení dat (rag/sql/0003_indexes.sql), ne při CREATE TABLE
+# - záloha 3:30, ne 3:00 — bipolar zálohuje ve 3:00 a CPU jsou jen dvě
+
+services:
+  library-postgres:
+    image: postgres:16-alpine
+    container_name: library_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: library
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: ${LIBRARY_PG_PASSWORD}
+      # data na vlastní podadresář, ať docker může volume založit jako
+      # prázdný a initdb nespadne na "directory not empty"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command: >
+      postgres
+        -c shared_buffers=256MB
+        -c work_mem=16MB
+        -c maintenance_work_mem=192MB
+        -c effective_cache_size=1GB
+        -c max_connections=30
+        -c random_page_cost=1.1
+        -c jit=off
+    ports:
+      - "0.0.0.0:5433:5432"
+    volumes:
+      - ${LIBRARY_PG_DATA:-/media/storage/library-pg}:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    mem_limit: 768m
+    shm_size: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U library -d library"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  library-backup:
+    image: prodrigestivill/postgres-backup-local
+    container_name: library_backup
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: library-postgres
+      POSTGRES_DB: library
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: ${LIBRARY_PG_PASSWORD}
+      SCHEDULE: "30 3 * * *"
+      BACKUP_KEEP_DAYS: 14
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 3
+      HEALTHCHECK_PORT: 8080
+    volumes:
+      - ${LIBRARY_PG_BACKUPS:-/media/storage/library-pg-backups}:/backups
+    depends_on:
+      library-postgres:
+        condition: service_healthy

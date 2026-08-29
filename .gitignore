@@ -16,3 +16,6 @@ downloader/*.exe
 *.log
 *.tmp
 aria2c.log
+
+# tajemství JODA stacku (heslo Postgresu)
+deploy/joda/.env
