@@ -31,7 +31,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))  # rag/ na path
 import chromadb
 
 from embeddings import DEFAULT_MODEL, format_query, make_embedder
-from retrieval import build_alias_index, diversify, route, route_groups
+from retrieval import (build_alias_index, diversify, looks_tabular, route,
+                       route_groups)
 
 
 def norm(s):
@@ -49,6 +50,7 @@ def as_list(v):
 
 
 def query(collection, embedding, n_results, works=None, groups=None):
+    """Vrací i text chunku — filtr na rejstříky se dělá nad ním."""
     where = None
     if works:
         where = {"work": {"$in": works}}
@@ -56,11 +58,11 @@ def query(collection, embedding, n_results, works=None, groups=None):
         where = {"group": {"$in": groups}}
     r = collection.query(
         query_embeddings=[embedding], n_results=n_results, where=where,
-        include=["metadatas", "distances"],
+        include=["documents", "metadatas", "distances"],
     )
     return [
-        {"work": m.get("work"), "group": m.get("group"), "distance": d}
-        for m, d in zip(r["metadatas"][0], r["distances"][0])
+        {"work": m.get("work"), "group": m.get("group"), "distance": d, "text": t}
+        for t, m, d in zip(r["documents"][0], r["metadatas"][0], r["distances"][0])
     ]
 
 
@@ -77,7 +79,10 @@ def make_retriever(mode, collection, index, top_k, factor, max_per_work):
         pool = max(top_k, top_k * factor) if diverse else top_k
         hits = query(collection, emb, pool, works, groups)
         if diverse:
-            hits = diversify(hits, top_k, max_per_work)
+            # stejné pořadí jako server.retrieve(): nejdřív pryč s rejstříky,
+            # pak teprve strop na dílo
+            readable = [h for h in hits if not looks_tabular(h["text"])]
+            hits = diversify(readable or hits, top_k, max_per_work)
         return hits[:top_k], {"works": works, "groups": groups}
 
     return retrieve

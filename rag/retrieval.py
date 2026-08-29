@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Směrování dotazu na dílo a diverzita výsledků.
+"""Směrování dotazu na dílo, diverzita výsledků a filtry na úryvky.
 
 Čistá logika bez Chromy a bez modelu — používá ji server.py i
 eval/eval_retrieval.py, takže se měří přesně to, co appka posílá.
@@ -18,6 +18,7 @@ Dvě protiopatření:
 
 import re
 import unicodedata
+from difflib import SequenceMatcher
 
 # --- porovnávání bez diakritiky a velikosti písmen -------------------------
 
@@ -303,6 +304,48 @@ def diversify(hits, top_k: int, max_per_work: int = 2, key=None):
     return picked
 
 
+def looks_tabular(text: str) -> bool:
+    """Přepis tabulky (rejstřík, obsah, konkordance), ne souvislý text.
+
+    Allenovy Texty pyramid mají vzadu konkordanci zaříkání — „PT 160 /
+    W 122, T 128, P 179, M 170, N 226, Nt 161", tedy číslo zaříkání a jeho
+    pozice v šesti pyramidách. PyMuPDF tabulku vytáhne buňku po buňce
+    a chunker z ní udělá chunk jako z každého jiného textu; jako citace je
+    to k ničemu a překladač z toho dělá nesmysl.
+
+    Měřeno na korpusu (vzorek začátek/střed/konec každého díla): chytí
+    zadní matérii Textů pyramid (27 %), obsah Čuang-c' (10 %) a Eddy
+    (9 %), pod 2 % u Avesty a Rgvédu — a **nic** u zbylých 87 děl.
+    """
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if len(lines) < 5:
+        return False
+    # obsah knihy: „Spells for Proceeding toward the Sky ......... 297"
+    dotted = sum(1 for line in lines if re.search(r"\.{6,}", line)) / len(lines)
+    if dotted > 0.3:
+        return True
+    short = sum(1 for line in lines if len(line) < 40) / len(lines)
+    digits = sum(c.isdigit() for c in text) / max(1, len(text))
+    return short > 0.8 and digits > 0.12
+
+
+def is_echo(original: str, translation: str, threshold: float = 0.7) -> bool:
+    """Přeložil model úryvek, nebo ho jen opsal?
+
+    U pálijských veršů se to stává běžně — model si neví rady, tak vrátí
+    originál. Vydávat to za překlad je horší než nic: appka pak ukáže
+    dvakrát totéž, jednou jako překlad a jednou jako originál.
+
+    Práh 0,7 je schválně vysoko: skutečný český překlad sdílí se zdrojem
+    nanejvýš jména a čísla, kdežto opsaný text sedí skoro znak na znak.
+    """
+    a = " ".join(original.split())
+    b = " ".join(translation.split())
+    if not b:
+        return True
+    return SequenceMatcher(None, a, b).ratio() >= threshold
+
+
 def _selftest() -> None:
     catalog = {
         "Milindapañhapāḷi": "Khuddaka-nikája — Otázky krále Milindy",
@@ -349,6 +392,38 @@ def _selftest() -> None:
     assert [h["d"] for h in diversify(hits, 3, 2)] == [1, 2, 4]
     assert [h["d"] for h in diversify(hits, 5, 2)] == [1, 2, 4, 5, 3]
     assert [h["d"] for h in diversify(hits, 2, 1)] == [1, 4]
+    # konkordance z Textů pyramid vs. souvislá próza
+    tabulka = ("225, Nt 160\nPT 160\nW 122, T 128, P 179, M\n170, N 226, Nt 161\n"
+               "PT 161\nW 123, T 129, P 180, M\n171, N 227, Nt 162\nPT 162\n")
+    proza = ("Nečinnost není pasivita, ale nezásah. Když vládce nechá věci "
+             "plynout, samy se uspořádají.\nProto se říká: cesta nic nedělá "
+             "a přesto není nic, co by nebylo uděláno.\nTak zní čtyřicátá "
+             "kapitola.\nA dál se praví, že měkké přemáhá tvrdé.\n"
+             "Voda je toho příkladem, protože ustupuje a přece hloubí kámen.")
+    obsah = ("CONTENTS\n"
+             "Spells for Proceeding toward the Sky ................. 297\n"
+             "Spells for Joining the Gods ......................... 312\n"
+             "Fragments ........................................... 331\n"
+             "A Note on Translation ............................... 8\n")
+    assert looks_tabular(tabulka)
+    assert looks_tabular(obsah)
+    assert not looks_tabular(proza)
+    assert not looks_tabular("krátký úryvek\nna dva řádky")
+    # verše s číslováním ještě tabulka nejsou
+    assert not looks_tabular(
+        "469. Tassa puṭṭho viyākāsi, mātali devasārathi;\n"
+        "Vipākaṃ pāpakammānaṃ, jānaṃ akkhāsijānato.\n"
+        "470. Yo ve pubbe katvā pāpakammaṃ, taṃ pacchā anutappati;\n"
+        "Assumukho rodamāno, vipākaṃ phussate pāpaṃ.\n"
+        "471. Idha socati pecca socati, pāpakārī ubhayattha socati.")
+
+    pali = "Soṇḍova pitvā visamissapānaṃ, teneva so hoti dukkhī parattha."
+    assert is_echo(pali, pali)
+    assert is_echo(pali, " ".join(pali.split()) + " ")
+    assert is_echo(pali, "")
+    assert not is_echo(pali, "Kdo pije nápoj smíšený s jedem, tím se pak trápí.")
+    assert not is_echo("道可道，非常道。", "Cesta, kterou lze vyslovit, není věčná cesta.")
+
     print("retrieval.py: selftest ok")
 
 

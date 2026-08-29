@@ -38,7 +38,8 @@ from pydantic import BaseModel
 
 from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
 from embeddings import format_query, make_embedder
-from retrieval import build_alias_index, diversify, route, route_groups
+from retrieval import (build_alias_index, diversify, is_echo, looks_tabular,
+                       route, route_groups)
 
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 # model občas uvede překlad slovem ze zadání — useknout
@@ -264,8 +265,11 @@ class RAGServer:
             print(f"překlad úryvku selhal: {exc}")
             return
         answer = EXCERPT_LEAD_RE.sub("", answer).strip()
-        if answer:
-            source["excerpt_cs"] = answer
+        if not answer or is_echo(text, answer):
+            # model úryvek jen opsal (typicky pálijské verše) — tvářit se,
+            # že je to překlad, znamená ukázat v appce dvakrát totéž
+            return
+        source["excerpt_cs"] = answer
 
     def _start_excerpt_translation(self, sources: list[dict]):
         """Vrátí seznam futures (prázdný, když je překlad vypnutý)."""
@@ -316,6 +320,11 @@ class RAGServer:
             result["documents"][0], result["metadatas"][0], result["distances"][0]
         ):
             hits.append({"text": doc, "meta": meta or {}, "distance": dist})
+        # rejstříky a obsahy ven — jako citace neříkají nic. Když by po
+        # filtru nezbylo nic (dotaz mířil na dílo, z něhož se trefila jen
+        # tabulka), radši vrátit i tabulku než prázdný kontext.
+        readable = [h for h in hits if not looks_tabular(h["text"])]
+        hits = readable or hits
         hits = diversify(
             hits, top_k, self.args.max_per_work,
             key=lambda h: h["meta"].get("work"),
