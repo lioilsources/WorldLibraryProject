@@ -41,6 +41,8 @@ from embeddings import format_query, make_embedder
 from retrieval import (build_alias_index, diversify, fold, is_echo, looks_tabular,
                        route, route_groups)
 from retriever import Plan, Retriever, context_block
+import catalog as cat
+from planner import Planner, QueryPlan, find_chapter
 
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 # model občas uvede překlad slovem ze zadání — useknout
@@ -155,6 +157,19 @@ class RAGServer:
                 candidate_factor=args.candidate_factor, max_per_work=args.max_per_work,
                 rrf_k=args.rrf_k, no_routing=args.no_routing, context_window=args.context_window,
             )
+        # plánovač dotazu (intent + přepis) — jen v PG režimu a když není vypnutý
+        self.planner = None
+        if self.pool and args.planner != "off":
+            with self.pool.connection() as conn, conn.cursor() as cur:
+                cur.execute("SELECT id, name_cs FROM topics ORDER BY sort")
+                topics = cur.fetchall()
+            counts: dict[str, int] = {}
+            for info in self.catalog.values():
+                counts[info["group"]] = counts.get(info["group"], 0) + 1
+            self.planner = Planner(self.llm, args.planner_model, pool=self.pool, known_groups=self.known_groups,
+                                   topics=topics, group_counts=counts, timeout=args.planner_timeout)
+        # „čti dál": session_id -> (work_id, další seq)
+        self.reading: dict[str, tuple[str, int]] = {}
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
         # vlákna na překlad úryvků — běží souběžně s generováním odpovědi
@@ -445,7 +460,8 @@ class RAGServer:
         )
         return hits, {"works": works, "groups": groups}
 
-    def build_messages(self, message: str, hits, history):
+    def build_messages(self, message: str, hits, history, catalog_context: str | None = None,
+                       instruction: str | None = None):
         if self.retriever is not None:
             context = context_block(hits)   # dílo › kapitola (ref) [překlad]
         else:
@@ -459,16 +475,150 @@ class RAGServer:
         messages = [{"role": "system", "content": self.system_prompt}]
         for role, content in history:
             messages.append({"role": role, "content": content})
-        messages.append(
-            {
-                "role": "user",
-                "content": (
-                    f"Úryvky z knihovny relevantní k otázce:\n\n{context}\n\n"
-                    f"Otázka: {message}"
-                ),
-            }
-        )
+        parts = []
+        if catalog_context:
+            parts.append(f"Výpis z katalogu knihovny:\n\n{catalog_context}")
+        if hits or not catalog_context:
+            parts.append(f"Úryvky z knihovny relevantní k otázce:\n\n{context}")
+        if instruction:
+            parts.append(instruction)
+        parts.append(f"Otázka: {message}")
+        messages.append({"role": "user", "content": "\n\n".join(parts)})
         return messages
+
+    # --- plán → kontext ------------------------------------------------------------
+
+    def _prepare(self, req: ChatRequest, session_id: str, history) -> dict:
+        """Rozhodne podle intentu, co jde do promptu. Vrací hits, routed,
+        catalog_context, instruction, payload (pro SSE) a plán."""
+        out = {"hits": [], "routed": {"works": [], "groups": []}, "catalog_context": None,
+               "instruction": None, "payload": {}, "plan": None}
+        if self.retriever is None:
+            out["hits"], out["routed"] = self.retrieve(req.message, req.top_k)
+            return out
+        plan = QueryPlan()
+        if self.planner is not None:
+            tail = [c for r, c in list(history)[-6:] if r == "user"]
+            plan = self.planner.plan(req.message, tail, accept_models={self.args.planner_model, self.args.llm_model})
+        out["plan"] = plan
+        work_ids = cat.resolve_work(self.catalog, self.legacy_to_id, self.alias_index, plan.work_hint, None)
+        if not work_ids and not plan.work_hint:
+            # bez jmenovaného díla zkusit aliasy přímo na otázku (jako dřív)
+            work_ids = [self.legacy_to_id[w] for w in route(req.message, self.alias_index) if w in self.legacy_to_id]
+        intent = plan.intent
+        detail = plan.detail
+        with self.pool.connection() as conn:
+            tnames = cat.topic_names(conn)
+            if intent == "smalltalk":
+                out["instruction"] = "Uživatel nechce nic hledat — odpověz krátce a přátelsky, bez citací."
+                out["routed"] = {"works": [], "groups": [], "intent": intent}
+                return out
+
+            if intent == "catalog" or (intent in ("work_overview", "chapters", "chapter_detail") and not work_ids and plan.author):
+                ctx, payload = cat.build_catalog(
+                    conn, plan, group_by=plan.group_by if plan.group_by != "none" else "tradition",
+                    detail=detail, groups=plan.groups or None, topics=plan.topics or None,
+                    author=plan.author, work_ids=work_ids or None, hide_priority=self.args.hide_priority)
+                out["catalog_context"], out["payload"] = ctx, {"catalog": payload}
+                out["instruction"] = ("Sestav odpověď z výpisu: seskup podle zadaného klíče, u každého díla uveď autora, "
+                                      "jazyk originálu a (když je) anotaci; tabulku zachovej jako markdown. "
+                                      "Nepřidávej díla mimo výpis.")
+                out["routed"] = {"works": work_ids, "groups": plan.groups, "intent": intent}
+                return out
+
+            if intent in ("work_overview", "chapters", "chapter_detail", "read") and work_ids:
+                w = self.catalog[work_ids[0]]
+                if intent == "work_overview":
+                    ctx, payload = cat.build_work_overview(conn, w, tnames)
+                    out["catalog_context"], out["payload"] = ctx, {"work": payload}
+                    hits, routed = self.retriever.retrieve(req.message, min(req.top_k, 3), Plan(works=[w["id"]]))
+                    out["hits"], out["routed"] = hits, {**routed, "intent": intent}
+                    return out
+                if intent == "chapters":
+                    ctx, payload = cat.build_chapters(conn, w, tnames, detail=detail,
+                                                      group_by=plan.group_by, topic=(plan.topics or [None])[0])
+                    out["catalog_context"], out["payload"] = ctx, {"chapters": payload}
+                    out["instruction"] = "Vypiš kapitoly z výpisu (zachovej pořadí a úrovně), nic nedomýšlej."
+                    out["routed"] = {"works": [w["id"]], "groups": [], "intent": intent}
+                    return out
+                if intent == "chapter_detail":
+                    chapters = cat.query_chapters(conn, w["id"])
+                    ch = find_chapter(chapters, plan.chapter_hint or req.message)
+                    if ch:
+                        ctx = (f"Dílo: {w.get('name_cs') or w['title']}\nKapitola: {ch['path']}"
+                               + (f" — {ch['heading_cs']}" if ch.get("heading_cs") else "")
+                               + "\nAnotace kapitoly: " + (ch.get("summary_long") or ch.get("summary_medium") or ch.get("summary_short") or "(zatím bez anotace)"))
+                        out["catalog_context"] = ctx
+                        out["payload"] = {"chapter": {"work_id": w["id"], "id": ch["id"], "path": ch["path"], "heading_cs": ch.get("heading_cs"),
+                                                      "summary": ch.get("summary_long") or ch.get("summary_medium")}}
+                        hits, routed = self.retriever.retrieve(req.message, req.top_k * 2, Plan(works=[w["id"]]))
+                        in_ch = [h for h in hits if h["meta"].get("chapter_id") == ch["id"]]
+                        if len(in_ch) < 2:
+                            with self.pool.connection() as c2, c2.cursor() as cur:
+                                cur.execute("SELECT id FROM chunks WHERE chapter_id = %s ORDER BY seq_in_chapter LIMIT 3", (ch["id"],))
+                                ids = [r[0] for r in cur.fetchall()]
+                            from pg_search import hydrate
+                            rows = hydrate(c2, ids) if ids else {}
+                            for cid in ids:
+                                r = rows.get(cid)
+                                if r:
+                                    in_ch.append({"text": r["text"], "distance": 0.0, "meta": {
+                                        "chunk_id": cid, "work": r["title"], "work_id": r["work_id"], "name_cs": r["name_cs"],
+                                        "title": f"{r['title']} (část {r['seq'] + 1}/?)", "group": r["group"], "lang": r["lang"],
+                                        "lang_original": r["lang_original"], "lang_corpus": r["lang_corpus"], "edition": r["edition"],
+                                        "path": r["source_path"], "chapter_id": r["chapter_id"], "chapter_path": r["chapter_path"],
+                                        "ref_start": r["ref_start"], "ref_end": r["ref_end"], "seq": r["seq"], "score": None, "channels": ["chapter"]}})
+                        out["hits"] = in_ch[: req.top_k]
+                        out["routed"] = {**routed, "intent": intent, "chapter": ch["id"]}
+                        return out
+                    # kapitola nenalezena → přehled díla
+                    ctx, payload = cat.build_work_overview(conn, w, tnames)
+                    out["catalog_context"], out["payload"] = ctx, {"work": payload}
+                    out["instruction"] = "Kapitolu, na kterou se uživatel ptá, katalog nenašel — nabídni seznam kapitol."
+                    out["routed"] = {"works": [w["id"]], "groups": [], "intent": intent}
+                    return out
+
+            if intent == "read":
+                wid, nxt = self.reading.get(session_id, (work_ids[0] if work_ids else None, 0))
+                if wid:
+                    with self.pool.connection() as c2, c2.cursor() as cur:
+                        cur.execute("SELECT id FROM chunks WHERE work_id = %s AND seq >= %s ORDER BY seq LIMIT 3", (wid, nxt))
+                        ids = [r[0] for r in cur.fetchall()]
+                    from pg_search import hydrate
+                    rows = hydrate(c2, ids) if ids else {}
+                    hits = []
+                    for cid in ids:
+                        r = rows.get(cid)
+                        if r:
+                            hits.append({"text": r["text"], "distance": 0.0, "meta": {
+                                "chunk_id": cid, "work": r["title"], "work_id": r["work_id"], "name_cs": r["name_cs"],
+                                "title": f"{r['title']} (část {r['seq'] + 1}/?)", "group": r["group"], "lang": r["lang"],
+                                "lang_original": r["lang_original"], "lang_corpus": r["lang_corpus"], "edition": r["edition"],
+                                "path": r["source_path"], "chapter_id": r["chapter_id"], "chapter_path": r["chapter_path"],
+                                "ref_start": r["ref_start"], "ref_end": r["ref_end"], "seq": r["seq"], "score": None, "channels": ["read"]}})
+                    if hits:
+                        self.reading[session_id] = (wid, hits[-1]["meta"]["seq"] + 1)
+                    out["hits"] = hits
+                    out["instruction"] = "Uživatel čte dílo postupně: přelož tyto úryvky do češtiny v pořadí a stručně je okomentuj; na konci řekni, kde jsme (kapitola)."
+                    out["routed"] = {"works": [wid], "groups": [], "intent": intent, "read_from": nxt}
+                    return out
+
+            # content / mixed / fallback
+            rplan = Plan(works=work_ids, groups=plan.groups, terms_orig=plan.terms_orig, terms_cs=plan.terms_cs,
+                         hyde_cs=plan.hyde_cs if self.args.rewrite != "off" else "",
+                         hyde_orig=plan.hyde_orig if self.args.rewrite == "terms+hyde" else {})
+            if self.args.rewrite == "off":
+                rplan.terms_orig, rplan.terms_cs = {}, []
+            hits, routed = self.retriever.retrieve(req.message, req.top_k, rplan)
+            out["hits"], out["routed"] = hits, {**routed, "intent": intent}
+            if hits and hits[0]["meta"].get("work_id"):
+                self.reading[session_id] = (hits[0]["meta"]["work_id"], hits[0]["meta"]["seq"] + 1)
+            if intent == "mixed":
+                ctx, payload = cat.build_catalog(conn, plan, group_by="tradition", detail="short",
+                                                 groups=plan.groups or None, topics=plan.topics or None,
+                                                 author=plan.author, hide_priority=self.args.hide_priority)
+                out["catalog_context"], out["payload"] = ctx, {"catalog": payload}
+        return out
 
     def chat(self, req: ChatRequest):
         session_id = req.session_id or str(uuid.uuid4())
@@ -476,10 +626,11 @@ class RAGServer:
             session_id, deque(maxlen=2 * self.args.history_turns)
         )
 
-        hits, routed = self.retrieve(req.message, req.top_k)
+        prep = self._prepare(req, session_id, history)
+        hits, routed = prep["hits"], prep["routed"]
         sources = self._sources(hits)
         translation = self._start_excerpt_translation(sources)
-        messages = self.build_messages(req.message, hits, history)
+        messages = self.build_messages(req.message, hits, history, prep["catalog_context"], prep["instruction"])
 
         extra = {}
         if self.args.no_think:
@@ -501,7 +652,8 @@ class RAGServer:
 
         self._await_excerpts(translation, self.args.excerpt_timeout)
         return {"answer": answer, "sources": sources, "routed": routed,
-                "session_id": session_id, "model": model}
+                "session_id": session_id, "model": model,
+                "intent": routed.get("intent"), "plan": prep["plan"].brief() if prep["plan"] else None, **prep["payload"]}
 
     def chat_stream(self, req: ChatRequest):
         """SSE generátor: eventy {"delta": ...} po tokenech, na závěr
@@ -511,10 +663,13 @@ class RAGServer:
             session_id, deque(maxlen=2 * self.args.history_turns)
         )
 
-        hits, routed = self.retrieve(req.message, req.top_k)
+        # SSE komentář hned: proxy dostane hlavičky dřív, než doběhne plánovač
+        yield ": planning\n\n"
+        prep = self._prepare(req, session_id, history)
+        hits, routed = prep["hits"], prep["routed"]
         sources = self._sources(hits)
         translation = self._start_excerpt_translation(sources)
-        messages = self.build_messages(req.message, hits, history)
+        messages = self.build_messages(req.message, hits, history, prep["catalog_context"], prep["instruction"])
 
         extra = {}
         if self.args.no_think:
@@ -545,7 +700,8 @@ class RAGServer:
         # překlad běžel po celou dobu streamu, takže tady už bývá hotový
         self._await_excerpts(translation, self.args.excerpt_timeout)
         final = {"done": True, "sources": sources, "routed": routed,
-                 "session_id": session_id, "model": model}
+                 "session_id": session_id, "model": model,
+                 "intent": routed.get("intent"), "plan": prep["plan"].brief() if prep["plan"] else None, **prep["payload"]}
         yield "data: " + json.dumps(final, ensure_ascii=False) + "\n\n"
 
 
@@ -671,6 +827,14 @@ def create_app(args) -> FastAPI:
             items = [{"id": r[0], "seq": r[1], "text": r[2], "chapter_path": r[3]} for r in cur.fetchall()]
         return {"work_id": wid, "items": items, "next": (items[-1]["seq"] + 1) if items else None}
 
+    @app.post("/plan")
+    def plan(req: ChatRequest):
+        """Jen plánovač — ladění intentu a přepisu."""
+        if server.planner is None:
+            raise HTTPException(status_code=404, detail="plánovač neběží (jen PG režim)")
+        p = server.planner.plan(req.message, [], accept_models={args.planner_model, args.llm_model})
+        return p.to_dict()
+
     @app.get("/search")
     def search(q: str, top_k: int = 5, work: str | None = None, group: str | None = None):
         """Retrieval bez LLM — ladění, lab, eval."""
@@ -751,6 +915,14 @@ def main():
     p.add_argument("--channels", default="vec,gloss,fts,fts_cs",
                    help="kanály hybridního retrievalu (PG režim)")
     p.add_argument("--rrf-k", type=int, default=60)
+    p.add_argument("--planner", default="on", choices=["on", "off"],
+                   help="LLM plánovač dotazu (intent + přepis) před retrievalem")
+    p.add_argument("--planner-model", default="translate")
+    p.add_argument("--planner-timeout", type=float, default=25.0)
+    p.add_argument("--rewrite", default="terms+hyde", choices=["off", "terms", "terms+hyde"],
+                   help="co z plánu použít pro retrieval")
+    p.add_argument("--hide-priority", type=int, default=3,
+                   help="díla s prioritou ≥ N se v katalogu jen sečtou (fragmenty, scholia)")
     p.add_argument("--context-window", type=int, default=0,
                    help="±N sousedních chunků téže kapitoly do kontextu (0 = vypnuto)")
     p.add_argument("--candidate-factor", type=int, default=4,

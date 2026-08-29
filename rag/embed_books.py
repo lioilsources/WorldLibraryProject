@@ -73,9 +73,10 @@ def read_jsonl(path: str):
 # --- pasáže -------------------------------------------------------------------
 
 class Splitter:
-    """Dělí chunk na pasáže podle tokenů embedding modelu. Řeže na hranici
-    věty/řádku (stejná sada znaků jako chunking.py), poslední kousek se
-    slije s předchozím, je-li krátký."""
+    """Dělí chunk na pasáže podle tokenů embedding modelu. Tokenizuje
+    jednou s offsety a řeže podle nich (binární hledání s opakovanou
+    tokenizací bylo hlavní CPU brzda). Řez se zarovná zpět na konec
+    věty/řádku, poslední krátký kousek se slije s předchozím."""
 
     ENDINGS = set(".!?。！？؟।॥…\n;")
 
@@ -84,36 +85,39 @@ class Splitter:
         self.tok = AutoTokenizer.from_pretrained(model_name)
         self.budget = max_tokens - prefix_tokens   # místo na prefix 'Dílo › Kapitola'
 
-    def count(self, text: str) -> int:
-        return len(self.tok(text, add_special_tokens=False)["input_ids"])
-
     def split(self, text: str) -> list[str]:
-        if self.count(text) <= self.budget:
+        enc = self.tok(text, add_special_tokens=False, return_offsets_mapping=True)
+        offsets = enc["offset_mapping"]
+        n = len(offsets)
+        if n <= self.budget:
             return [text]
-        # binárně: kolik znaků se vejde; pak zarovnat na konec věty
-        pieces, rest = [], text
-        while rest:
-            if self.count(rest) <= self.budget:
-                pieces.append(rest)
+        pieces, start_tok = [], 0
+        while start_tok < n:
+            end_tok = min(start_tok + self.budget, n)
+            char_start = offsets[start_tok][0]
+            char_end = offsets[end_tok - 1][1]
+            if end_tok < n:
+                # zarovnat na konec věty v poslední třetině okna
+                floor = char_start + (char_end - char_start) * 2 // 3
+                for i in range(char_end - 1, floor, -1):
+                    if text[i] in self.ENDINGS:
+                        char_end = i + 1
+                        break
+                # další start = první token začínající za řezem
+                nxt = start_tok + 1
+                while nxt < n and offsets[nxt][0] < char_end:
+                    nxt += 1
+                end_tok = nxt
+            piece = text[char_start:char_end].strip()
+            if piece:
+                pieces.append(piece)
+            if end_tok >= n:
                 break
-            lo, hi = 1, len(rest)
-            while lo < hi:
-                mid = (lo + hi + 1) // 2
-                if self.count(rest[:mid]) <= self.budget:
-                    lo = mid
-                else:
-                    hi = mid - 1
-            cut = lo
-            for i in range(cut - 1, max(cut // 2, 0), -1):
-                if rest[i] in self.ENDINGS:
-                    cut = i + 1
-                    break
-            pieces.append(rest[:cut].strip())
-            rest = rest[cut:].strip()
+            start_tok = end_tok
         if len(pieces) > 1 and len(pieces[-1]) < 120:
             pieces[-2] = pieces[-2] + " " + pieces[-1]
             pieces.pop()
-        return [p for p in pieces if p]
+        return pieces or [text]
 
 
 def passage_text(doc: dict, passage: str, model_name: str) -> str:

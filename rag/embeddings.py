@@ -49,15 +49,26 @@ def pick_device(requested: str) -> str:
 
 
 class LocalEmbedder:
-    """sentence-transformers v procesu (cuda/mps/cpu)."""
+    """sentence-transformers v procesu (cuda/mps/cpu).
 
-    def __init__(self, model_name: str, device: str = "auto"):
+    Na CUDA běží ve fp16: měřeno na GB10 28 → 95 pasáží/s, shoda s fp32
+    min cos 0,9998 (bf16 je 165/s, ale min cos 0,998 — už se to hne).
+    Index i dotaz musí používat totéž — server i embed_books jdou přes
+    tuhle třídu. EMBED_DTYPE=fp32 to přebije."""
+
+    def __init__(self, model_name: str, device: str = "auto", dtype: str | None = None):
+        import os
         from sentence_transformers import SentenceTransformer
 
         self.model_name = model_name
         dev = pick_device(device)
-        print(f"Načítám {model_name} (device={dev})...")
-        self.model = SentenceTransformer(model_name, device=dev)
+        dtype = dtype or os.getenv("EMBED_DTYPE") or ("fp16" if dev == "cuda" else "fp32")
+        kwargs = {}
+        if dtype in ("fp16", "bf16"):
+            import torch
+            kwargs["model_kwargs"] = {"torch_dtype": torch.float16 if dtype == "fp16" else torch.bfloat16}
+        print(f"Načítám {model_name} (device={dev}, {dtype})...")
+        self.model = SentenceTransformer(model_name, device=dev, **kwargs)
 
     def encode(self, texts: list[str], batch_size: int = 64) -> list[list[float]]:
         return self.model.encode(
