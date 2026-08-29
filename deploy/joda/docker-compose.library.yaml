@@ -18,8 +18,32 @@
 # - maintenance_work_mem 192MB kvůli stavbě GIN indexů — ty se tvoří až
 #   PO načtení dat (rag/sql/0003_indexes.sql), ne při CREATE TABLE
 # - záloha 3:30, ne 3:00 — bipolar zálohuje ve 3:00 a CPU jsou jen dvě
+# - library-chroma (:8007) na SSD — viz komentář u služby
 
 services:
+  # Vektorový index knihovny (books_v2 pasáže + books_gloss glosy). Vlastní
+  # instance vedle SwarmBattle Chromy (:8006) — ta má data na /media, což je
+  # plotnový disk: měřeno 2 upserty/s, 250 000 pasáží by trvalo dva dny.
+  # Tahle jede z SSD systémového disku (/home). Image přišpendlená na
+  # verzi, kterou má i :8006 (1.4.4), ať klient 1.5.x mluví s obojím stejně.
+  # Bez healthchecku: image nemá curl a heartbeat zvenku je spolehlivější
+  # (viz PLAN-joda-chroma.md — u :8006 healthcheck hlásí unhealthy a funguje).
+  library-chroma:
+    # pull_policy missing: vezme se lokálně cachovaný image (= tentýž, na
+    # kterém běží :8006, v době nasazení 1.4.4); tag s verzí Chroma nevydává
+    image: chromadb/chroma:latest
+    pull_policy: missing
+    container_name: library_chroma
+    restart: unless-stopped
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    ports:
+      - "0.0.0.0:8007:8000"
+    volumes:
+      - ${LIBRARY_CHROMA_DATA:-/home/oli/deploy/WorldLibraryProject/chroma-data}:/data
+    mem_limit: 1g
+
   library-postgres:
     image: postgres:16-alpine
     container_name: library_postgres

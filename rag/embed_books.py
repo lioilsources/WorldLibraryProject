@@ -198,7 +198,7 @@ def main() -> int:
     p.add_argument("--works", default="works.jsonl", help="kvůli name_cs do prefixu")
     p.add_argument("--source", default="jsonl", choices=["jsonl", "pg"])
     p.add_argument("--dsn", default=os.getenv("PG_DSN"))
-    p.add_argument("--chroma-url", default="http://192.168.88.88:8006")
+    p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://192.168.88.88:8006"))
     p.add_argument("--collection", default="books_v2")
     p.add_argument("--mode", default="passages", choices=["passages", "chunks"])
     p.add_argument("--max-tokens", type=int, default=450)

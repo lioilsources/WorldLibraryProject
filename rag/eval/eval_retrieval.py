@@ -20,6 +20,7 @@ Použití (M2 i SPARK, Chroma na JODA):
 
 import argparse
 import json
+import os
 import sys
 import unicodedata
 from datetime import datetime, timezone
@@ -190,7 +191,7 @@ def aggregate(rows):
 def main():
     p = argparse.ArgumentParser(description="Retrieval eval")
     p.add_argument("--golden", default=str(Path(__file__).parent / "golden.jsonl"))
-    p.add_argument("--chroma-url", default="http://192.168.88.88:8006")
+    p.add_argument("--chroma-url", default=os.environ.get("CHROMA_URL", "http://192.168.88.88:8006"))
     p.add_argument("--collection", default="books")
     p.add_argument("--embed-model", default=DEFAULT_MODEL)
     p.add_argument("--device", default="auto")
