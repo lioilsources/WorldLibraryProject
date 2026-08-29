@@ -234,7 +234,22 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
     41 232 chunků. Pozor při případném re-ingestu — ID chunku se počítá
     ze `sha256(cesty)`, takže nový text na staré cestě by `embed_books.py`
     přeskočil jako „už tam je"; staré chunky musí padnout první.
-11. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+11. **SwarmBattle Chroma na JODA zapisuje na plotnový disk** (`/media`, 16 TB,
+    93 % plno): 128 upsertů za 24–69 s = 2 vektory/s při 0 % CPU. Původních
+    41 k chunků prošlo, ale 250 k pasáží 2. vlny by trvalo dva dny. Proto
+    má knihovna vlastní `library_chroma` :8007 s daty na SSD (`deploy/joda`,
+    439 upsertů/s). Kolekce `books` na :8006 je jen legacy pro režim bez PG.
+12. **`multilingual-e5-large` má `max_seq_length` 512** a co je nad, tiše
+    uřízne: 100 % pálijských chunků (medián 592 tokenů), polovina čínských.
+    Řeší se pasážemi ≤ 450 tokenů v `embed_books.py` a per-jazyk velikostí
+    chunku v ingestu (pálí 1 100, čínština 500 znaků).
+13. **fp16 embedding** na GB10: 28 → 95 pasáží/s, shoda s fp32 min cos 0,9998;
+    bf16 je 165/s, ale min cos 0,998 — už se to hne. Index i dotaz musí jet
+    stejně (`embeddings.LocalEmbedder`, `EMBED_DTYPE`).
+14. **`pkill -f` přes ssh zabije i vlastní shell**, když vzor sedí na
+    příkazovou řádku `bash -c` (obsahuje tentýž text). Vzor `"[e]mbed_books"`
+    pomůže jen tehdy, když start nového procesu není v témže ssh volání.
+15. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.

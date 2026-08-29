@@ -1,7 +1,7 @@
 # RAG chatbot — cíle pro jednotlivé stroje.
 #
 #   M2    ingest (registry + kapitoly + Perseus) → JSONL → rsync na SPARK; migrace PG; deploy
-#   JODA  Postgres (deploy/joda) + Chroma (AiStack deploy/docker-compose.swarm.nas.yaml)
+#   JODA  Postgres :5433 + Chroma knihovny :8007 (deploy/joda); AiStack Chroma :8006 drží legacy `books`
 #   SPARK load do PG, embedding, obohacení (LLM), server
 #
 # Tajemství jsou v rag/.env (PG_DSN) a deploy/joda/.env (heslo) — mimo git.
@@ -25,6 +25,7 @@ PY          ?= .venv/bin/python3
 SPARK_DIR   ?= /home/ol1n/deploy/WorldLibraryProject
 JODA_DIR    ?= ~/deploy/WorldLibraryProject/deploy/joda
 MODE        ?= full
+SERVER_URL  ?= http://localhost:8090
 PRIORITY    ?= 1
 NO_TRGM     ?=
 
@@ -34,7 +35,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval serve restart-chat deploy-spark
+        eval eval-catalog serve restart-chat deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -43,7 +44,13 @@ deps:
 test:
 	$(PY) retrieval.py
 	$(PY) chapters.py
+	$(PY) clean_text.py
+	$(PY) hybrid.py
 	$(PY) -m pytest -q tests
+
+# eval plánovače a katalogu přes běžící server (PG režim)
+eval-catalog:
+	$(PY) eval/eval_catalog.py --url $(SERVER_URL)
 
 # --- M2 (orchestrátor) ---
 ingest:
@@ -63,7 +70,7 @@ sync-spark:
 	rsync -avz --progress $(JSONL) works.jsonl chapters.jsonl spark:$(SPARK_DIR)/rag/
 	rsync -a $(REGISTRY)/ spark:$(SPARK_DIR)/rag/$(REGISTRY)/
 
-# --- JODA (Postgres; Chroma je v AiStacku) ---
+# --- JODA (Postgres + Chroma knihovny; deploy/joda) ---
 deploy-joda:
 	ssh joda "mkdir -p $(JODA_DIR)"
 	rsync -a --exclude .env ../deploy/joda/ joda:$(JODA_DIR)/
@@ -107,7 +114,7 @@ embed-gloss:
 		--collection $(GLOSS_COLLECTION) $(EMBED_FLAGS)
 
 chroma-drop:
-	$(PY) -c "import chromadb; c=chromadb.HttpClient(host='192.168.88.88',port=8006); c.delete_collection('$(COLLECTION)'); print('smazána', '$(COLLECTION)')"
+	$(PY) -c "import chromadb,urllib.parse as u; p=u.urlparse('$(CHROMA_URL)'); c=chromadb.HttpClient(host=p.hostname,port=p.port); c.delete_collection('$(COLLECTION)'); print('smazána', '$(COLLECTION)', 'na', '$(CHROMA_URL)')"
 
 # obohacení jde přímo na TRT-LLM (:8004), ne přes gateway — LiteLLM by při pádu
 # translate tiše přepnul na Qwen3-4B a otrávil data
