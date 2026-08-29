@@ -141,6 +141,53 @@ Odpověď obsahuje `session_id` — pošli ho v dalším dotazu a chatbot si
 pamatuje kontext konverzace. `POST /reset` paměť smaže. Swagger UI na
 `/docs`, stav na `/status`.
 
+## 2. vlna: katalog, kapitoly, hybridní retrieval (srpen 2026)
+
+```
+M2      ingest_books.py (registry + kapitoly + Perseus TEI) → books.jsonl / works.jsonl / chapters.jsonl
+JODA    library_postgres :5433   katalog děl, kapitoly, chunky + fulltext, obohacení, témata
+        library_chroma   :8007   books_v2 (pasáže ≤ 450 tokenů) + books_gloss (české glosy)   ← SSD
+        swarm-chromadb   :8006   legacy kolekce `books` (režim bez PG)                          ← HDD
+SPARK   load_pg.py → PG;  embed_books.py → Chroma;  enrich_*.py (translate/director) → PG
+        server.py: plánovač (LLM) → katalog z PG | hybrid (vec + gloss + fts + fts_cs → RRF) → LLM
+```
+
+- **Registr** (`registry/`): `works.yaml` — kurátorská metadata 93 dnešních děl (název_cs, autor,
+  `lang_original` vs `lang_corpus` — poctivě, u překladů `en`), `topics.yaml` — 33 témat pro
+  constrained labeling, `perseus_overrides.yaml` — české názvy a aliasy kanonických antických děl
+  a autorů. `validate.py` před ingestem.
+- **Kapitoly** (`chapters.py`): detektory per tradice (čínské 第…章, pálijské vagga › sutta,
+  Mahábhárata SECTION, Gutenberg CHAPTER s obsahem, Hegel z osnovy PDF, Rgvéd HYMN, PDF bookmarks
+  pro Avestu a Texty pyramid). Perseus má kapitoly v TEI (`perseus_tei.py`, jen originály).
+  Chunk nikdy nekříží kapitolu; velikost per jazyk (pálí 1 100 zn., čínština 500 — měřeno
+  tokenizerem e5, limit 512: dřív bylo 100 % pálijských chunků nad limit).
+- **ID**: `work_id` slug (`zh.daodejing`, `grc.tlg0012.tlg001`), kapitola `…:0008`, chunk
+  `…:0008:0001` — nezávislé na cestě souboru. Vše NFC.
+- **Embedding**: pasáže ≤ 450 tokenů s prefixem „Dílo › Kapitola", fp16 na CUDA (95 pasáží/s).
+  Chroma knihovny běží z SSD (`deploy/joda`) — SwarmBattle Chroma na /media (HDD) dávala 2 upserty/s.
+- **Retrieval** (`retriever.py`, `pg_search.py`, `hybrid.py`): kanály vektor-originál, vektor-glosy,
+  fulltext-originál (prefixy termínů, bigramy pro čínštinu), fulltext-glosy → Reciprocal Rank
+  Fusion → filtr balastu (`looks_tabular`, `quality = 0`) → diverzita. Bez plánu bere termíny
+  pro fulltext přímo z dotazu („無為" → kapitoly 37 a 48 Tao te ťingu, „Milinda" → Otázky
+  krále Milindy).
+- **Plánovač** (`planner.py`): jeden LLM roundtrip → intent (`catalog | work_overview | chapters |
+  chapter_detail | read | content | mixed | smalltalk`), tradice/témata/dílo/kapitola, délka,
+  přepis do jazyků korpusu (termíny + HyDE). Selhání = prázdný plán = obsahové hledání. Cache v PG.
+- **Katalog** (`catalog.py`): deterministický kontext z DB podle intentu (tabulka děl s autorem,
+  jazykem originálu, „v korpusu: originál / překlad", tématy a anotací v délce podle počtu; antika
+  po autorech; fragmenty se jen sečtou), přehled díla, seznam kapitol, obsah kapitoly, čtení dál.
+  Do systémového promptu už nejde celý katalog, jen index tradic (7 551 → 1 805 znaků).
+- **Obohacení** (`enrich_chunks.py` translate přímo na :8004; `enrich_chapters.py`,
+  `enrich_works.py` director): gloss_cs, klíčová slova cs/en/orig, otázky, entity, témata, kvalita;
+  summary kapitol a děl ve 3 délkách. Resume přes `input_sha`, fallback model se zahazuje.
+- **Endpointy navíc**: `GET /works` (filtry group/topic/author/lang/q, `detail`),
+  `GET /works/{id}/chapters`, `GET /works/{id}/chunks` (čtení dál), `GET /search` (bez LLM),
+  `POST /plan`, `/status` s `pg` a `mode`. Finální SSE event nese `intent`, `plan` a payload
+  `catalog | work | chapters | chapter`.
+- **Provoz**: `rag/.env` (`PG_DSN`, `CHROMA_URL`, `COLLECTION`) čte server, embed i eval;
+  `--pg-dsn` prázdné = rollback na režim jen s Chromou. Makefile: `pg-*`, `ingest-stats`,
+  `sync-spark`, `load-pg`, `pg-index`, `embed`, `embed-gloss`, `enrich-*`, `eval MODE=…`.
+
 ## Kvalita vyhledávání
 
 Dotaz je česky, korpus v pálí, sanskrtu, čínštině a hebrejštině — a

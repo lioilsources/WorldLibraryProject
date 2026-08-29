@@ -1,0 +1,26 @@
+{"q": "Jaké knihy máš o smrti a nesmrtelnosti?", "intent": "catalog", "expect_topics": ["smrt_nesmrtelnost"], "min_works": 3}
+{"q": "Co máš od Platóna?", "intent": "catalog", "expect_author": "Plat", "min_works": 10}
+{"q": "Které texty máš v knihovně jen v překladu?", "intent": "catalog", "expect_filter": {"is_translation": true}, "min_works": 5}
+{"q": "Vypiš buddhistické texty o meditaci.", "intent": "catalog", "expect_groups": ["pali"], "expect_topics": ["meditace_askeze"]}
+{"q": "Jaké latinské autory máš?", "intent": "catalog", "expect_groups": ["greek_latin"], "min_works": 20}
+{"q": "Co je za knihu Ústava od Platóna?", "intent": "work_overview", "expect_work": "grc.tlg0059.tlg030"}
+{"q": "O čem je Tao te ťing?", "intent": "work_overview", "expect_work": "zh.daodejing"}
+{"q": "Kolik má Tao te ťing kapitol a o čem je osmá?", "intent": "chapter_detail", "expect_work": "zh.daodejing", "expect_chapter_ref": "8"}
+{"q": "Vypiš mi kapitoly Hovorů Konfuciových.", "intent": "chapters", "expect_work": "zh.lunyu"}
+{"q": "Jaké knihy má Ílias?", "intent": "chapters", "expect_work": "grc.tlg0012.tlg001"}
+{"q": "O čem je sedmá kniha Ústavy?", "intent": "chapter_detail", "expect_work": "grc.tlg0059.tlg030", "expect_chapter_ref": "7"}
+{"q": "Které kapitoly Dhammapady mluví o mysli?", "intent": "chapters", "expect_work": "pi.kn.dhammapada", "expect_topics": ["vedomi_mysl"]}
+{"q": "Čím začíná Ílias — o čí hněv jde?", "intent": "content", "expect_work": "grc.tlg0012.tlg001", "expect_chapter_ref": "1", "expect_group": "greek_latin"}
+{"q": "Co říká Marcus Aurelius o smrti?", "intent": "content", "expect_work": "grc.tlg0562.tlg001", "expect_group": "greek_latin"}
+{"q": "Jak Lucretius vysvětluje atomy?", "intent": "content", "expect_work": "lat.phi0550.phi001", "expect_group": "greek_latin"}
+{"q": "Co píše Cicero o přátelství v Laeliovi?", "intent": "content", "expect_work": "lat.phi0474.phi052", "expect_group": "greek_latin"}
+{"q": "Co radí Seneca Luciliovi o čase?", "intent": "content", "expect_work": "lat.phi1017.phi015", "expect_group": "greek_latin"}
+{"q": "Jak Hérodotos popisuje Egypťany?", "intent": "content", "expect_work": "grc.tlg0016.tlg001", "expect_group": "greek_latin"}
+{"q": "Co říká Aristotelés o ctnosti jako středu?", "intent": "content", "expect_work": "grc.tlg0086.tlg010", "expect_group": "greek_latin"}
+{"q": "Jak Sókratés obhajuje svůj život v Obraně?", "intent": "content", "expect_work": "grc.tlg0059.tlg002", "expect_group": "greek_latin"}
+{"q": "Co je v Antigoně konflikt mezi zákonem obce a zákonem bohů?", "intent": "content", "expect_work": "grc.tlg0011.tlg002", "expect_group": "greek_latin"}
+{"q": "Jak Vergilius líčí pád Tróje v Aeneidě?", "intent": "content", "expect_work": "lat.phi0690.phi003", "expect_group": "greek_latin"}
+{"q": "Jaké podobenství o jeskyni je v Ústavě?", "intent": "content", "expect_work": "grc.tlg0059.tlg030", "expect_group": "greek_latin"}
+{"q": "Přečti mi další kus.", "intent": "read"}
+{"q": "Ahoj, jak se máš?", "intent": "smalltalk"}
+{"q": "Děkuju, to stačí.", "intent": "smalltalk"}

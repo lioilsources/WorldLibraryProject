@@ -893,7 +893,8 @@ def main():
     p = argparse.ArgumentParser(description="RAG chatbot server")
     p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://192.168.88.88:8006"),
                    help="Chroma na JODA (AiStack swarm.nas)")
-    p.add_argument("--collection", default="books")
+    p.add_argument("--collection", default=os.getenv("COLLECTION", "books"),
+                   help="Chroma kolekce pasáží; PG režim chce books_v2 (rag/.env: COLLECTION)")
     p.add_argument("--llm-url", default=os.getenv("LLM_URL", "http://localhost:4000/v1"),
                    help="AiStack LiteLLM (na SPARKu localhost:4000/v1, "
                         "odjinud https://llm.ol1n.com/v1 + CF Access token v env)")
