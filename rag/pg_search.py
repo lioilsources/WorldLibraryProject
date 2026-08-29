@@ -33,7 +33,8 @@ tak take také takze takže tam tato te tě tebe tebou ted teď tedy tema téma 
 timto tímto tipy to tohle toho tohoto tom tomto tomu tomuto toto tu tuto tvuj tvůj ty tyto u uz už v vam vám
 vas vás vase vaše ve vedle vice více vsak však vsechen všechen vy z za zda zde ze že
 mluvi mluví pise píše soudi soudí uci učí uvadi uvádí popisuje vyklada vykládá text texty knihovna knihovne
-knihovně kniha knize knize knizka dilo díle dila
+knihovně kniha knize knizka knihy knih dilo díle dila kapitola kapitoly kapitole kapitolu kapitol oddil oddíl
+verš vers verse cast část časti části
 """.split())
 
 CJK_RE = re.compile(r"[㐀-䶿一-鿿]")

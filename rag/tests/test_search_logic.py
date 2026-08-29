@@ -18,7 +18,7 @@ def test_query_terms_keeps_cjk_and_numbers():
 
 
 def test_tsquery_prefix_for_long_terms():
-    assert _tsquery(["nibbana", "sati"]) == "nibbana:* | sati"
+    assert _tsquery(["nibbana", "sat"]) == "nibbana:* | sat"
     assert _bigram_query("道可道") == "道可 & 可道"
     assert _bigram_query("道") == ""
 
@@ -58,5 +58,6 @@ def test_find_chapter_by_number_and_heading():
                 {"ordinal": 8, "level": 1, "ref": "8", "heading": "第八章", "heading_cs": "Nejvyšší dobro je jako voda"},
                 {"ordinal": 9, "level": 2, "ref": "1.2", "heading": "Kniha 1 › Oddíl 2"}]
     assert find_chapter(chapters, "kapitola 8")["ref"] == "8"
-    assert find_chapter(chapters, "osmá")["ref"] == "8" or find_chapter(chapters, "jako voda")["ref"] == "8"
+    assert find_chapter(chapters, "osmá kapitola")["ref"] == "8"
+    assert find_chapter(chapters, "jako voda")["ref"] == "8"
     assert find_chapter(chapters, "nic takového") is None

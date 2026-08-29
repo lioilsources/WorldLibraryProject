@@ -221,10 +221,23 @@ class Planner:
         return plan
 
 
+_ORDINALS_CS = {"prvni": 1, "druha": 2, "druhy": 2, "treti": 3, "ctvrta": 4, "ctvrty": 4, "pata": 5, "paty": 5,
+                "sesta": 6, "sesty": 6, "sedma": 7, "sedmy": 7, "osma": 8, "osmy": 8, "devata": 9, "devaty": 9,
+                "desata": 10, "desaty": 10, "jedenacta": 11, "dvanacta": 12, "trinacta": 13, "ctrnacta": 14,
+                "patnacta": 15, "sestnacta": 16, "sedmnacta": 17, "osmnacta": 18, "devatenacta": 19, "dvacata": 20}
+
+
 def find_chapter(chapters: list[dict], hint: str) -> dict | None:
-    """chapter_hint → kapitola: číslo (ordinal/ref), nebo podřetězec nadpisu."""
+    """chapter_hint → kapitola: číslo (ref/ordinal), české řadové slovo
+    („osmá"), nebo podřetězec nadpisu."""
     h = fold(hint)
     m = re.search(r"(\d+)", h)
+    if not m:
+        for word, num in _ORDINALS_CS.items():
+            if re.search(rf"\b{word}\b", h):
+                h = h.replace(word, str(num))
+                m = re.search(r"(\d+)", h)
+                break
     if m:
         n = m.group(1)
         for c in chapters:
