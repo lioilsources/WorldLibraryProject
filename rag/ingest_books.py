@@ -313,9 +313,11 @@ def chapters_from_lines(lines: list[str], detector: str, toc=None, page_first_li
         chs = chap.build(lines, chap.marks_from_toc(toc or [], page_first_line or []))
     else:
         chs = chap.detect(lines, detector)
-    out = []
+    out, skipped = [], set()
     for c in chs:
-        if chap.is_front_matter(c.heading):
+        # front matter (obálka, tiráž, obsah, rejstřík) i s celým podstromem
+        if chap.is_front_matter(c.heading) or c.parent_ordinal in skipped:
+            skipped.add(c.ordinal)
             continue
         text = c.text(lines)
         out.append({"ordinal": c.ordinal, "level": c.level, "parent_ordinal": c.parent_ordinal,

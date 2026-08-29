@@ -119,8 +119,12 @@ def replace_work(conn, work_id: str, chapters: list[dict], chunks: list[dict]) -
             cur.execute("DELETE FROM chunks WHERE work_id = %s", (work_id,))
             cur.execute("DELETE FROM chapters WHERE work_id = %s", (work_id,))
 
-            # kapitoly v pořadí — rodič musí existovat dřív
+            # kapitoly v pořadí — rodič musí existovat dřív; rodič mimo seznam
+            # (front matter vynechané ingestem) → bez rodiče, ne pád
+            present = {c["id"] for c in chapters}
             for ch in sorted(chapters, key=lambda c: c["ordinal"]):
+                if ch.get("parent_id") and ch["parent_id"] not in present:
+                    ch = dict(ch, parent_id=None)
                 cur.execute(
                     """INSERT INTO chapters (id, work_id, ordinal, level, parent_id, ref, heading, path, char_count, chunk_count)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
