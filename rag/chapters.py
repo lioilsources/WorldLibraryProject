@@ -474,10 +474,13 @@ def build(lines: list[str], marks: list[Mark]) -> list[Chapter]:
         end = marks[k + 1].line if k + 1 < len(marks) else n
         chapters.append(Chapter(0, m.level, None, m.ref, m.heading, start, end))
 
-    # ordinály a rodiče: rodič = poslední předchozí kapitola s nižší úrovní
+    # ordinály a rodiče: rodič = poslední předchozí kapitola s nižší úrovní;
+    # „(úvod)" před první kapitolou není rodič ničeho
     stack: list[Chapter] = []
     for i, ch in enumerate(chapters, 1):
         ch.ordinal = i
+        if ch.heading == "(úvod)":
+            continue
         while stack and stack[-1].level >= ch.level:
             stack.pop()
         if stack:
@@ -590,10 +593,10 @@ def _selftest() -> None:
     marks = marks_from_toc([(1, "Fargard I", 1), (2, "Fargard I, 1", 1), (1, "Fargard II", 3)], [0, 10, 20])
     assert [(m.line, m.level, m.heading) for m in marks] == [(0, 1, "Fargard I"), (20, 1, "Fargard II")]
 
-    # dlouhý úvod se stane kapitolou (úvod)
-    long_intro = ["x" * 500, "第一章", "t"]
-    ch = detect(long_intro, "zh_zhang")
-    assert ch[0].heading == "(úvod)" and ch[1].ref == "1"
+    # dlouhý úvod se stane kapitolou (úvod), ale není rodičem dalších
+    long_intro = ["x" * 500, "1. Yamakavaggo", "1. Cakkhusuttaṃ", "t"]
+    ch = detect(long_intro, "pali_vagga")
+    assert ch[0].heading == "(úvod)" and ch[1].parent_ordinal is None and ch[2].path == "1. Yamakavaggo › 1. Cakkhusuttaṃ", [c.path for c in ch]
     print("chapters.py: selftest ok")
 
 
