@@ -38,8 +38,9 @@ from pydantic import BaseModel
 
 from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
 from embeddings import format_query, make_embedder
-from retrieval import (build_alias_index, diversify, is_echo, looks_tabular,
+from retrieval import (build_alias_index, diversify, fold, is_echo, looks_tabular,
                        route, route_groups)
+from retriever import Plan, Retriever, context_block
 
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 # model občas uvede překlad slovem ze zadání — useknout
@@ -74,9 +75,23 @@ class RAGServer:
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
         self.collection = client.get_collection(args.collection)
 
-        # katalog děl z metadat kolekce — jednorázově při startu; po změně
-        # korpusu (make embed) je potřeba server restartovat
-        self.catalog = self._build_catalog()
+        # Režim s Postgresem (katalog, kapitoly, fulltext, obohacení) vs.
+        # dnešní režim jen s Chromou — --pg-dsn prázdné = rollback na staré chování.
+        self.pool = None
+        self.retriever = None
+        self.gloss = None
+        if args.pg_dsn:
+            from psycopg_pool import ConnectionPool
+            self.pool = ConnectionPool(args.pg_dsn, min_size=1, max_size=8, open=True)
+            self.catalog = self._build_catalog_pg()
+            try:
+                self.gloss = client.get_collection(args.gloss_collection)
+            except Exception:
+                self.gloss = None   # glosy ještě neexistují — kanál se přeskočí
+        else:
+            # katalog děl z metadat kolekce — jednorázově při startu; po změně
+            # korpusu (make embed) je potřeba server restartovat
+            self.catalog = self._build_catalog()
 
         # volitelné anotace děl (gen_summaries.py) — obohatí /works i prompt
         summaries_path = Path(args.summaries_file)
@@ -102,10 +117,11 @@ class RAGServer:
                 info["summary"] = entry
                 info["name_cs"] = None
 
-        self.system_prompt += self._catalog_prompt()
+        self.system_prompt += self._catalog_prompt_slim() if self.pool else self._catalog_prompt()
 
-        # rejstřík aliasů pro směrování dotazu na dílo (viz retrieval.py)
-        self.alias_index = build_alias_index(
+        # rejstřík aliasů pro směrování dotazu na dílo (viz retrieval.py);
+        # v PG režimu i aliasy z registru (autoři, česká jména Perseu)
+        self.alias_index = self._build_alias_index_pg() if self.pool else build_alias_index(
             {w: info.get("name_cs") for w, info in self.catalog.items()}
         )
         # tradice, které korpus opravdu má — aliasy na skupinu smějí mířit jen
@@ -131,6 +147,14 @@ class RAGServer:
         self.llm = OpenAI(
             base_url=args.llm_url, api_key=args.llm_api_key, default_headers=headers
         )
+        if self.pool:
+            self.retriever = Retriever(
+                orig=self.collection, gloss=self.gloss, pool=self.pool, embedder=self.embedder,
+                embed_model=args.embed_model, alias_index=self.alias_index,
+                channels=[c.strip() for c in args.channels.split(",") if c.strip()],
+                candidate_factor=args.candidate_factor, max_per_work=args.max_per_work,
+                rrf_k=args.rrf_k, no_routing=args.no_routing, context_window=args.context_window,
+            )
         # historie: session_id -> deque[(role, content)]
         self.sessions: dict[str, deque] = {}
         # vlákna na překlad úryvků — běží souběžně s generováním odpovědi
@@ -160,6 +184,70 @@ class RAGServer:
                 break
             offset += limit
         return catalog
+
+    def _build_catalog_pg(self) -> dict:
+        """work_id -> metadata díla z Postgresu (works + témata)."""
+        cols = ["id", "group", "subgroup", "title", "work_legacy", "name_cs", "author", "author_cs",
+                "lang_original", "lang_corpus", "edition", "form", "period", "priority", "aliases",
+                "chunk_count", "chapter_count", "summary_short", "summary_medium", "summary_long", "topic_ids"]
+        with self.pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(f'SELECT {", ".join(chr(34) + c + chr(34) for c in cols)} FROM catalog_v')
+            rows = [dict(zip(cols, r)) for r in cur.fetchall()]
+        catalog = {}
+        for r in rows:
+            r["path"] = None
+            r["lang"] = r["lang_corpus"]
+            r["summary"] = r.get("summary_medium")
+            catalog[r["id"]] = r
+        return catalog
+
+    def _build_alias_index_pg(self):
+        """Aliasy: kurátorská tabulka (retrieval.ALIASES, klíčovaná dnešními
+        jmény → přes work_legacy), názvy z katalogu a aliasy z registru
+        (včetně autorů Perseu). Výsledek mapuje na work_id."""
+        keys = {}
+        self.legacy_to_id = {}
+        for wid, info in self.catalog.items():
+            legacy = info.get("work_legacy") or info["title"]
+            keys[legacy] = info.get("name_cs")
+            self.legacy_to_id[legacy] = wid
+        index = build_alias_index(keys)   # [(alias, (legacy,…))] seřazené podle délky
+        extra: dict[str, set] = {}
+        for wid, info in self.catalog.items():
+            legacy = info.get("work_legacy") or info["title"]
+            for a in info.get("aliases") or []:
+                if len(a) >= 3:
+                    extra.setdefault(fold(a), set()).add(legacy)
+            if info.get("author_cs") and len(info["author_cs"]) >= 4:
+                extra.setdefault(fold(info["author_cs"]), set()).add(legacy)
+        merged: dict[str, set] = {a: set(w) for a, w in index}
+        for a, ws in extra.items():
+            merged.setdefault(a, set()).update(ws)
+        return sorted(((a, tuple(sorted(w))) for a, w in merged.items()), key=lambda kv: -len(kv[0]))
+
+    def _catalog_prompt_slim(self) -> str:
+        """Ultra-štíhlý index do systémového promptu: tradice, počty a pár
+        příkladů. Celý katalog (1 173 děl) se do promptu nelepí — na
+        katalogové otázky odpovídá plánovač cíleným kontextem z DB."""
+        by_group: dict[str, list[dict]] = {}
+        for info in self.catalog.values():
+            by_group.setdefault(info["group"] or "misc", []).append(info)
+        blocks = []
+        for group, works in sorted(by_group.items()):
+            authors = {w.get("author_cs") or w.get("author") for w in works if w.get("author_cs") or w.get("author")}
+            top = sorted((w for w in works if w.get("priority") == 1 and w.get("name_cs")), key=lambda w: w["name_cs"])
+            examples = ", ".join(w["name_cs"] for w in top[:8])
+            line = f"- {group}: {len(works)} děl"
+            if len(authors) > 3:
+                line += f", {len(authors)} autorů"
+            if examples:
+                line += f" (např. {examples})"
+            blocks.append(line)
+        return (
+            "\n\nKnihovna má tyto tradice:\n" + "\n".join(blocks) + "\n"
+            "Když se uživatel ptá na seznam knih, autora nebo kapitoly, dostaneš cílený "
+            "výpis z katalogu v kontextu — odpovídej jen z něj a nepřidávej díla, která tam nejsou."
+        )
 
     # věta končí tečkou, za níž je mezera — ale tečka po samostatném velkém
     # písmenu je iniciála („překlad J. P. Allen"), ne konec věty
@@ -227,21 +315,34 @@ class RAGServer:
         """Jméno díla pro člověka — české, když ho katalog zná. Používá se
         v promptu (katalog i hlavičky úryvků), aby model citoval názvy,
         kterým Čech rozumí, a ne „Milindapañhapāḷi"."""
+        if meta.get("name_cs"):
+            return meta["name_cs"]
         work = meta.get("work")
-        info = self.catalog.get(work) or {}
+        info = self.catalog.get(meta.get("work_id") or work) or {}
         return info.get("name_cs") or work or meta.get("title") or "neznámý zdroj"
 
     def _sources(self, hits) -> list[dict]:
         return [
             {
                 "work": h["meta"].get("work"),
-                "name_cs": (self.catalog.get(h["meta"].get("work")) or {}).get("name_cs"),
+                "name_cs": h["meta"].get("name_cs")
+                           or (self.catalog.get(h["meta"].get("work_id") or h["meta"].get("work")) or {}).get("name_cs"),
                 "title": h["meta"].get("title"),
                 "group": h["meta"].get("group"),
                 "lang": h["meta"].get("lang"),
                 "path": h["meta"].get("path"),
                 "distance": h["distance"],
                 "excerpt": self._excerpt(h["text"]),
+                # 2. vlna: struktura a původ (appka je zatím ignoruje)
+                "work_id": h["meta"].get("work_id"),
+                "chapter_id": h["meta"].get("chapter_id"),
+                "chapter_path": h["meta"].get("chapter_path"),
+                "ref_start": h["meta"].get("ref_start"),
+                "ref_end": h["meta"].get("ref_end"),
+                "lang_original": h["meta"].get("lang_original"),
+                "lang_corpus": h["meta"].get("lang_corpus"),
+                "score": h["meta"].get("score"),
+                "channels": h["meta"].get("channels"),
             }
             for h in hits
         ]
@@ -303,6 +404,12 @@ class RAGServer:
         bere top_k s omezením na počet úryvků z jednoho díla — jinak top-5
         běžně tvoří pětkrát tentýž svazek. Když otázka dílo jmenuje, hledá
         se rovnou jen v něm; když jmenuje jen tradici, aspoň v ní."""
+        if self.retriever is not None:
+            # PG režim: hybrid (vektor + glosy + fulltext → RRF); route() vrací
+            # dnešní jména děl, retriever chce work_id
+            works = [] if self.args.no_routing else [
+                self.legacy_to_id[w] for w in route(query, self.alias_index) if w in self.legacy_to_id]
+            return self.retriever.retrieve(query, top_k, Plan(), works_override=works)
         text = format_query(query, self.args.embed_model)
         embedding = self.embedder.encode([text])[0]
         works = [] if self.args.no_routing else route(query, self.alias_index)
@@ -339,12 +446,15 @@ class RAGServer:
         return hits, {"works": works, "groups": groups}
 
     def build_messages(self, message: str, hits, history):
-        context_lines = []
-        for i, h in enumerate(hits, 1):
-            m = h["meta"]
-            label = self._label(m)
-            context_lines.append(f"[{i}] {label} ({m.get('group', '?')}):\n{h['text']}")
-        context = "\n\n".join(context_lines) if context_lines else "(nic nenalezeno)"
+        if self.retriever is not None:
+            context = context_block(hits)   # dílo › kapitola (ref) [překlad]
+        else:
+            context_lines = []
+            for i, h in enumerate(hits, 1):
+                m = h["meta"]
+                label = self._label(m)
+                context_lines.append(f"[{i}] {label} ({m.get('group', '?')}):\n{h['text']}")
+            context = "\n\n".join(context_lines) if context_lines else "(nic nenalezeno)"
 
         messages = [{"role": "system", "content": self.system_prompt}]
         for role, content in history:
@@ -439,6 +549,19 @@ class RAGServer:
         yield "data: " + json.dumps(final, ensure_ascii=False) + "\n\n"
 
 
+def _pg_status(server) -> dict | None:
+    if server.pool is None:
+        return None
+    from pg_search import status
+    try:
+        with server.pool.connection() as conn:
+            st = status(conn)
+        st["enriched_pct"] = round(100 * st["enriched"] / max(1, st["chunks"]), 1)
+        return st
+    except Exception as exc:  # noqa: BLE001
+        return {"error": str(exc)}
+
+
 def create_app(args) -> FastAPI:
     server = RAGServer(args)
     app = FastAPI(title="Knihovna RAG chatbot")
@@ -469,14 +592,96 @@ def create_app(args) -> FastAPI:
         )
 
     @app.get("/works")
-    def works():
-        items = [
-            {"work": work, **info}
-            for work, info in sorted(
-                server.catalog.items(), key=lambda kv: (kv[1]["group"] or "", kv[0])
+    def works(group: str | None = None, subgroup: str | None = None, topic: str | None = None,
+              author: str | None = None, lang: str | None = None, priority: int | None = None,
+              q: str | None = None, detail: str = "medium", limit: int = 200, offset: int = 0):
+        """Katalog. V PG režimu s filtry; jinak dnešní výpis z metadat Chromy."""
+        if server.pool is None:
+            items = [
+                {"work": work, **info}
+                for work, info in sorted(
+                    server.catalog.items(), key=lambda kv: (kv[1]["group"] or "", kv[0])
+                )
+            ]
+            return {"works": items, "count": len(items)}
+        summary_col = {"short": "summary_short", "medium": "summary_medium", "long": "summary_long"}.get(detail, "summary_medium")
+        where, params = [], []
+        if group:
+            where.append('"group" = %s'); params.append(group)
+        if subgroup:
+            where.append("subgroup = %s"); params.append(subgroup)
+        if topic:
+            where.append("%s = ANY(topic_ids)"); params.append(topic)
+        if author:
+            where.append("(author ILIKE %s OR author_cs ILIKE %s)"); params += [f"%{author}%", f"%{author}%"]
+        if lang:
+            where.append("(lang_original = %s OR lang_corpus = %s)"); params += [lang, lang]
+        if priority:
+            where.append("priority <= %s"); params.append(priority)
+        if q:
+            where.append("(title ILIKE %s OR name_cs ILIKE %s OR author ILIKE %s)"); params += [f"%{q}%"] * 3
+        sql_where = (" WHERE " + " AND ".join(where)) if where else ""
+        cols = ["id", "group", "subgroup", "title", "name_cs", "author", "author_cs", "lang_original", "lang_corpus",
+                "is_translation", "edition", "form", "period", "priority", "chunk_count", "chapter_count", "topic_ids"]
+        with server.pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(f"SELECT count(*) FROM catalog_v{sql_where}", params)
+            total = cur.fetchone()[0]
+            cur.execute(
+                f'SELECT {", ".join(chr(34) + c + chr(34) for c in cols)}, {summary_col} AS summary FROM catalog_v{sql_where} '
+                f'ORDER BY "group", priority, coalesce(author_cs, author), coalesce(name_cs, title) LIMIT %s OFFSET %s',
+                params + [limit, offset],
             )
-        ]
-        return {"works": items, "count": len(items)}
+            items = [dict(zip(cols + ["summary"], r)) for r in cur.fetchall()]
+        return {"works": items, "count": len(items), "total": total, "detail": detail}
+
+    @app.get("/works/{work_id}/chapters")
+    def chapters(work_id: str, detail: str = "short", topic: str | None = None, offset: int = 0, n: int = 80):
+        if server.pool is None:
+            raise HTTPException(status_code=404, detail="kapitoly jsou jen v PG režimu")
+        summary_col = {"short": "summary_short", "medium": "summary_medium", "long": "summary_long"}.get(detail, "summary_short")
+        wid = server.legacy_to_id.get(work_id, work_id)
+        with server.pool.connection() as conn, conn.cursor() as cur:
+            cur.execute("SELECT id, name_cs, title, chapter_count FROM works WHERE id = %s", (wid,))
+            w = cur.fetchone()
+            if not w:
+                raise HTTPException(status_code=404, detail="neznámé dílo")
+            extra, params = "", [wid]
+            if topic:
+                extra, params = " AND %s = ANY(topic_ids)", [wid, topic]
+            cur.execute(
+                f"SELECT id, ordinal, level, parent_id, ref, heading, heading_cs, path, chunk_count, {summary_col}, topic_ids "
+                f"FROM chapters_v WHERE work_id = %s{extra} ORDER BY ordinal LIMIT %s OFFSET %s",
+                params + [n, offset],
+            )
+            cols = ["id", "ordinal", "level", "parent_id", "ref", "heading", "heading_cs", "path", "chunk_count", "summary", "topic_ids"]
+            items = [dict(zip(cols, r)) for r in cur.fetchall()]
+        return {"work_id": w[0], "name_cs": w[1], "title": w[2], "total": w[3], "items": items, "offset": offset}
+
+    @app.get("/works/{work_id}/chunks")
+    def chunks(work_id: str, offset: int = 0, n: int = 3):
+        """Sekvenční čtení: n chunků od pozice (čtení dál)."""
+        if server.pool is None:
+            raise HTTPException(status_code=404, detail="jen v PG režimu")
+        wid = server.legacy_to_id.get(work_id, work_id)
+        n = max(1, min(n, 10))
+        with server.pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT c.id, c.seq, c.text, ch.path FROM chunks c LEFT JOIN chapters ch ON ch.id = c.chapter_id "
+                "WHERE c.work_id = %s AND c.seq >= %s ORDER BY c.seq LIMIT %s", (wid, offset, n))
+            items = [{"id": r[0], "seq": r[1], "text": r[2], "chapter_path": r[3]} for r in cur.fetchall()]
+        return {"work_id": wid, "items": items, "next": (items[-1]["seq"] + 1) if items else None}
+
+    @app.get("/search")
+    def search(q: str, top_k: int = 5, work: str | None = None, group: str | None = None):
+        """Retrieval bez LLM — ladění, lab, eval."""
+        if not q.strip():
+            raise HTTPException(status_code=400, detail="prázdný dotaz")
+        if server.retriever is not None and (work or group):
+            plan = Plan(works=[server.legacy_to_id.get(work, work)] if work else [], groups=[group] if group else [])
+            hits, routed = server.retriever.retrieve(q, top_k, plan)
+        else:
+            hits, routed = server.retrieve(q, top_k)
+        return {"hits": server._sources(hits), "routed": routed}
 
     @app.post("/reset")
     def reset(req: ResetRequest):
@@ -492,6 +697,9 @@ def create_app(args) -> FastAPI:
             # systémový prompt jde do každého dotazu a čeština tokenizuje
             # ~1 token/znak — tohle číslo je přímo cena prefillu
             "system_prompt_chars": len(server.system_prompt),
+            "mode": "pg" if server.pool else "chroma",
+            "pg": _pg_status(server),
+            "gloss_collection": (args.gloss_collection if server.gloss is not None else None),
             "llm_model": args.llm_model,
             "llm_url": args.llm_url,
             "embed_model": args.embed_model,
@@ -505,7 +713,19 @@ def create_app(args) -> FastAPI:
     return app
 
 
+def _load_dotenv(path: Path) -> None:
+    """rag/.env: PG_DSN a spol. — mimo git."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
+
+
 def main():
+    _load_dotenv(Path(__file__).parent / ".env")
     p = argparse.ArgumentParser(description="RAG chatbot server")
     p.add_argument("--chroma-url", default="http://192.168.88.88:8006",
                    help="Chroma na JODA (AiStack swarm.nas)")
@@ -524,6 +744,15 @@ def main():
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
     p.add_argument("--summaries-file", default=str(Path(__file__).parent / "summaries.json"),
                    help="anotace děl z gen_summaries.py (chybějící soubor = bez anotací)")
+    p.add_argument("--pg-dsn", default=os.getenv("PG_DSN", ""),
+                   help="knihovní Postgres na JODA (rag/.env: PG_DSN); prázdné = jen Chroma jako dřív")
+    p.add_argument("--gloss-collection", default="books_gloss",
+                   help="Chroma kolekce českých glos (embed_books.py --source pg)")
+    p.add_argument("--channels", default="vec,gloss,fts,fts_cs",
+                   help="kanály hybridního retrievalu (PG režim)")
+    p.add_argument("--rrf-k", type=int, default=60)
+    p.add_argument("--context-window", type=int, default=0,
+                   help="±N sousedních chunků téže kapitoly do kontextu (0 = vypnuto)")
     p.add_argument("--candidate-factor", type=int, default=4,
                    help="kolikrát víc kandidátů než top_k načíst před "
                         "prořezáním na diverzitu")

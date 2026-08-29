@@ -66,6 +66,33 @@ def query(collection, embedding, n_results, works=None, groups=None):
     ]
 
 
+HYBRID_MODES = {
+    # režim → kanály hybridního retrieveru (PG + books_v2)
+    "vec": ("vec",),
+    "fts": ("fts",),
+    "hybrid": ("vec", "fts"),
+    "hybrid+gloss": ("vec", "gloss", "fts", "fts_cs"),
+    "all": ("vec", "gloss", "fts", "fts_cs"),
+}
+
+
+def make_hybrid_retriever(mode, collection, gloss, pool, embedder, model_name, index, top_k, factor, max_per_work):
+    """PG režim: totéž, co server (retriever.Retriever). Vrací funkci se
+    stejným rozhraním jako make_retriever, ale hity nesou work_id."""
+    from retriever import Plan, Retriever
+    r = Retriever(orig=collection, gloss=gloss, pool=pool, embedder=embedder, embed_model=model_name,
+                  alias_index=index, channels=HYBRID_MODES[mode], candidate_factor=factor,
+                  max_per_work=max_per_work)
+
+    def retrieve(q, emb):
+        hits, routed = r.retrieve(q, top_k, Plan())
+        out = [{"work": h["meta"]["work_id"], "group": h["meta"]["group"],
+                "distance": h["distance"], "text": h["text"]} for h in hits]
+        return out, {"works": routed["works"], "groups": routed["groups"]}
+
+    return retrieve
+
+
 def make_retriever(mode, collection, index, top_k, factor, max_per_work,
                    known_groups=None):
     """Režimy měří jednotlivé zásahy zvlášť, ať je vidět, co pomohlo:
@@ -169,7 +196,9 @@ def main():
     p.add_argument("--device", default="auto")
     p.add_argument("--top-k", type=int, default=5)
     p.add_argument("--retrieve-mode", default="plain",
-                   choices=["plain", "route", "diverse", "full"])
+                   choices=["plain", "route", "diverse", "full"] + sorted(HYBRID_MODES))
+    p.add_argument("--pg-dsn", default=None, help="PG režim (hybridní režimy); výchozí PG_DSN z rag/.env")
+    p.add_argument("--gloss-collection", default="books_gloss")
     p.add_argument("--candidate-factor", type=int, default=4)
     p.add_argument("--max-per-work", type=int, default=2)
     p.add_argument("--summaries-file",
@@ -185,12 +214,57 @@ def main():
         .get_collection(args.collection)
     embedder = make_embedder(args.embed_model, device=args.device)
 
-    index, groups = (load_catalog(collection, args.summaries_file)
-                     if args.retrieve_mode in ("route", "full") else ({}, None))
-    retrieve = make_retriever(
-        args.retrieve_mode, collection, build_alias_index(index),
-        args.top_k, args.candidate_factor, args.max_per_work, groups,
-    )
+    legacy_to_id = {}
+    if args.retrieve_mode in HYBRID_MODES:
+        import os
+        from pathlib import Path as _P
+        env = _P(__file__).parent.parent / ".env"
+        if env.exists():
+            for line in env.read_text(encoding="utf-8").splitlines():
+                if line.startswith("PG_DSN=") and not args.pg_dsn:
+                    args.pg_dsn = line.split("=", 1)[1].strip()
+        if not args.pg_dsn:
+            print("CHYBA: hybridní režimy potřebují --pg-dsn (nebo PG_DSN v rag/.env)", file=sys.stderr)
+            return 2
+        from psycopg_pool import ConnectionPool
+        pool = ConnectionPool(args.pg_dsn, min_size=1, max_size=4, open=True)
+        with pool.connection() as conn, conn.cursor() as cur:
+            cur.execute("SELECT id, coalesce(work_legacy, title), name_cs, aliases, author_cs FROM works")
+            rows_w = cur.fetchall()
+        # aliasy: kurátorská tabulka přes dnešní jména + registr; výsledek → work_id
+        keys = {legacy: name_cs for _id, legacy, name_cs, _a, _ac in rows_w}
+        legacy_to_id = {legacy: _id for _id, legacy, _n, _a, _ac in rows_w}
+        base = {a: set(w) for a, w in build_alias_index(keys)}
+        for _id, legacy, _n, aliases, author_cs in rows_w:
+            for a in (aliases or []) + ([author_cs] if author_cs and len(author_cs) >= 4 else []):
+                if len(a) >= 3:
+                    base.setdefault(norm(a).lower(), set()).add(legacy)
+        from retrieval import fold as _fold
+        index_h = sorted(((_fold(a), tuple(sorted(w))) for a, w in base.items()), key=lambda kv: -len(kv[0]))
+        try:
+            gloss = chromadb.HttpClient(host=url.hostname, port=url.port or 8000).get_collection(args.gloss_collection)
+        except Exception:
+            gloss = None
+        retrieve_h = make_hybrid_retriever(args.retrieve_mode, collection, gloss, pool, embedder, args.embed_model,
+                                           index_h, args.top_k, args.candidate_factor, args.max_per_work)
+
+        def retrieve(q, emb):
+            hits, routed = retrieve_h(q, emb)
+            # route() v retrieveru mapuje na dnešní jména → work_id (jako server)
+            return hits, routed
+
+        # zlatý standard je psaný dnešními jmény → převést na work_id
+        for item in questions:
+            ew = item.get("expect_work")
+            if ew:
+                item["expect_work"] = [legacy_to_id.get(norm(w), w) for w in as_list(ew)]
+    else:
+        index, groups = (load_catalog(collection, args.summaries_file)
+                         if args.retrieve_mode in ("route", "full") else ({}, None))
+        retrieve = make_retriever(
+            args.retrieve_mode, collection, build_alias_index(index),
+            args.top_k, args.candidate_factor, args.max_per_work, groups,
+        )
     rows = evaluate(questions, retrieve, embedder, args.embed_model)
     agg = aggregate(rows)
 
