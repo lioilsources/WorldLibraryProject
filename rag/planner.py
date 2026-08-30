@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from llm_batch import THINK_RE, parse_json
 from retrieval import fold
 
-PROMPT_VERSION = "plan-v1"
+PROMPT_VERSION = "plan-v2"   # v2: + lang (jazyk originálu); změna promptu = nový klíč cache
 
 INTENTS = ("catalog", "work_overview", "chapters", "chapter_detail", "read", "content", "mixed", "smalltalk")
 
