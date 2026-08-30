@@ -145,7 +145,11 @@ def build_catalog(conn, plan, *, group_by: str = "tradition", detail: str = "aut
             + (f" {note}" if note else ""))
         return ctx, {"detail": detail, "group_by": group_by, "total": 0, "hidden": hidden, "truncated": False, "groups": []}
 
-    # seskupení
+    # seskupení podle tématu bez přiřazených témat by dalo jeden koš
+    # „(bez tématu)" — pak raději po autorech (víc autorů) nebo tradici
+    if group_by == "topic" and not any(w.get("topic_ids") for w in works):
+        authors = {w.get("author_cs") or w.get("author") for w in works}
+        group_by = "author" if len(authors) > 1 else "tradition"
     key_fn = {
         "tradition": lambda w: w["group"],
         "author": lambda w: (w.get("author_cs") or w.get("author") or "neznámý autor"),
