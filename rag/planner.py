@@ -43,6 +43,7 @@ Vrať JSON:
  "intent": "catalog | work_overview | chapters | chapter_detail | read | content | mixed | smalltalk",
  "groups": ["kódy tradic, na které se ptá; [] = všechny"],
  "topics": ["0–3 slugy témat z výčtu, když se ptá tematicky"],
+ "lang": "kód jazyka originálu, když se ptá na jazyk (lat, grc, pi, sa, lzh, de), jinak null",
  "author": "jméno autora, když ho jmenuje, jinak null",
  "work_hint": "název díla, když ho jmenuje (jak ho napsal), jinak null",
  "chapter_hint": "označení kapitoly/knihy/oddílu, když ho jmenuje (např. 'kniha 7', 'kapitola 8'), jinak null",
@@ -74,6 +75,7 @@ class QueryPlan:
     groups: list[str] = field(default_factory=list)
     topics: list[str] = field(default_factory=list)
     author: str | None = None
+    lang: str | None = None
     work_hint: str | None = None
     chapter_hint: str | None = None
     detail: str = "auto"
@@ -92,7 +94,7 @@ class QueryPlan:
 
     def brief(self) -> dict:
         """Zkrácená verze do SSE eventu."""
-        return {"intent": self.intent, "groups": self.groups, "topics": self.topics, "author": self.author,
+        return {"intent": self.intent, "groups": self.groups, "topics": self.topics, "author": self.author, "lang": self.lang,
                 "work_hint": self.work_hint, "chapter_hint": self.chapter_hint, "detail": self.detail,
                 "group_by": self.group_by, "terms_orig": self.terms_orig, "model": self.model,
                 "cached": self.cached, "ms": self.ms}
@@ -114,6 +116,8 @@ def from_json(parsed: dict | None, known_groups: set[str], known_topics: set[str
     plan.groups = [g for g in _lst(parsed.get("groups"), 8) if g in known_groups]
     plan.topics = [t for t in _lst(parsed.get("topics"), 3) if t in known_topics]
     plan.author = (parsed.get("author") or None) if isinstance(parsed.get("author"), str) else None
+    lang = parsed.get("lang")
+    plan.lang = lang.strip().lower() if isinstance(lang, str) and 2 <= len(lang.strip()) <= 3 else None
     plan.work_hint = (parsed.get("work_hint") or None) if isinstance(parsed.get("work_hint"), str) else None
     plan.chapter_hint = (parsed.get("chapter_hint") or None) if isinstance(parsed.get("chapter_hint"), str) else None
     plan.detail = parsed.get("detail") if parsed.get("detail") in ("short", "medium", "long", "auto") else "auto"

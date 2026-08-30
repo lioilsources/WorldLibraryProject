@@ -525,12 +525,16 @@ class RAGServer:
 
             if intent == "catalog" or (intent in ("work_overview", "chapters", "chapter_detail") and not work_ids and plan.author):
                 group_by = plan.group_by if plan.group_by != "none" else "tradition"
+                if plan.lang in ("lat", "grc") and not plan.groups:
+                    plan.groups = ["greek_latin"]
+                if plan.lang and group_by == "tradition":
+                    group_by = "author"     # jeden jazyk = jedna tradice, po autorech je to čitelnější
                 # díla vyřešená přes aliasy jsou směrodatná — filtr autora by je
                 # jen shodil (plánovač píše i „Platóna", genitiv)
                 ctx, payload = cat.build_catalog(
                     conn, plan, group_by=group_by, detail=detail, groups=plan.groups or None,
                     topics=plan.topics or None, author=None if work_ids else plan.author,
-                    work_ids=work_ids or None, hide_priority=self.args.hide_priority)
+                    work_ids=work_ids or None, hide_priority=self.args.hide_priority, lang=plan.lang)
                 note = None
                 if payload["total"] == 0 and work_ids:
                     # plánovač přibalil témata/tradici, které na vyřešená díla nesedí

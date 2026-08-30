@@ -65,10 +65,13 @@ WORK_COLS = ["id", "group", "subgroup", "title", "name_cs", "author", "author_cs
              "summary_short", "summary_medium", "summary_long", "topic_ids"]
 
 
-def query_works(conn, *, groups=None, topics=None, author=None, work_ids=None, hide_priority=3, limit=2000) -> list[dict]:
+def query_works(conn, *, groups=None, topics=None, author=None, work_ids=None, hide_priority=3, limit=2000,
+                lang=None) -> list[dict]:
     where, params = [], []
     if work_ids:
         where.append("id = ANY(%s)"); params.append(list(work_ids))
+    if lang:
+        where.append("lang_original = %s"); params.append(lang)
     if groups:
         where.append('"group" = ANY(%s)'); params.append(list(groups))
     if topics:
@@ -130,18 +133,19 @@ def work_line(w: dict, detail: str, tnames: dict[str, str]) -> str:
 
 
 def build_catalog(conn, plan, *, group_by: str = "tradition", detail: str = "auto", groups=None, topics=None,
-                  author=None, work_ids=None, hide_priority: int = 3, note: str | None = None) -> tuple[str, dict]:
+                  author=None, work_ids=None, hide_priority: int = 3, note: str | None = None,
+                  lang=None) -> tuple[str, dict]:
     """→ (kontext pro LLM, payload pro appku). `note` je věta pro LLM
     o původu výběru (např. že témata ještě nejsou přiřazena)."""
     tnames = topic_names(conn)
-    works = query_works(conn, groups=groups, topics=topics, author=author, work_ids=work_ids, hide_priority=hide_priority)
+    works = query_works(conn, groups=groups, topics=topics, author=author, work_ids=work_ids, hide_priority=hide_priority, lang=lang)
     hidden = count_hidden(conn, groups, hide_priority) if not (author or work_ids) else 0
     n = len(works)
     detail = pick_detail(n, detail)
     if n == 0:
         ctx = ("Katalog: pro zadaný filtr (" + ", ".join(x for x in [
             "tradice " + ", ".join(groups) if groups else "", "téma " + ", ".join(tnames.get(t, t) for t in topics) if topics else "",
-            f"autor {author}" if author else ""] if x) + ") knihovna NEMÁ žádné dílo."
+            f"autor {author}" if author else "", f"jazyk {LANG_CS.get(lang, lang)}" if lang else ""] if x) + ") knihovna NEMÁ žádné dílo."
             + (f" {note}" if note else ""))
         return ctx, {"detail": detail, "group_by": group_by, "total": 0, "hidden": hidden, "truncated": False, "groups": []}
 
