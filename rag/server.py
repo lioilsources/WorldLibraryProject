@@ -947,9 +947,9 @@ def main():
     p.add_argument("--channels", default="vec,gloss,fts,fts_cs",
                    help="kanály hybridního retrievalu (PG režim)")
     p.add_argument("--rrf-k", type=int, default=60)
-    p.add_argument("--planner", default="on", choices=["on", "off"],
-                   help="LLM plánovač dotazu (intent + přepis) před retrievalem")
-    p.add_argument("--planner-model", default="translate")
+    p.add_argument("--planner", default=os.getenv("PLANNER", "on"), choices=["on", "off"],
+                   help="LLM plánovač dotazu (intent + přepis) před retrievalem; rag/.env: PLANNER=off")
+    p.add_argument("--planner-model", default=os.getenv("PLANNER_MODEL", "translate"))
     p.add_argument("--planner-timeout", type=float, default=25.0)
     p.add_argument("--rewrite", default="terms+hyde", choices=["off", "terms", "terms+hyde"],
                    help="co z plánu použít pro retrieval")
