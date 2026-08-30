@@ -523,11 +523,18 @@ class RAGServer:
 
             if intent == "catalog" or (intent in ("work_overview", "chapters", "chapter_detail") and not work_ids and plan.author):
                 group_by = plan.group_by if plan.group_by != "none" else "tradition"
+                # díla vyřešená přes aliasy jsou směrodatná — filtr autora by je
+                # jen shodil (plánovač píše i „Platóna", genitiv)
                 ctx, payload = cat.build_catalog(
                     conn, plan, group_by=group_by, detail=detail, groups=plan.groups or None,
-                    topics=plan.topics or None, author=plan.author, work_ids=work_ids or None,
-                    hide_priority=self.args.hide_priority)
+                    topics=plan.topics or None, author=None if work_ids else plan.author,
+                    work_ids=work_ids or None, hide_priority=self.args.hide_priority)
                 note = None
+                if payload["total"] == 0 and work_ids:
+                    # plánovač přibalil témata/tradici, které na vyřešená díla nesedí
+                    # (nebo témata ještě nejsou přiřazena) — díla jsou důležitější než filtr
+                    ctx, payload = cat.build_catalog(conn, plan, group_by=group_by, detail=detail,
+                                                     work_ids=work_ids, hide_priority=0)
                 if payload["total"] == 0 and (plan.topics or plan.terms_cs) and not work_ids:
                     # témata zatím nejsou přiřazena (obohacení neběželo) nebo filtr
                     # nesedí → díla, kde se téma opravdu vyskytuje v textu
@@ -802,13 +809,16 @@ def create_app(args) -> FastAPI:
         if topic:
             where.append("%s = ANY(topic_ids)"); params.append(topic)
         if author:
-            where.append("(author ILIKE %s OR author_cs ILIKE %s)"); params += [f"%{author}%", f"%{author}%"]
+            where.append("(unaccent(lower(coalesce(author, ''))) LIKE unaccent(lower(%s)) "
+                         "OR unaccent(lower(coalesce(author_cs, ''))) LIKE unaccent(lower(%s)))")
+            params += [f"%{author}%", f"%{author}%"]
         if lang:
             where.append("(lang_original = %s OR lang_corpus = %s)"); params += [lang, lang]
         if priority:
             where.append("priority <= %s"); params.append(priority)
         if q:
-            where.append("(title ILIKE %s OR name_cs ILIKE %s OR author ILIKE %s)"); params += [f"%{q}%"] * 3
+            where.append("(unaccent(lower(title)) LIKE unaccent(lower(%s)) OR unaccent(lower(coalesce(name_cs, ''))) LIKE unaccent(lower(%s)) "
+                         "OR unaccent(lower(coalesce(author, ''))) LIKE unaccent(lower(%s)))"); params += [f"%{q}%"] * 3
         sql_where = (" WHERE " + " AND ".join(where)) if where else ""
         cols = ["id", "group", "subgroup", "title", "name_cs", "author", "author_cs", "lang_original", "lang_corpus",
                 "is_translation", "edition", "form", "period", "priority", "chunk_count", "chapter_count", "topic_ids"]
