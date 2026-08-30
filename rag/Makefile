@@ -142,9 +142,11 @@ serve:
 	$(PY) server.py --chroma-url $(CHROMA_URL) --collection $(COLLECTION) \
 		--llm-url $(LLM_URL) --llm-model $(LLM_MODEL) $(EMBED_FLAGS)
 
-# systemd unit library-chat má Restart=on-failure — kill stačí, sudo netřeba
+# systemd unit library-chat má Restart=on-failure — proto kill -9 (SIGKILL =
+# selhání → restart). Obyčejný kill = SIGTERM = čistý konec → systemd
+# NEnastartuje znovu a bez sudo se to zpátky nedostane.
 restart-chat:
-	ssh spark "kill \$$(pgrep -f 'server.py' | head -1) && sleep 8 && curl -s localhost:8090/status"
+	ssh spark "kill -9 \$$(pgrep -f 'rag/.venv/bin/python3 server.py' | head -1) && sleep 12 && curl -s localhost:8090/status"
 
 deploy-spark:
 	ssh spark "cd $(SPARK_DIR) && git pull --ff-only && rag/.venv/bin/pip install -q -r rag/requirements.txt"

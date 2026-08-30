@@ -249,7 +249,13 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
 14. **`pkill -f` přes ssh zabije i vlastní shell**, když vzor sedí na
     příkazovou řádku `bash -c` (obsahuje tentýž text). Vzor `"[e]mbed_books"`
     pomůže jen tehdy, když start nového procesu není v témže ssh volání.
-15. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+15. **Restart `library-chat` bez sudo jen přes `kill -9`.** Unit má
+    `Restart=on-failure`; SIGTERM (`kill` bez čísla) ukončí uvicorn čistě,
+    systemd hlásí „Deactivated successfully" a **nenastartuje znovu** —
+    produkce zůstane dole a `systemctl start` chce heslo. Stalo se 30. 8.
+    2026; server pak běžel ručně (`nohup … server.py`) mimo systemd, dokud
+    ho uživatel nevrátil pod unit.
+16. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.
