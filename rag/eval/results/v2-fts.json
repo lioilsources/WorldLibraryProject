@@ -1,0 +1,350 @@
+{
+  "ts": "2026-08-30T04:39:08Z",
+  "label": "v2: fts",
+  "mode": "fts",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 23,
+    "routed": 17,
+    "routed_group": 6,
+    "work_hit_rate": 0.588,
+    "group_hit_rate": 0.522,
+    "mean_distinct": 0.78,
+    "empty": 11,
+    "mean_d1": 0.7377,
+    "mean_spread": 0.0171
+  },
+  "rows": [
+    {
+      "q": "Co říká Tao te ťing o nečinnosti (wu-wej)?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Jak Konfucius v Hovorech popisuje ušlechtilého člověka?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Co soudí Mencius o lidské přirozenosti?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Vyprávěj mi Zhuangziho sen o motýlovi.",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Jaké verše o mysli obsahuje Dhammapada?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.dhammapada @0.738",
+        "pi.kn.dhammapada @0.742",
+        "pi.kn.dhammapada @0.746",
+        "pi.kn.dhammapada @0.750",
+        "pi.kn.dhammapada @0.754"
+      ]
+    },
+    {
+      "q": "Na co se ptá král Milinda mnicha Nágasény?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.milindapanha @0.738",
+        "pi.kn.milindapanha @0.742",
+        "pi.kn.milindapanha @0.746",
+        "pi.kn.milindapanha @0.750",
+        "pi.kn.milindapanha @0.754"
+      ]
+    },
+    {
+      "q": "Co zpívají mnišky v Therígáthě?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Jak probíhala bitva na Kuruovském poli v Bhíšmaparvě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.mbh06 @0.738",
+        "sa.mbh06 @0.742",
+        "sa.mbh06 @0.746",
+        "sa.mbh06 @0.750",
+        "sa.mbh06 @0.754"
+      ]
+    },
+    {
+      "q": "O čem je hra v kostky v Sabháparvě Mahábháraty?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Jak zní hymnus o stvoření světa v Rigvédě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.rigveda_griffith @0.738",
+        "sa.rigveda_griffith @0.742",
+        "sa.rigveda_griffith @0.746",
+        "sa.rigveda_griffith @0.750",
+        "sa.rigveda_griffith @0.754"
+      ]
+    },
+    {
+      "q": "Jak Beowulf porazil Grendela?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.7377,
+      "spread": 0.0083,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "ang.beowulf_hall @0.738",
+        "ang.beowulf_hall @0.742",
+        "ang.beowulf_gummere @0.754",
+        "ang.beowulf_gummere @0.775",
+        "ang.beowulf_hall @0.746"
+      ]
+    },
+    {
+      "q": "Co předpovídá vědma ve Vědmině písni (Völuspá) v Poetické Eddě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_poetic @0.738"
+      ]
+    },
+    {
+      "q": "Jak Snorriho Edda popisuje stvoření světa z těla obra Ymiho?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_prose @0.738",
+        "non.edda_prose @0.742",
+        "non.edda_prose @0.746",
+        "non.edda_prose @0.750",
+        "non.edda_prose @0.754"
+      ]
+    },
+    {
+      "q": "Co je dialektika pána a raba ve Fenomenologii ducha?",
+      "work_hit": false,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": []
+    },
+    {
+      "q": "Jak Hegel ve Vědě o logice vykládá bytí a nic?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": null,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "de.hegel_werke05 @0.738"
+      ]
+    },
+    {
+      "q": "Co jsou egyptské Texty pyramid a k čemu sloužily?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "egy.pyramid_texts_allen @0.738",
+        "egy.pyramid_texts_allen @0.742",
+        "egy.pyramid_texts_allen @0.746",
+        "egy.pyramid_texts_allen @0.750",
+        "egy.pyramid_texts_allen @0.754"
+      ]
+    },
+    {
+      "q": "Co učí Avesta o Ahura Mazdovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "ae.avesta_darmesteter @0.738",
+        "ae.avesta_darmesteter @0.742",
+        "ae.avesta_darmesteter @0.746",
+        "ae.avesta_darmesteter @0.750",
+        "ae.avesta_darmesteter @0.754"
+      ]
+    },
+    {
+      "q": "Co učí buddhismus o utrpení a jeho zániku?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 0,
+      "routed_groups": [
+        "pali"
+      ],
+      "top": []
+    },
+    {
+      "q": "Jak hinduistické texty vykládají karmu a dharmu?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 0,
+      "routed_groups": [
+        "sanskrit"
+      ],
+      "top": []
+    },
+    {
+      "q": "Jak čínská filosofie chápe ctnost?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 0,
+      "routed_groups": [
+        "chinese"
+      ],
+      "top": []
+    },
+    {
+      "q": "Co říká severská mytologie o ragnaröku, konci světa?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 0,
+      "d1": null,
+      "spread": null,
+      "routed": 0,
+      "routed_groups": [
+        "european"
+      ],
+      "top": []
+    },
+    {
+      "q": "Jak německý idealismus pracuje s pojmem ducha?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.7377,
+      "spread": 0.0337,
+      "routed": 0,
+      "routed_groups": [
+        "european_philosophy"
+      ],
+      "top": [
+        "de.hegel_werke05 @0.738",
+        "de.hegel_werke05 @0.742",
+        "de.hegel_werke03 @0.746",
+        "de.hegel_werke03 @0.754",
+        "de.hegel_werke01 @0.771"
+      ]
+    },
+    {
+      "q": "Srovnej pojetí duše v buddhismu a v hinduismu.",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 4,
+      "d1": 0.7377,
+      "spread": 0.0161,
+      "routed": 0,
+      "routed_groups": [
+        "pali",
+        "sanskrit"
+      ],
+      "top": [
+        "pi.vin.mahavagga @0.738",
+        "pi.an.atthakanipata @0.742",
+        "pi.kn.jataka-1 @0.746",
+        "pi.an.atthakanipata @0.750",
+        "pi.vin.pacittiya @0.754"
+      ]
+    }
+  ]
+}

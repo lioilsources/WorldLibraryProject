@@ -156,6 +156,7 @@ class RAGServer:
                 channels=[c.strip() for c in args.channels.split(",") if c.strip()],
                 candidate_factor=args.candidate_factor, max_per_work=args.max_per_work,
                 rrf_k=args.rrf_k, no_routing=args.no_routing, context_window=args.context_window,
+                legacy_to_id=self.legacy_to_id,
             )
         # plánovač dotazu (intent + přepis) — jen v PG režimu a když není vypnutý
         self.planner = None

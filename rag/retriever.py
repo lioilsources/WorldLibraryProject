@@ -43,7 +43,7 @@ class Retriever:
     def __init__(self, *, orig, gloss, pool, embedder, embed_model: str, alias_index,
                  channels=("vec", "gloss", "fts", "fts_cs"), candidate_factor: int = 4,
                  max_per_work: int = 2, rrf_k: int = 60, weights=None, no_routing: bool = False,
-                 context_window: int = 0):
+                 context_window: int = 0, legacy_to_id: dict[str, str] | None = None):
         self.orig = orig            # Chroma kolekce pasáží (books_v2)
         self.gloss = gloss          # Chroma kolekce glos (books_gloss) nebo None
         self.pool = pool            # psycopg_pool.ConnectionPool
@@ -57,6 +57,10 @@ class Retriever:
         self.weights = weights or {}
         self.no_routing = no_routing
         self.context_window = context_window
+        # route() pracuje s dnešními jmény děl (kurátorské aliasy); filtry
+        # v Chromě i PG chtějí work_id — bez převodu by směrování vracelo
+        # prázdný výsledek (eval to odhalil: 17 z 23 otázek bez hitu)
+        self.legacy_to_id = legacy_to_id or {}
         with self.pool.connection() as conn:
             self.known_groups = known_groups(conn)
 
@@ -76,7 +80,7 @@ class Retriever:
         plan = plan or Plan()
         works = list(works_override or plan.works)
         if not works and not self.no_routing:
-            works = route(query, self.alias_index)
+            works = [self.legacy_to_id.get(w, w) for w in route(query, self.alias_index)]
         groups = plan.groups if works == [] else []
         if not works and not groups and not self.no_routing:
             groups = [g for g in route_groups(query) if g in self.known_groups]

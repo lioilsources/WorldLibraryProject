@@ -77,13 +77,14 @@ HYBRID_MODES = {
 }
 
 
-def make_hybrid_retriever(mode, collection, gloss, pool, embedder, model_name, index, top_k, factor, max_per_work):
+def make_hybrid_retriever(mode, collection, gloss, pool, embedder, model_name, index, top_k, factor, max_per_work,
+                          legacy_to_id=None):
     """PG režim: totéž, co server (retriever.Retriever). Vrací funkci se
     stejným rozhraním jako make_retriever, ale hity nesou work_id."""
     from retriever import Plan, Retriever
     r = Retriever(orig=collection, gloss=gloss, pool=pool, embedder=embedder, embed_model=model_name,
                   alias_index=index, channels=HYBRID_MODES[mode], candidate_factor=factor,
-                  max_per_work=max_per_work)
+                  max_per_work=max_per_work, legacy_to_id=legacy_to_id)
 
     def retrieve(q, emb):
         hits, routed = r.retrieve(q, top_k, Plan())
@@ -181,14 +182,28 @@ def aggregate(rows):
         "work_hit_rate": rate("work_hit"),
         "group_hit_rate": rate("group_hit"),
         "mean_distinct": round(sum(r["distinct"] for r in rows) / len(rows), 2),
-        "mean_d1": round(sum(r["d1"] for r in rows) / len(rows), 4),
+        "empty": sum(1 for r in rows if r["d1"] is None),   # otázky bez jediného hitu
+        "mean_d1": round(sum(r["d1"] for r in rows if r["d1"] is not None)
+                         / max(1, sum(1 for r in rows if r["d1"] is not None)), 4),
         "mean_spread": round(
             sum(r["spread"] for r in rows if r["spread"] is not None)
             / max(1, sum(1 for r in rows if r["spread"] is not None)), 4),
     }
 
 
+def _load_dotenv() -> None:
+    """rag/.env: PG_DSN, CHROMA_URL — stejně jako server."""
+    env = Path(__file__).parent.parent / ".env"
+    if env.exists():
+        for line in env.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+
 def main():
+    _load_dotenv()
     p = argparse.ArgumentParser(description="Retrieval eval")
     p.add_argument("--golden", default=str(Path(__file__).parent / "golden.jsonl"))
     p.add_argument("--chroma-url", default=os.environ.get("CHROMA_URL", "http://192.168.88.88:8006"))
@@ -217,13 +232,8 @@ def main():
 
     legacy_to_id = {}
     if args.retrieve_mode in HYBRID_MODES:
-        import os
-        from pathlib import Path as _P
-        env = _P(__file__).parent.parent / ".env"
-        if env.exists():
-            for line in env.read_text(encoding="utf-8").splitlines():
-                if line.startswith("PG_DSN=") and not args.pg_dsn:
-                    args.pg_dsn = line.split("=", 1)[1].strip()
+        if not args.pg_dsn:
+            args.pg_dsn = os.environ.get("PG_DSN")
         if not args.pg_dsn:
             print("CHYBA: hybridní režimy potřebují --pg-dsn (nebo PG_DSN v rag/.env)", file=sys.stderr)
             return 2
@@ -247,7 +257,8 @@ def main():
         except Exception:
             gloss = None
         retrieve_h = make_hybrid_retriever(args.retrieve_mode, collection, gloss, pool, embedder, args.embed_model,
-                                           index_h, args.top_k, args.candidate_factor, args.max_per_work)
+                                           index_h, args.top_k, args.candidate_factor, args.max_per_work,
+                                           legacy_to_id)
 
         def retrieve(q, emb):
             hits, routed = retrieve_h(q, emb)
