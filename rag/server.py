@@ -383,8 +383,14 @@ class RAGServer:
                 max_tokens=self.args.excerpt_max_tokens,
             )
             answer = THINK_RE.sub("", resp.choices[0].message.content or "").strip()
+            got = (resp.model or "").strip()
         except Exception as exc:  # noqa: BLE001 — překlad je bonus, ne podmínka
             print(f"překlad úryvku selhal: {exc}")
+            return
+        if got and got != self.args.excerpt_model and not got.startswith(self.args.excerpt_model):
+            # LiteLLM přepadl na fallback (Qwen3-4B): buď úryvek opíše, nebo
+            # vyrobí paskvil — ani jedno nevydávat za překlad
+            print(f"překlad úryvku: odpověděl {got!r}, ne {self.args.excerpt_model!r} — přeskakuji")
             return
         answer = EXCERPT_LEAD_RE.sub("", answer).strip()
         if not answer or is_echo(text, answer):
@@ -645,6 +651,9 @@ class RAGServer:
             **extra,
         )
         answer = THINK_RE.sub("", completion.choices[0].message.content or "").strip()
+        # hlásit, kdo doopravdy odpověděl — LiteLLM při pádu translate tiše
+        # přepadá na fallback a appka by jinak ukazovala „translate"
+        model = (completion.model or model).strip() or model
 
         # do historie jde otázka bez kontextu, ať se paměť nenafukuje
         history.append(("user", req.message))
@@ -685,6 +694,8 @@ class RAGServer:
         )
         parts = []
         for chunk in stream:
+            if getattr(chunk, "model", None):
+                model = chunk.model.strip() or model   # skutečný respondent (fallback?)
             if not chunk.choices:
                 continue  # závěrečný usage chunk apod.
             delta = chunk.choices[0].delta.content or ""
