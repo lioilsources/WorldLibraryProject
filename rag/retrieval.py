@@ -262,7 +262,7 @@ def build_alias_index(catalog_keys) -> list[tuple[str, tuple[str, ...]]]:
     )
 
 
-def route(query: str, index, max_works: int = 24) -> list[str]:
+def route(query: str, index, max_works: int = 80) -> list[str]:
     """Díla, na která otázka ukazuje. Prázdný seznam = hledej všude.
 
     Když sedí víc aliasů, platí jejich **průnik**, pokud je neprázdný:

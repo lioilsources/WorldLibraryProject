@@ -74,8 +74,12 @@ def query_works(conn, *, groups=None, topics=None, author=None, work_ids=None, h
     if topics:
         where.append("topic_ids && %s"); params.append(list(topics))
     if author:
+        # bez diakritiky a velikosti: plánovač napíše „Platon", registr má „Platón",
+        # Perseus „Plato" — unaccent + LIKE to srovná
         a = f"%{author}%"
-        where.append("(author ILIKE %s OR author_cs ILIKE %s OR name_cs ILIKE %s)"); params += [a, a, a]
+        where.append("(unaccent(lower(coalesce(author, ''))) LIKE unaccent(lower(%s)) "
+                     "OR unaccent(lower(coalesce(author_cs, ''))) LIKE unaccent(lower(%s)) "
+                     "OR unaccent(lower(coalesce(name_cs, ''))) LIKE unaccent(lower(%s)))"); params += [a, a, a]
     if hide_priority and not work_ids and not author:
         where.append("priority < %s"); params.append(hide_priority)
     sql_where = (" WHERE " + " AND ".join(where)) if where else ""
