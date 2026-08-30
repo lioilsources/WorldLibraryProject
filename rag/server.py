@@ -522,14 +522,33 @@ class RAGServer:
                 return out
 
             if intent == "catalog" or (intent in ("work_overview", "chapters", "chapter_detail") and not work_ids and plan.author):
+                group_by = plan.group_by if plan.group_by != "none" else "tradition"
                 ctx, payload = cat.build_catalog(
-                    conn, plan, group_by=plan.group_by if plan.group_by != "none" else "tradition",
-                    detail=detail, groups=plan.groups or None, topics=plan.topics or None,
-                    author=plan.author, work_ids=work_ids or None, hide_priority=self.args.hide_priority)
+                    conn, plan, group_by=group_by, detail=detail, groups=plan.groups or None,
+                    topics=plan.topics or None, author=plan.author, work_ids=work_ids or None,
+                    hide_priority=self.args.hide_priority)
+                note = None
+                if payload["total"] == 0 and (plan.topics or plan.terms_cs) and not work_ids:
+                    # témata zatím nejsou přiřazena (obohacení neběželo) nebo filtr
+                    # nesedí → díla, kde se téma opravdu vyskytuje v textu
+                    rplan = Plan(groups=plan.groups, terms_orig=plan.terms_orig, terms_cs=plan.terms_cs, hyde_cs=plan.hyde_cs)
+                    hits, _ = self.retriever.retrieve(req.message, 40, rplan)
+                    found, seen = [], set()
+                    for h in hits:
+                        wid = h["meta"].get("work_id")
+                        if wid and wid not in seen:
+                            seen.add(wid); found.append(wid)
+                    if found:
+                        note = ("Výběr vznikl vyhledáním tématu v textech (témata děl zatím nejsou v katalogu "
+                                "přiřazena) — jde o díla, kde se o tom skutečně píše.")
+                        ctx, payload = cat.build_catalog(conn, plan, group_by=group_by, detail=detail,
+                                                         work_ids=found[:15], hide_priority=0, note=note)
+                        out["hits"] = hits[: req.top_k]
                 out["catalog_context"], out["payload"] = ctx, {"catalog": payload}
                 out["instruction"] = ("Sestav odpověď z výpisu: seskup podle zadaného klíče, u každého díla uveď autora, "
                                       "jazyk originálu a (když je) anotaci; tabulku zachovej jako markdown. "
-                                      "Nepřidávej díla mimo výpis.")
+                                      "NIKDY nepřidávej díla mimo výpis — když je výpis prázdný, řekni, že knihovna "
+                                      "pro tenhle filtr nic nemá, a nabídni jiný (tradici, autora).")
                 out["routed"] = {"works": work_ids, "groups": plan.groups, "intent": intent}
                 return out
 

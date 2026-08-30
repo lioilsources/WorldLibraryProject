@@ -126,13 +126,20 @@ def work_line(w: dict, detail: str, tnames: dict[str, str]) -> str:
 
 
 def build_catalog(conn, plan, *, group_by: str = "tradition", detail: str = "auto", groups=None, topics=None,
-                  author=None, work_ids=None, hide_priority: int = 3) -> tuple[str, dict]:
-    """→ (kontext pro LLM, payload pro appku)."""
+                  author=None, work_ids=None, hide_priority: int = 3, note: str | None = None) -> tuple[str, dict]:
+    """→ (kontext pro LLM, payload pro appku). `note` je věta pro LLM
+    o původu výběru (např. že témata ještě nejsou přiřazena)."""
     tnames = topic_names(conn)
     works = query_works(conn, groups=groups, topics=topics, author=author, work_ids=work_ids, hide_priority=hide_priority)
     hidden = count_hidden(conn, groups, hide_priority) if not (author or work_ids) else 0
     n = len(works)
     detail = pick_detail(n, detail)
+    if n == 0:
+        ctx = ("Katalog: pro zadaný filtr (" + ", ".join(x for x in [
+            "tradice " + ", ".join(groups) if groups else "", "téma " + ", ".join(tnames.get(t, t) for t in topics) if topics else "",
+            f"autor {author}" if author else ""] if x) + ") knihovna NEMÁ žádné dílo."
+            + (f" {note}" if note else ""))
+        return ctx, {"detail": detail, "group_by": group_by, "total": 0, "hidden": hidden, "truncated": False, "groups": []}
 
     # seskupení
     key_fn = {
@@ -146,7 +153,8 @@ def build_catalog(conn, plan, *, group_by: str = "tradition", detail: str = "aut
     for w in works:
         grouped[key_fn(w)].append(w)
 
-    lines = [f"Katalog: {n} děl" + (f" (+ {hidden} menších textů, fragmentů a scholií, které se nevypisují)" if hidden else "") + "."]
+    lines = [f"Katalog: {n} děl" + (f" (+ {hidden} menších textů, fragmentů a scholií, které se nevypisují)" if hidden else "") + "."
+             + (f" {note}" if note else "")]
     payload_groups = []
     rows_used, truncated = 0, False
     for key, ws in grouped.items():
