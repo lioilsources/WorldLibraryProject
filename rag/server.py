@@ -506,7 +506,9 @@ class RAGServer:
         plan = QueryPlan()
         if self.planner is not None:
             tail = [c for r, c in list(history)[-6:] if r == "user"]
-            plan = self.planner.plan(req.message, tail, accept_models={self.args.planner_model, self.args.llm_model})
+            # fallback (Qwen3-4B) se přijímá taky: horší plán je lepší než žádný —
+            # bez plánu by katalogová otázka spadla do obyčejného hledání
+            plan = self.planner.plan(req.message, tail, accept_models={self.args.planner_model, self.args.llm_model, "fallback"})
         out["plan"] = plan
         work_ids = cat.resolve_work(self.catalog, self.legacy_to_id, self.alias_index, plan.work_hint, None)
         if not work_ids and not plan.work_hint:
@@ -875,7 +877,7 @@ def create_app(args) -> FastAPI:
         """Jen plánovač — ladění intentu a přepisu."""
         if server.planner is None:
             raise HTTPException(status_code=404, detail="plánovač neběží (jen PG režim)")
-        p = server.planner.plan(req.message, [], accept_models={args.planner_model, args.llm_model})
+        p = server.planner.plan(req.message, [], accept_models={args.planner_model, args.llm_model, "fallback"})
         return p.to_dict()
 
     @app.get("/search")
