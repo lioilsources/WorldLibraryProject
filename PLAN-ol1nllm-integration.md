@@ -293,7 +293,20 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
     u TRT-LLM se volnému místu přizpůsobí sama.
     Doporučení: nespouštět spolu. Nejdřív chunky na plném `translate`,
     pak ho shodit a pustit directora samotného na kapitoly a díla.
-19. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+19. **Dávkový timeout musí počítat s čekáním na dávku, ne na sebe.** Při
+    16 vláknech a 7,7 chunku/min trvá jeden request ~125 s, takže původních
+    180 s v `LLMBatch` padalo na „Request timed out" při každém zaškobrtnutí
+    (na translate s 18,9/min ≈ 50 s to nikdy nevyplavalo). Výchozích 600 s.
+20. **`kill $(pgrep … | head -1)` zabije obálku, ne program.** `pgrep -f`
+    najde nejdřív `bash -c`, který proces spustil; `head -1` pak zabije jen
+    ji a Python běží dál. Starý běh obohacení takhle přežil, mířil na
+    mezitím shozený `translate` a půl hodiny bral GPU čas tomu novému
+    (7,7 → 6,7 chunku/min). Ověřovat `pgrep -af` bez `head`.
+21. **Obohacení v šířku, ne do hloubky.** `ORDER BY work_id, seq` znamená,
+    že po první noci je hotová Avesta a nic jiného — katalog ani témata
+    napříč knihovnou nefungují ještě dva týdny. `--order breadth` bere n-tý
+    chunk každého díla: po 204 uzlech se dotklo 107 děl.
+22. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.
