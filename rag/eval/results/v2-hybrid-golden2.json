@@ -1,0 +1,241 @@
+{
+  "ts": "2026-08-30T04:43:41Z",
+  "label": "v2: hybrid, golden_v2",
+  "mode": "hybrid",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 13,
+    "routed": 12,
+    "routed_group": 0,
+    "work_hit_rate": 1.0,
+    "group_hit_rate": 0.923,
+    "mean_distinct": 1.54,
+    "empty": 0,
+    "mean_d1": 0.6527,
+    "mean_spread": 0.04
+  },
+  "rows": [
+    {
+      "q": "Co znamená v Tao-te-ťingu pojem te?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.daodejing @0.672",
+        "zh.daodejing @0.677",
+        "zh.daodejing @0.682",
+        "zh.daodejing @0.688",
+        "zh.daodejing @0.692"
+      ]
+    },
+    {
+      "q": "Jaké rady dává Lao-c' vládcům?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.daodejing @0.672",
+        "zh.daodejing @0.677",
+        "zh.daodejing @0.682",
+        "zh.daodejing @0.688",
+        "zh.daodejing @0.692"
+      ]
+    },
+    {
+      "q": "Co se v Dhammapadě říká o hněvu?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4194,
+      "spread": 0.2729,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.dhammapada @0.419",
+        "pi.kn.dhammapada @0.425",
+        "pi.kn.dhammapada @0.672",
+        "pi.kn.dhammapada @0.682",
+        "pi.kn.dhammapada @0.692"
+      ]
+    },
+    {
+      "q": "Vyprávěj příběh z Džátak o opičím králi.",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.jataka-1 @0.672",
+        "pi.kn.jataka-1 @0.677",
+        "pi.kn.jataka-1 @0.682",
+        "pi.kn.jataka-1 @0.688",
+        "pi.kn.jataka-1 @0.692"
+      ]
+    },
+    {
+      "q": "Jak Mahábhárata líčí smrt Karny?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0294,
+      "routed": 18,
+      "routed_groups": [],
+      "top": [
+        "sa.mbh11 @0.672",
+        "sa.mbh07 @0.677",
+        "sa.mbh08 @0.682",
+        "sa.mbh08 @0.688",
+        "sa.mbh07 @0.702"
+      ]
+    },
+    {
+      "q": "O čem je Bhagavadgíta?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.mbh06 @0.672",
+        "sa.mbh06 @0.677",
+        "sa.mbh06 @0.682",
+        "sa.mbh06 @0.688",
+        "sa.mbh06 @0.692"
+      ]
+    },
+    {
+      "q": "Co vypráví Snorri o Thorovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_prose @0.672",
+        "non.edda_prose @0.677",
+        "non.edda_prose @0.682",
+        "non.edda_prose @0.688",
+        "non.edda_prose @0.692"
+      ]
+    },
+    {
+      "q": "Co učí zoroastrismus o dobru a zlu?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "ae.avesta_darmesteter @0.672",
+        "ae.avesta_darmesteter @0.677",
+        "ae.avesta_darmesteter @0.682",
+        "ae.avesta_darmesteter @0.688",
+        "ae.avesta_darmesteter @0.692"
+      ]
+    },
+    {
+      "q": "Které texty od Hegela v knihovně máš?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.6721,
+      "spread": 0.0104,
+      "routed": 3,
+      "routed_groups": [],
+      "top": [
+        "de.hegel_werke01 @0.672",
+        "de.hegel_werke01 @0.677",
+        "de.hegel_werke03 @0.688",
+        "de.hegel_werke03 @0.722",
+        "de.hegel_werke01 @0.682"
+      ]
+    },
+    {
+      "q": "Jak buddhistická scholastika abhidhammy třídí jevy mysli?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 13,
+      "routed_groups": [],
+      "top": [
+        "pi.abh.patthana-3 @0.672",
+        "pi.abh.dhammasangani @0.677",
+        "pi.abh.dhammasangani @0.682",
+        "pi.abh.patthana-1 @0.688",
+        "pi.abh.patthana-3 @0.692"
+      ]
+    },
+    {
+      "q": "Co je to wu-wej a proč se o něm mluví?",
+      "work_hit": null,
+      "group_hit": false,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0249,
+      "routed": 0,
+      "routed_groups": [],
+      "top": [
+        "pi.sn.salayatanavagga @0.672",
+        "pi.sn.nidanavagga @0.677",
+        "pi.sn.khandhavagga @0.682",
+        "pi.sn.salayatanavagga @0.688",
+        "pi.sn.khandhavagga @0.697"
+      ]
+    },
+    {
+      "q": "Jaké otázky kladl Nágasénovi král?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.milindapanha @0.672",
+        "pi.kn.milindapanha @0.677",
+        "pi.kn.milindapanha @0.682",
+        "pi.kn.milindapanha @0.688",
+        "pi.kn.milindapanha @0.692"
+      ]
+    },
+    {
+      "q": "Co se zpívá ve Völuspě o konci světa?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_poetic @0.672",
+        "non.edda_poetic @0.677",
+        "non.edda_poetic @0.682",
+        "non.edda_poetic @0.688",
+        "non.edda_poetic @0.692"
+      ]
+    }
+  ]
+}
