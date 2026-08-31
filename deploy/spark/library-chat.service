@@ -1,0 +1,35 @@
+# Knihovní RAG chatbot jako UŽIVATELSKÁ systemd služba — správa bez sudo.
+#
+#   scp deploy/spark/library-chat.service spark:~/.config/systemd/user/
+#   ssh spark 'systemctl --user daemon-reload && systemctl --user enable --now library-chat'
+#
+# Proč user scope: systémový unit šel bez hesla restartovat jen přes `kill -9`
+# (SIGTERM = čistý konec → `Restart=on-failure` nezabere), `systemctl start`
+# chtěl sudo, a produkce kvůli tomu 30. 8. 2026 zůstala dole a doběhla ručně
+# přes nohup mimo systemd. V user scope je `systemctl --user restart
+# library-chat` bez hesla a `Restart=always` zabere i po čistém konci.
+#
+# Linger je zapnutý (`loginctl show-user ol1n` → Linger=yes), takže služba
+# běží i bez přihlášeného sezení a naskočí po rebootu.
+#
+# POZOR, jednorázově a naposled se sudem: systémový unit
+# /etc/systemd/system/library-chat.service je pořád `enabled` a po rebootu by
+# sáhl na týž port 8090 →  sudo systemctl disable --now library-chat
+
+[Unit]
+Description=Knihovní RAG chatbot (WorldLibraryProject, port 8090)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/deploy/WorldLibraryProject/rag
+ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 server.py --llm-url http://localhost:8080/v1
+# PG_DSN, CHROMA_URL a COLLECTION si server načte sám z rag/.env (mimo git)
+Restart=always
+RestartSec=5
+# Načtení e5 embedderu trvá ~20 s; do té doby /status neodpovídá
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target

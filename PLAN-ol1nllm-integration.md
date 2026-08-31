@@ -249,12 +249,17 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
 14. **`pkill -f` přes ssh zabije i vlastní shell**, když vzor sedí na
     příkazovou řádku `bash -c` (obsahuje tentýž text). Vzor `"[e]mbed_books"`
     pomůže jen tehdy, když start nového procesu není v témže ssh volání.
-15. **Restart `library-chat` bez sudo jen přes `kill -9`.** Unit má
-    `Restart=on-failure`; SIGTERM (`kill` bez čísla) ukončí uvicorn čistě,
-    systemd hlásí „Deactivated successfully" a **nenastartuje znovu** —
-    produkce zůstane dole a `systemctl start` chce heslo. Stalo se 30. 8.
-    2026; server pak běžel ručně (`nohup … server.py`) mimo systemd, dokud
-    ho uživatel nevrátil pod unit.
+15. ~~**Restart `library-chat` bez sudo jen přes `kill -9`.**~~ **VYŘEŠENO
+    31. 8. 2026** přesunem pod **uživatelský** systemd
+    (`deploy/spark/library-chat.service`, `make install-unit`). Původně:
+    systémový unit měl `Restart=on-failure`, takže SIGTERM ukončil uvicorn
+    čistě, systemd ho **nenastartoval znovu** a `systemctl start` chtěl
+    heslo — produkce 30. 8. zůstala dole a doběhla ručně přes `nohup` mimo
+    systemd. Nový unit má `Restart=always` (ověřeno: `kill` MainPID →
+    `NRestarts=1` a služba je zpět) a `systemctl --user restart` nechce
+    sudo. Systémový unit zůstal `enabled` — jednorázově
+    `sudo systemctl disable --now library-chat`, jinak po rebootu sáhnou
+    oba na port 8090.
 16. **Uvažování se u obohacení musí vypnout.** Qwen3 napíše na značkovací
     úlohu dlouhý `<think>` a JSON pak useknou `max_tokens` uprostřed →
     chybí závorka → neparsovatelné. První ostrý benchmark kvůli tomu vrátil
