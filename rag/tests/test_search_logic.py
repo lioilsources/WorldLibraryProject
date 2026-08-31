@@ -87,3 +87,17 @@ def test_parse_json_leaves_valid_json_alone():
         {"a": "x", "b": [1, 2], "c": True, "d": None, "e": -3.5}
     assert parse_json("žádný json") is None
     assert parse_json('text před {"a": 1} a za') == {"a": 1}
+
+
+def test_enrich_keywords_split_and_dedup():
+    """Model občas pošle seznam jako jeden řetězec („a, b, c"); bez rozdělení
+    by se celá věta uložila jako jedno klíčové slovo a fulltext by ji netrefil."""
+    from enrich_chunks import validate
+    v = validate({"text": "Grendel a Kain"},
+                 {"gloss_cs": "x", "keywords_cs": "Bůh, peklo, duše",
+                  "keywords_orig": "Grendel; Kain", "quality": 2, "topics": []}, set())
+    assert v["keywords_cs"] == ["Bůh", "peklo", "duše"]
+    assert v["keywords_orig"] == ["Grendel", "Kain"]   # obojí je v textu
+    assert validate({"text": "x"}, {"gloss_cs": "x", "keywords_cs": ["a", "A", "b"],
+                                    "quality": 2, "topics": []}, set())["keywords_cs"] == ["a", "b"]
+    assert validate({"text": "x"}, {"gloss_cs": "", "quality": 2}, set()) is None

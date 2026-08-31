@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import os
 import sys
 import time
@@ -132,8 +133,18 @@ def validate(item: dict, parsed: dict | None, slugs: set[str]) -> dict | None:
     def lst(key, n=8):
         v = parsed.get(key) or []
         if isinstance(v, str):
-            v = [v]
-        return [str(x).strip() for x in v if str(x).strip()][:n]
+            # model občas pošle seznam jako jeden řetězec („a, b, c") — bez
+            # rozdělení by se celá věta uložila jako JEDNO klíčové slovo
+            # a fulltext by ji nikdy netrefil (naměřeno na swarm-directorovi)
+            v = [part for part in re.split(r"[,;]\s*|\s*\|\s*", v) if part.strip()]
+        out, seen = [], set()
+        for x in v:
+            x = str(x).strip().strip("\"'")
+            key_x = x.lower()
+            if x and key_x not in seen:
+                seen.add(key_x)
+                out.append(x)
+        return out[:n]
     text_fold = fold(item["text"])
     kw_orig = [k for k in lst("keywords_orig") if fold(k) in text_fold]   # model si je nesmí vymyslet
     topics = [t for t in lst("topics", 3) if t in slugs]
