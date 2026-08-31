@@ -346,6 +346,23 @@ def is_echo(original: str, translation: str, threshold: float = 0.7) -> bool:
     return SequenceMatcher(None, a, b).ratio() >= threshold
 
 
+def is_not_czech(translation: str, min_latin: float = 0.8) -> bool:
+    """Je „překlad" vůbec psaný latinkou?
+
+    Model si s řečtinou občas poradí přepisem do azbuky
+    („δʼ ἰέναι" → „дʼ іенай") — opis to není, takže is_echo() to pustí, ale
+    čtenáři je to k ničemu stejně jako originál. Počítá se podíl latinky
+    mezi písmeny; čeština ho má 1,0, přepis do jiného písma skoro 0.
+    Vlastní jména v původním písmu (Ἀγαμέμνων) jsou v překladu běžná, proto
+    práh 0,8 a ne 1,0.
+    """
+    letters = [c for c in translation if c.isalpha()]
+    if not letters:
+        return True
+    latin = sum(1 for c in letters if "a" <= c.lower() <= "z" or unicodedata.name(c, "").startswith("LATIN"))
+    return latin / len(letters) < min_latin
+
+
 def _selftest() -> None:
     catalog = {
         "Milindapañhapāḷi": "Khuddaka-nikája — Otázky krále Milindy",
@@ -423,6 +440,13 @@ def _selftest() -> None:
     assert is_echo(pali, "")
     assert not is_echo(pali, "Kdo pije nápoj smíšený s jedem, tím se pak trápí.")
     assert not is_echo("道可道，非常道。", "Cesta, kterou lze vyslovit, není věčná cesta.")
+
+    # překlad musí být latinkou — přepis řečtiny do azbuky není překlad
+    assert is_not_czech("дʼ іенай, мета дее крееіон агамемнон")
+    assert is_not_czech("δʼ ἰέναι, μετὰ δὲ κρείων Ἀγαμέμνων")
+    assert is_not_czech("")
+    assert not is_not_czech("Šel a za ním vládce Agamemnón, očima podobný Diovi")
+    assert not is_echo("δʼ ἰέναι, μετὰ δὲ κρείων", "Šel a za ním vládce")
 
     print("retrieval.py: selftest ok")
 

@@ -38,7 +38,7 @@ from pydantic import BaseModel
 
 from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
 from embeddings import format_query, make_embedder
-from retrieval import (build_alias_index, diversify, fold, is_echo, looks_tabular,
+from retrieval import (build_alias_index, diversify, fold, is_echo, is_not_czech, looks_tabular,
                        route, route_groups)
 from retriever import Plan, Retriever, context_block
 import catalog as cat
@@ -394,9 +394,10 @@ class RAGServer:
             print(f"překlad úryvku: odpověděl {got!r}, ne {self.args.excerpt_model!r} — přeskakuji")
             return
         answer = EXCERPT_LEAD_RE.sub("", answer).strip()
-        if not answer or is_echo(text, answer):
-            # model úryvek jen opsal (typicky pálijské verše) — tvářit se,
-            # že je to překlad, znamená ukázat v appce dvakrát totéž
+        if not answer or is_echo(text, answer) or is_not_czech(answer):
+            # model úryvek jen opsal (typicky pálijské verše) nebo ho přepsal
+            # do jiného písma (řečtina → azbuka) — tvářit se, že je to překlad,
+            # znamená ukázat v appce dvakrát totéž, jen hůř čitelně
             return
         source["excerpt_cs"] = answer
 
