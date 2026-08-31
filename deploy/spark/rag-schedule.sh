@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 # Denní/noční režim SPARKu — ComfyUI přes den, obohacení korpusu v noci.
 #
-#   den (08:00)  ComfyUI běží, translate v úsporném profilu (~36 GiB),
-#                obohacení stojí → Image Studio má GPU pro sebe
-#   noc (22:00)  ComfyUI dole, translate plný (57 GiB), obohacení jede
-#                na plný plyn (18,9 chunku/min místo 9,7)
+#   den (08:00)  ComfyUI + translate úsporný (~36 GiB), obohacení stojí
+#                → Image Studio i chat mají GPU pro sebe
+#   noc (22:00)  ComfyUI i translate dole, nahoru swarm-director (~100 GiB),
+#                obohacení korpusu jede na něm
 #
-# Chat knihovny (library-chat) běží v obou režimech — jen v úsporném má
-# translate menší KV cache, což jednomu dotazu bohatě stačí.
+# Proč v noci director a ne translate, když je 2,8× pomalejší (6,7 vs 18,9
+# chunku/min): obohacení se zapéká do databáze NATRVALO, takže rozhoduje
+# kvalita, ne rychlost — a noční okno je stejně prázdné. A/B na 30 chuncích
+# v deseti jazycích originálu: translate napsal o Beowulfovi „staroslovanský
+# epos" (director „anglosaský") a u Hérodota „kvůli královny dcera Io".
+#
+# Chat knihovny (library-chat) běží v obou režimech. V noci translate neběží,
+# ale LiteLLM má řetěz translate → swarm-director → fallback, takže chat sáhne
+# na directora — tedy na LEPŠÍ model, ne na 4B nouzovku.
 #
 # Volá se z rag-schedule.service (timer 08:00 a 22:00 + po bootu). Ručně:
 #   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh day|night|auto
@@ -31,31 +38,36 @@ if [ "$mode" = auto ]; then
   log "auto → $mode (je ${h}:xx)"
 fi
 
-# Čeká, až translate zase odpovídá — bez toho by chat i obohacení chvíli
-# mlely naprázdno a LiteLLM by tiše přepadl na fallback.
-wait_translate() {
+# Čeká, až model zase odpovídá — bez toho by chat i obohacení chvíli mlely
+# naprázdno a LiteLLM by tiše přepadl na fallback.
+wait_endpoint() {
+  local port="$1" name="$2"
   for _ in $(seq 1 40); do
     sleep 15
-    if curl -sf -m 5 http://localhost:8004/v1/models >/dev/null 2>&1; then
-      log "translate odpovídá"; return 0
+    if curl -sf -m 5 "http://localhost:${port}/v1/models" >/dev/null 2>&1; then
+      log "$name odpovídá"; return 0
     fi
   done
-  log "POZOR: translate do 10 min nenaběhl"; return 1
+  log "POZOR: $name do 10 min nenaběhl"; return 1
 }
 
 case "$mode" in
   day)
-    log "denní režim: obohacení stop, translate úsporný, ComfyUI nahoru"
+    log "denní režim: obohacení stop, director dole, translate úsporný, ComfyUI nahoru"
     systemctl --user stop library-enrich || true
+    ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
     ( cd "$AISTACK" && make up-translate-lean >/dev/null )
-    wait_translate || true
+    wait_endpoint 8004 translate || true
     systemctl --user start comfyui
     ;;
   night)
-    log "noční režim: ComfyUI dole, translate plný, obohacení jede"
+    log "noční režim: ComfyUI i translate dole, director nahoru, obohacení jede"
     systemctl --user stop comfyui || true
-    ( cd "$AISTACK" && make up-translate >/dev/null )
-    wait_translate || true
+    # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
+    # když je volné paměti míň než util × total (0.80 = 97 GiB)
+    ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
+    ( cd "$AISTACK" && make up-director-night >/dev/null )
+    wait_endpoint 8012 swarm-director || true
     systemctl --user start library-enrich
     ;;
   *)
