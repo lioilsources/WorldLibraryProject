@@ -181,7 +181,9 @@ def main() -> int:
     p.add_argument("--model", default="translate")
     p.add_argument("--accept-model", action="append", help="povolené názvy modelu v odpovědi (výchozí = --model)")
     p.add_argument("--workers", type=int, default=12)
-    p.add_argument("--max-tokens", type=int, default=600)
+    # 600 useknulo ~2 % odpovědí (finish_reason=length) — plný profil píše tři
+    # seznamy klíčových slov, entity i otázky; navýšení platí jen pro ty dlouhé
+    p.add_argument("--max-tokens", type=int, default=900)
     p.add_argument("--priority", type=int, default=None, help="jen díla s prioritou ≤ N")
     p.add_argument("--work"); p.add_argument("--group")
     p.add_argument("--limit", type=int, default=0)
