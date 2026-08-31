@@ -4,7 +4,7 @@ otázky, entity, témata a kvalita → chunk_enrichment v Postgresu.
 
 Běží na SPARKu proti TRT-LLM přímo (:8004), ne přes gateway — LiteLLM by
 při pádu translate tiše přepnul na Qwen3-4B (viz llm_batch.py). Je
-resumovatelné (input_sha = sha1(PROMPT_VERSION + text)); restart nic
+resumovatelné (input_sha = "PROMPT_VERSION:sha1(text)"); restart nic
 neopakuje. Priorita 1 nejdřív (dnešní korpus + kanonický Perseus),
 zbytek noční dávky.
 
@@ -80,7 +80,10 @@ def load_topics(registry: Path) -> tuple[set[str], str]:
 
 def pending(conn, priority: int | None, work: str | None, group: str | None, limit: int, profile: str):
     """Chunky bez obohacení (nebo s jiným PROMPT_VERSION) — streamem."""
-    where, params = ["(e.chunk_id IS NULL OR e.input_sha <> sha1(%s || chr(0) || c.text))"], [PROMPT_VERSION]
+    # Postgres nemá sha1(); invalidace při změně promptu jde přes prefix
+    # `verze:` v input_sha (viz llm_batch.input_sha), změnu textu už zahodil
+    # load_pg.replace_work() podle text_sha.
+    where, params = ["(e.chunk_id IS NULL OR e.input_sha NOT LIKE %s)"], [PROMPT_VERSION + ":%"]
     if priority:
         where.append("w.priority <= %s"); params.append(priority)
     if work:
@@ -202,8 +205,9 @@ def main() -> int:
         conn_w.commit()
         with conn.cursor() as cur:
             cur.execute("SELECT count(*) FROM chunks c JOIN works w ON w.id = c.work_id LEFT JOIN chunk_enrichment e ON e.chunk_id = c.id "
-                        "WHERE e.chunk_id IS NULL" + (" AND w.priority <= %s" if args.priority else ""),
-                        ([args.priority] if args.priority else []))
+                        "WHERE (e.chunk_id IS NULL OR e.input_sha NOT LIKE %s)"
+                        + (" AND w.priority <= %s" if args.priority else ""),
+                        [PROMPT_VERSION + ":%"] + ([args.priority] if args.priority else []))
             todo = cur.fetchone()[0]
         print(f"k obohacení: {todo} chunků (priorita ≤ {args.priority}); běh #{run_id}, model {args.model} @ {args.llm_url}")
 

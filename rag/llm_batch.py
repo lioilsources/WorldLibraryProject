@@ -65,11 +65,17 @@ def parse_json(text: str) -> dict | None:
 
 
 def input_sha(prompt_version: str, *parts: str) -> str:
+    """`verze:hexdigest` — prefix je schválně: díky němu se „změnil se prompt?"
+    ptá SQL jako `input_sha NOT LIKE 'chunk-v1:%'`, tedy bez hashovací funkce
+    na straně Postgresu (ten `sha1()` vůbec nemá, jen sha224+ přes bytea).
+    Změnu *textu* řeší load_pg.replace_work(), který obohacení zahazuje, když
+    nesedí `text_sha` — tady se proto nehashuje kvůli němu, ale kvůli vstupům,
+    které v DB nejsou (složené promptu kapitol a děl)."""
     h = hashlib.sha1(prompt_version.encode("utf-8"))
     for p in parts:
         h.update(b"\x00")
         h.update((p or "").encode("utf-8"))
-    return h.hexdigest()
+    return f"{prompt_version}:{h.hexdigest()}"
 
 
 class LLMBatch:

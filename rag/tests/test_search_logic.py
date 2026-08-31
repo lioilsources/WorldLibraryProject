@@ -3,6 +3,7 @@
 from catalog import corpus_note, pick_detail, summary_for
 from hybrid import combine_rerank, dedup_passages, rrf
 from pg_search import _bigram_query, _tsquery, query_terms
+from llm_batch import input_sha
 from planner import find_chapter, from_json
 
 
@@ -61,3 +62,13 @@ def test_find_chapter_by_number_and_heading():
     assert find_chapter(chapters, "osmá kapitola")["ref"] == "8"
     assert find_chapter(chapters, "jako voda")["ref"] == "8"
     assert find_chapter(chapters, "nic takového") is None
+
+
+def test_input_sha_carries_prompt_version_prefix():
+    """Resume se v SQL ptá `input_sha NOT LIKE 'chunk-v1:%'` — Postgres sha1()
+    nemá, takže verze musí být v hodnotě, ne dopočítaná dotazem."""
+    a = input_sha("chunk-v1", "text")
+    assert a.startswith("chunk-v1:") and len(a) == len("chunk-v1:") + 40
+    assert not input_sha("chunk-v2", "text").startswith("chunk-v1:")
+    assert input_sha("chunk-v1", "text") != input_sha("chunk-v1", "jiný")
+    assert input_sha("chunk-v1", "a", "b") != input_sha("chunk-v1", "ab")

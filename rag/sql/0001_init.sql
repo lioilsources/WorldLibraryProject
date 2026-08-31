@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS works (
   summary_long    text,                     -- ~150 slov
   keywords_cs     text[] NOT NULL DEFAULT '{}',
   summary_model   text,                     -- skutečný response.model — audit, že to není fallback
-  summary_input_sha text,                   -- sha1(PROMPT_VERSION + vstup) → idempotence
+  summary_input_sha text,                   -- "PROMPT_VERSION:sha1(vstup)" → idempotence
   summary_at      timestamptz,
   aliases         text[] NOT NULL DEFAULT '{}',  -- kmeny pro směrování (route())
   updated_at      timestamptz NOT NULL DEFAULT now()
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS chunk_enrichment (
   entities        jsonb  NOT NULL DEFAULT '[]',  -- [{"name":"Arjuna","type":"person"}]
   topics          text[] NOT NULL DEFAULT '{}',  -- 0–3 slugy z topics
   quality         smallint,                 -- LLM 0–3; 0 = patička/rejstřík/balast → retrieval vyřadí
-  input_sha       char(40) NOT NULL,        -- sha1(PROMPT_VERSION + text) → idempotence
+  input_sha       text NOT NULL,            -- "PROMPT_VERSION:sha1(text)" → idempotence (viz 0004)
   model           text NOT NULL,            -- skutečný response.model; fallback se neukládá
   created_at      timestamptz NOT NULL DEFAULT now(),
   enrich_fold     text NOT NULL,            -- fold(gloss + keywords + questions) — vstup FTS
