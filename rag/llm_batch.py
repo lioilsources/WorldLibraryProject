@@ -13,6 +13,11 @@ Proč vlastní vrstva a ne prosté volání OpenAI klienta:
   zůstává chatu.
 - **JSON z modelu** není spolehlivý: bere se blok mezi první '{' a
   poslední '}', <think> se stříhá.
+- **Uvažování se vypíná.** Qwen3 na značkovací úlohu spálí v <think>
+  násobek tokenů vlastní odpovědi a JSON se pak nevejde do max_tokens →
+  useknutá odpověď bez závorky = neparsovatelná. `enable_thinking: false`
+  jde do `chat_template_kwargs`; backend, který to neumí, se pozná z chyby
+  a přepne se zpátky.
 """
 
 from __future__ import annotations
@@ -35,6 +40,7 @@ class BatchStats:
     done: int = 0
     failed: int = 0
     rejected_fallback: int = 0
+    truncated: int = 0
     tokens_in: int = 0
     tokens_out: int = 0
     started: float = field(default_factory=time.time)
@@ -42,7 +48,8 @@ class BatchStats:
 
     def rate(self) -> str:
         dt = max(1e-6, time.time() - self.started)
-        return (f"{self.done} hotovo, {self.failed} chyb, {self.rejected_fallback} fallback | "
+        trunc = f", {self.truncated} useknuto" if self.truncated else ""
+        return (f"{self.done} hotovo, {self.failed} chyb{trunc}, {self.rejected_fallback} fallback | "
                 f"{self.done / dt * 60:.1f}/min, in {self.tokens_in / dt:.0f} tok/s, out {self.tokens_out / dt:.0f} tok/s")
 
 
@@ -81,7 +88,7 @@ def input_sha(prompt_version: str, *parts: str) -> str:
 class LLMBatch:
     def __init__(self, url: str, model: str, *, workers: int = 12, temperature: float = 0.2,
                  max_tokens: int = 600, timeout: float = 180.0, accept_models: set[str] | None = None,
-                 json_mode: bool = True):
+                 json_mode: bool = True, thinking: bool = False):
         self.client = OpenAI(base_url=url, api_key="dummy", timeout=timeout, max_retries=0)
         self.model = model
         self.workers = workers
@@ -91,8 +98,10 @@ class LLMBatch:
         # by vrátil 'fallback' — cokoli mimo seznam se zahazuje
         self.accept = accept_models or {model}
         self.json_mode = json_mode
+        self.thinking = thinking
         self.stats = BatchStats()
         self._consecutive_bad = 0
+        self._shown_bad = False
 
     def one(self, messages: list[dict]) -> tuple[dict | None, str]:
         """Jeden request s tolerancí k výpadkům: při síťové chybě spí a
@@ -103,6 +112,8 @@ class LLMBatch:
                 kwargs = {}
                 if self.json_mode:
                     kwargs["response_format"] = {"type": "json_object"}
+                if not self.thinking:
+                    kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
                 resp = self.client.chat.completions.create(
                     model=self.model, messages=messages, temperature=self.temperature,
                     max_tokens=self.max_tokens, **kwargs,
@@ -111,6 +122,10 @@ class LLMBatch:
                 msg = str(exc)
                 if "response_format" in msg or "json_object" in msg:
                     self.json_mode = False   # backend to neumí — prompt-only JSON
+                    continue
+                if "chat_template_kwargs" in msg or "enable_thinking" in msg:
+                    self.thinking = True     # backend to neumí — nech model uvažovat
+                    print("  backend nezná chat_template_kwargs — uvažování zůstává zapnuté", flush=True)
                     continue
                 with self.stats.lock:
                     self._consecutive_bad += 1
@@ -135,8 +150,18 @@ class LLMBatch:
                 if resp.usage:
                     self.stats.tokens_in += resp.usage.prompt_tokens or 0
                     self.stats.tokens_out += resp.usage.completion_tokens or 0
-            text = resp.choices[0].message.content or ""
-            return parse_json(text), got_model
+            choice = resp.choices[0]
+            text = choice.message.content or ""
+            parsed = parse_json(text)
+            if parsed is None:
+                with self.stats.lock:
+                    if choice.finish_reason == "length":
+                        self.stats.truncated += 1
+                    show, self._shown_bad = not self._shown_bad, True
+                if show:   # ať se nehádá naslepo, proč je „0 hotovo, N chyb"
+                    print(f"  první neparsovatelná odpověď (finish_reason={choice.finish_reason}, "
+                          f"{resp.usage.completion_tokens if resp.usage else '?'} tok): {text[:300]!r}", flush=True)
+            return parsed, got_model
 
     def run(self, items, build_messages, on_result, *, label: str = "", report_every: int = 50):
         """items: iterovatelné položky; build_messages(item) → messages;
