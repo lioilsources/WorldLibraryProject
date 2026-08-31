@@ -255,7 +255,40 @@ klientovi nevadí — s Chromou mluví jen server na SPARKu.
     produkce zůstane dole a `systemctl start` chce heslo. Stalo se 30. 8.
     2026; server pak běžel ručně (`nohup … server.py`) mimo systemd, dokud
     ho uživatel nevrátil pod unit.
-16. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
+16. **Uvažování se u obohacení musí vypnout.** Qwen3 napíše na značkovací
+    úlohu dlouhý `<think>` a JSON pak useknou `max_tokens` uprostřed →
+    chybí závorka → neparsovatelné. První ostrý benchmark kvůli tomu vrátil
+    „0 hotovo, 40 chyb". `chat_template_kwargs: {enable_thinking: false}`
+    TRT-LLM umí; na „vrať jen `{"a":1}`" spadne ze 123 tokenů na 9.
+    Zbytek chyb ošetřuje tolerantní `parse_json` (holá hodnota bez uvozovek,
+    chybějící čárka) a `max_tokens` 900 — po obojím 0 chyb z 50.
+17. **Postgres nemá `sha1()`** (built-in jsou jen `sha224`+ nad `bytea`).
+    Idempotence obohacení proto nese verzi promptu v hodnotě
+    (`chunk-v1:<sha1>`) a SQL se ptá prefixem `NOT LIKE 'chunk-v1:%'`.
+18. **`translate` a `swarm-director` se na GB10 nevejdou rozumně vedle
+    sebe** (měřeno 31. 8. 2026, 121,7 GiB unified):
+
+    | | GiB | poznámka |
+    |---|---|---|
+    | ComfyUI (`run.sh`, `--cache-lru 2`) | 52 | mimo docker, `~/Code/ComfyUI` |
+    | `translate` produkční (batch 16, KV 0,5) | 57 | váhy 19,8 + KV 28,7 |
+    | `translate` úsporný (batch 8, KV 0,12) | 31 | váhy 19,8 + KV ~7 |
+    | `swarm-director` (util 0,65, len 32k, eager) | 84 | váhy ~74 (75 GB na disku) |
+    | `fallback` (Qwen3-4B) | 9 | |
+    | server knihovny (e5 embedder) | 1,2 | |
+
+    Vedle sebe naběhnou jen takhle: `translate` úsporný + `fallback` dole +
+    director `--gpu-memory-utilization 0.65 --max-model-len 32768
+    --enforce-eager` → 117 ze 121,7 GiB, aktivní swap, nulová page cache.
+    Rezidentní director přitom **propustnost nebere** (9,8 vs 9,7 chunku/min),
+    daň se platí předem na `translate`: úsporný 9,7/min vs plný 13,6/min,
+    tedy −29 %. Pořadí startu je dané: **director poslední**, protože tahle
+    verze vLLM odmítne start, když `volná paměť < util × total` (chybová
+    hláška to říká přesně) — kdežto `kv_cache_free_gpu_memory_fraction`
+    u TRT-LLM se volnému místu přizpůsobí sama.
+    Doporučení: nespouštět spolu. Nejdřív chunky na plném `translate`,
+    pak ho shodit a pustit directora samotného na kapitoly a díla.
+19. Latence: plný dotaz (top_k=5, max_tokens=1024) ~4 min na GB10;
    katalogový (top_k=1–2) ~40–80 s. Mitigace: `/chat/stream` (první
    tokeny po prefillu), snížit top_k/max_tokens, případně zkrátit
    chunky v kontextu.
