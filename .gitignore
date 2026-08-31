@@ -19,3 +19,7 @@ aria2c.log
 
 # tajemství JODA stacku (heslo Postgresu)
 deploy/joda/.env
+
+# virtuální prostředí (M2 i SPARK mají vlastní)
+.venv/
+rag/.venv/
