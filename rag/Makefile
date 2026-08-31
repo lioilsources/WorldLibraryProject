@@ -35,7 +35,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog serve restart-chat install-unit deploy-spark
+        eval eval-catalog serve restart-chat install-unit mode deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -147,12 +147,21 @@ serve:
 restart-chat:
 	ssh spark "systemctl --user restart library-chat && sleep 15 && curl -s localhost:8090/status"
 
-# Instalace/aktualizace unitu (poprvé i po změně souboru)
+# Instalace/aktualizace uživatelských unitů (poprvé i po změně souboru).
+# library-chat  chat knihovny, běží pořád
+# comfyui       Image Studio, přes den
+# library-enrich  obohacení korpusu, v noci
+# rag-schedule.timer  přepínač 08:00 / 22:00
 install-unit:
-	scp ../deploy/spark/library-chat.service spark:.config/systemd/user/
-	ssh spark "systemctl --user daemon-reload && systemctl --user enable --now library-chat"
+	scp ../deploy/spark/*.service ../deploy/spark/*.timer spark:.config/systemd/user/
+	ssh spark "systemctl --user daemon-reload && systemctl --user enable --now library-chat rag-schedule.timer"
+	@echo
 	@echo "jednorázově se sudem, ať po rebootu nekoliduje systémový unit:"
 	@echo "  ssh spark 'sudo systemctl disable --now library-chat'"
+
+# Ruční přepnutí režimu mimo rozvrh (MODE=day|night|auto)
+mode:
+	ssh spark "deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh $(or $(MODE),auto)"
 
 deploy-spark:
 	ssh spark "cd $(SPARK_DIR) && git pull --ff-only && rag/.venv/bin/pip install -q -r rag/requirements.txt"

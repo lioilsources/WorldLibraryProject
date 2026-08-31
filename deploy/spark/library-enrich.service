@@ -1,0 +1,25 @@
+# Obohacení korpusu (české glosy, klíčová slova, otázky, entity, témata).
+# Dlouhý běh na dny — spouští a zastavuje ho rag-schedule.sh podle denní doby.
+#
+# Restart=on-failure schválně: `systemctl --user stop` (denní režim) i čistý
+# konec po dojetí fronty mají službu nechat stát. Pád modelu naopak vede
+# k opakování — resume je v Postgresu přes input_sha, takže se nic nezopakuje.
+#
+# Postup po dojetí priority 1: přepsat --priority na 2 a znovu enable/start.
+
+[Unit]
+Description=Obohacení knihovního korpusu LLM (priorita 1)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/deploy/WorldLibraryProject/rag
+ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 enrich_chunks.py \
+    --llm-url http://localhost:8004/v1 --workers 16 --priority 1
+Restart=on-failure
+RestartSec=60
+# Ať se log dá číst po chuncích, ne až na konci
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

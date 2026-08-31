@@ -1,0 +1,9 @@
+# Jednorázový přepínač režimu; spouští ho rag-schedule.timer.
+[Unit]
+Description=Přepnutí SPARKu do denního/nočního režimu
+
+[Service]
+Type=oneshot
+ExecStart=%h/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh auto
+# make up-translate čeká na build TRT engine (~3 min) + wait_translate 10 min
+TimeoutStartSec=1800

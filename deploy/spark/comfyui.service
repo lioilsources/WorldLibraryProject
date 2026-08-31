@@ -1,0 +1,27 @@
+# ComfyUI jako uživatelská služba — dosud se pouštělo ručně přes run.sh
+# a po restartu stroje prostě chybělo (log končil v /tmp/comfyui-manual.log).
+#
+# Drží ~52 GiB ze 121,7 unified, takže se NEVEJDE vedle `translate` v plném
+# profilu (57 GiB) — proto ho v noci shazuje rag-schedule.sh a ráno vrací.
+#
+#   scp deploy/spark/comfyui.service spark:.config/systemd/user/
+#   ssh spark 'systemctl --user daemon-reload && systemctl --user enable --now comfyui'
+
+[Unit]
+Description=ComfyUI (port 8188)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Code/ComfyUI
+ExecStart=%h/Code/ComfyUI/run.sh
+Restart=always
+RestartSec=10
+# Načtení modelu z NVMe trvá desítky sekund
+TimeoutStartSec=300
+# Fronta se při shození ztratí, proto slušný SIGTERM a čas doběhnout
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target
