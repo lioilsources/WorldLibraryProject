@@ -79,7 +79,8 @@ def load_topics(registry: Path) -> tuple[set[str], str]:
     return slugs, hint
 
 
-def pending(conn, priority: int | None, work: str | None, group: str | None, limit: int, profile: str):
+def pending(conn, priority: int | None, work: str | None, group: str | None, limit: int,
+            profile: str, by: str = "breadth"):
     """Chunky bez obohacení (nebo s jiným PROMPT_VERSION) — streamem."""
     # Postgres nemá sha1(); invalidace při změně promptu jde přes prefix
     # `verze:` v input_sha (viz llm_batch.input_sha), změnu textu už zahodil
@@ -91,14 +92,23 @@ def pending(conn, priority: int | None, work: str | None, group: str | None, lim
         where.append("c.work_id = %s"); params.append(work)
     if group:
         where.append('w."group" = %s'); params.append(group)
+    # breadth: n-tý chunk každého díla, teprve pak (n+1)-ní — po každé noci
+    # má KAŽDÉ dílo kus obohacení, takže katalog i témata fungují napříč
+    # knihovnou. depth: dílo po díle (rychlejší čtení z disku, ale týden
+    # bys měl hotovou jen Avestu).
+    order = "rn, priority, work_id" if by == "breadth" else "priority, work_id, seq"
+    rank = (", row_number() OVER (PARTITION BY c.work_id ORDER BY c.seq) rn"
+            if by == "breadth" else "")
     sql = f"""
+        SELECT id, text, lang, name_cs, title, author, "group", lang_original, lang_corpus, edition, path FROM (
         SELECT c.id, c.text, c.lang, w.name_cs, w.title, w.author, w."group", w.lang_original, w.lang_corpus,
-               w.edition, ch.path
+               w.edition, ch.path, w.priority, c.work_id, c.seq{rank}
         FROM chunks c JOIN works w ON w.id = c.work_id
         LEFT JOIN chapters ch ON ch.id = c.chapter_id
         LEFT JOIN chunk_enrichment e ON e.chunk_id = c.id
         WHERE {' AND '.join(where)}
-        ORDER BY w.priority, c.work_id, c.seq
+        ) t
+        ORDER BY {order}
         {'LIMIT %s' if limit else ''}"""
     if limit:
         params.append(limit)
@@ -200,6 +210,8 @@ def main() -> int:
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--benchmark", type=int, default=0, help="zpracovat N chunků, změřit rychlost, uložit")
     p.add_argument("--profile", default="full", choices=["full", "lite"])
+    p.add_argument("--order", default="breadth", choices=["breadth", "depth"],
+                   help="breadth = kousek z každého díla (katalog funguje hned), depth = dílo po díle")
     p.add_argument("--registry", default=str(Path(__file__).parent / "registry"))
     args = p.parse_args()
     if not args.dsn:
@@ -233,7 +245,7 @@ def main() -> int:
             upsert(conn_w, item, enr, model)
             return True
 
-        stats = llm.run(pending(conn, args.priority, args.work, args.group, limit, args.profile),
+        stats = llm.run(pending(conn, args.priority, args.work, args.group, limit, args.profile, args.order),
                         lambda it: build_messages(it, hint), on_result, label="chunks")
         with conn_w.cursor() as cur:
             cur.execute("UPDATE enrich_runs SET finished_at = now(), done = %s, failed = %s, rejected_fallback = %s WHERE id = %s",
