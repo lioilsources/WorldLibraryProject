@@ -53,6 +53,23 @@ class BatchStats:
                 f"{self.done / dt * 60:.1f}/min, in {self.tokens_in / dt:.0f} tok/s, out {self.tokens_out / dt:.0f} tok/s")
 
 
+# Dvě nejčastější vady Qwen3 u dlouhých českých hodnot, obvykle spolu:
+# `"klic": holy text bez uvozovek` a chybějící čárka před dalším klíčem.
+# Hodnota končí koncem řádku — JSON string stejně nesmí obsahovat holý \n.
+BARE_VALUE_RE = re.compile(
+    r'^(\s*"[^"]+"\s*:\s*)(?![\s"\[{]|-?\d|true\b|false\b|null\b)(.+?)(,?)\s*$', re.MULTILINE)
+MISSING_COMMA_RE = re.compile(r'([^\s,\[{])[ \t]*\n([ \t]*")')
+
+
+def _repair(blob: str) -> str:
+    def quote(m):
+        val = m.group(2).replace("\\", "\\\\").replace('"', '\\"')
+        return f'{m.group(1)}"{val}"{m.group(3)}'
+    blob = BARE_VALUE_RE.sub(quote, blob)
+    blob = MISSING_COMMA_RE.sub(r'\1,\n\2', blob)
+    return re.sub(r",\s*([}\]])", r"\1", blob)
+
+
 def parse_json(text: str) -> dict | None:
     """Vezme první {...} blok; model občas obalí JSON textem nebo ```json."""
     text = THINK_RE.sub("", text or "").strip()
@@ -61,14 +78,13 @@ def parse_json(text: str) -> dict | None:
     if start < 0 or end <= start:
         return None
     blob = text[start:end + 1]
-    try:
-        return json.loads(blob)
-    except json.JSONDecodeError:
-        # nejčastější vada: koncová čárka před } nebo ]
+    # postupně tolerantnější: jak přišlo → bez koncové čárky → s opravami
+    for candidate in (blob, re.sub(r",\s*([}\]])", r"\1", blob), _repair(blob)):
         try:
-            return json.loads(re.sub(r",\s*([}\]])", r"\1", blob))
+            return json.loads(candidate)
         except json.JSONDecodeError:
-            return None
+            continue
+    return None
 
 
 def input_sha(prompt_version: str, *parts: str) -> str:

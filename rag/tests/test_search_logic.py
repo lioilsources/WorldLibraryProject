@@ -3,7 +3,7 @@
 from catalog import corpus_note, pick_detail, summary_for
 from hybrid import combine_rerank, dedup_passages, rrf
 from pg_search import _bigram_query, _tsquery, query_terms
-from llm_batch import input_sha
+from llm_batch import input_sha, parse_json
 from planner import find_chapter, from_json
 
 
@@ -72,3 +72,18 @@ def test_input_sha_carries_prompt_version_prefix():
     assert not input_sha("chunk-v2", "text").startswith("chunk-v1:")
     assert input_sha("chunk-v1", "text") != input_sha("chunk-v1", "jiný")
     assert input_sha("chunk-v1", "a", "b") != input_sha("chunk-v1", "ab")
+
+
+def test_parse_json_repairs_unquoted_value_and_missing_comma():
+    """Qwen3 u dlouhé české hodnoty vynechá uvozovky i čárku před dalším
+    klíčem — bez opravy padne ~4 % chunků na neparsovatelnou odpověď."""
+    d = parse_json('```json\n{\n  "gloss_cs": Úryvek o "čistotě" a démonech.\n'
+                   '  "keywords_cs": ["démon"],\n  "quality": 2,\n}\n```')
+    assert d == {"gloss_cs": 'Úryvek o "čistotě" a démonech.', "keywords_cs": ["démon"], "quality": 2}
+
+
+def test_parse_json_leaves_valid_json_alone():
+    assert parse_json('{"a": "x", "b": [1, 2], "c": true, "d": null, "e": -3.5}') == \
+        {"a": "x", "b": [1, 2], "c": True, "d": None, "e": -3.5}
+    assert parse_json("žádný json") is None
+    assert parse_json('text před {"a": 1} a za') == {"a": 1}
