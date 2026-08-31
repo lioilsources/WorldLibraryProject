@@ -205,6 +205,8 @@ def main() -> int:
     # 600 useknulo ~2 % odpovědí (finish_reason=length) — plný profil píše tři
     # seznamy klíčových slov, entity i otázky; navýšení platí jen pro ty dlouhé
     p.add_argument("--max-tokens", type=int, default=900)
+    # request čeká na celou dávku: 16 vláken / 6,7 chunku za minutu ≈ 140 s
+    p.add_argument("--timeout", type=float, default=600.0)
     p.add_argument("--priority", type=int, default=None, help="jen díla s prioritou ≤ N")
     p.add_argument("--work"); p.add_argument("--group")
     p.add_argument("--limit", type=int, default=0)
@@ -220,7 +222,7 @@ def main() -> int:
     slugs, hint = load_topics(Path(args.registry))
     limit = args.benchmark or args.limit
     llm = LLMBatch(args.llm_url, args.model, workers=args.workers, max_tokens=args.max_tokens,
-                   accept_models=set(args.accept_model or [args.model]))
+                   timeout=args.timeout, accept_models=set(args.accept_model or [args.model]))
 
     with psycopg.connect(args.dsn) as conn, psycopg.connect(args.dsn) as conn_w:
         with conn_w.cursor() as cur:

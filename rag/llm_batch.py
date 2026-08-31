@@ -10,7 +10,10 @@ Proč vlastní vrstva a ne prosté volání OpenAI klienta:
   Klient nekončí — při chybách spí a zkouší dál; resume je v DB přes
   input_sha, takže restart skriptu nic neopakuje.
 - **Paralelismus** ≤ max_batch_size TRT (16); výchozí 12 vláken, zbytek
-  zůstává chatu.
+  zůstává chatu. Timeout musí počítat s tím, že request čeká na celou dávku:
+  při 16 vláknech a 6,7 chunku/min (swarm-director) trvá jeden request
+  ~140 s, takže původních 180 s padalo na „Request timed out" při každém
+  zaškobrtnutí. Výchozích 600 s je se čtyřnásobnou rezervou.
 - **JSON z modelu** není spolehlivý: bere se blok mezi první '{' a
   poslední '}', <think> se stříhá.
 - **Uvažování se vypíná.** Qwen3 na značkovací úlohu spálí v <think>
@@ -103,7 +106,7 @@ def input_sha(prompt_version: str, *parts: str) -> str:
 
 class LLMBatch:
     def __init__(self, url: str, model: str, *, workers: int = 12, temperature: float = 0.2,
-                 max_tokens: int = 600, timeout: float = 180.0, accept_models: set[str] | None = None,
+                 max_tokens: int = 600, timeout: float = 600.0, accept_models: set[str] | None = None,
                  json_mode: bool = True, thinking: bool = False):
         self.client = OpenAI(base_url=url, api_key="dummy", timeout=timeout, max_retries=0)
         self.model = model
