@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Denní/noční režim SPARKu — ComfyUI přes den, obohacení korpusu v noci.
 #
-#   den (08:00)  ComfyUI + translate úsporný (~36 GiB), obohacení stojí
+#   den (06:00)  ComfyUI + translate úsporný (~36 GiB), obohacení stojí
 #                → Image Studio i chat mají GPU pro sebe
-#   noc (22:00)  ComfyUI i translate dole, nahoru swarm-director (~100 GiB),
+#   noc (02:00)  ComfyUI i translate dole, nahoru swarm-director (~93 GiB),
 #                obohacení korpusu jede na něm
 #
 # Proč v noci director a ne translate, když je 2,8× pomalejší (6,7 vs 18,9
@@ -22,20 +22,49 @@
 #
 # `auto` odvodí režim z hodin, takže timer smí mít Persistent=true —
 # po restartu stroje ve 3 ráno se srovná do nočního režimu, ne do denního.
+# Okno smí, ale nemusí přecházet půlnoc (02–06 i 22–08), viz mode_for_hour.
+#
+# Kontrola logiky bez zásahu do stroje:  rag-schedule.sh selftest
 
 set -euo pipefail
 
 AISTACK="${AISTACK:-$HOME/deploy/AiStack}"
-DAY_START="${DAY_START:-8}"     # hodina, od které platí denní režim
-NIGHT_START="${NIGHT_START:-22}"
+DAY_START="${DAY_START:-6}"     # hodina, od které platí denní režim
+NIGHT_START="${NIGHT_START:-2}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
+
+# Okno buď přechází půlnoc (22→08), nebo ne (02→06) — a plete se to snadno:
+# s naivním `h >= NIGHT_START || h < DAY_START` by okno 02–06 platilo i ve
+# 13:00 a stroj by v nočním režimu uvízl napořád.
+mode_for_hour() {
+  local h="$1" night="$2" day="$3"
+  if [ "$night" -lt "$day" ]; then          # 02–06, uvnitř jednoho dne
+    if [ "$h" -ge "$night" ] && [ "$h" -lt "$day" ]; then echo night; else echo day; fi
+  else                                       # 22–08, přes půlnoc
+    if [ "$h" -ge "$night" ] || [ "$h" -lt "$day" ]; then echo night; else echo day; fi
+  fi
+}
+
+if [ "${1:-}" = selftest ]; then
+  fail=0
+  check() { # hodina noc den očekávané
+    got=$(mode_for_hour "$1" "$2" "$3")
+    [ "$got" = "$4" ] || { echo "CHYBA: h=$1 okno $2–$3 → $got, čekáno $4"; fail=1; }
+  }
+  for h in 2 3 5; do check $h 2 6 night; done
+  for h in 0 1 6 7 13 21 23; do check $h 2 6 day; done      # okno bez půlnoci
+  for h in 22 23 0 3 7; do check $h 22 8 night; done
+  for h in 8 12 21; do check $h 22 8 day; done              # okno přes půlnoc
+  [ $fail = 0 ] && echo "rag-schedule.sh: selftest ok"
+  exit $fail
+fi
 
 mode="${1:-auto}"
 if [ "$mode" = auto ]; then
   h=$(date +%-H)
-  if [ "$h" -ge "$NIGHT_START" ] || [ "$h" -lt "$DAY_START" ]; then mode=night; else mode=day; fi
-  log "auto → $mode (je ${h}:xx)"
+  mode=$(mode_for_hour "$h" "$NIGHT_START" "$DAY_START")
+  log "auto → $mode (je ${h}:xx, noční okno ${NIGHT_START}–${DAY_START})"
 fi
 
 # Čeká, až model zase odpovídá — bez toho by chat i obohacení chvíli mlely

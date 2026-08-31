@@ -1,8 +1,11 @@
-# 08:00 denní režim (ComfyUI), 22:00 noční (obohacení korpusu).
+# 02:00 noční režim (obohacení korpusu), 06:00 denní (ComfyUI).
 #
 # Jeden timer pro obě hodiny a režim si odvodí skript z hodin — díky tomu
 # smí být Persistent=true, aniž by reboot ve 3 ráno nastartoval ComfyUI:
 # `auto` se srovná podle skutečného času, ne podle toho, který spouštěč utekl.
+#
+# Okno je 4 h, z toho ~5 min sežere výměna modelů (director se nahrává 2:40,
+# translate 2:25). Zbývá ~235 min × 7,7 chunku/min ≈ 1 800 chunků za noc.
 #
 #   systemctl --user enable --now rag-schedule.timer
 #   systemctl --user list-timers rag-schedule.timer
@@ -12,7 +15,7 @@
 Description=Rozvrh denního a nočního režimu SPARKu
 
 [Timer]
-OnCalendar=*-*-* 08,22:00:00
+OnCalendar=*-*-* 02,06:00:00
 OnBootSec=3min
 Persistent=true
 Unit=rag-schedule.service
