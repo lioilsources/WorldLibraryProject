@@ -260,7 +260,16 @@ def build_chapters(conn, w: dict, tnames: dict[str, str], *, detail: str = "shor
                          + (f": {summary_for(c, detail)}" if summary_for(c, detail) else ""))
     if offset + page < total:
         lines.append(f"\n(zobrazeno {offset + 1}–{offset + len(view)} z {total}; další na „pokračuj“)")
+    # Chybějící anotace musí být vidět v DATECH, ne jen v instrukci: model,
+    # který dílo zná, si je jinak domyslí a připíše katalogu („jak je uvedeno
+    # ve výpisu"). Naměřeno na Tao te ťing — u všech 81 kapitol je heading_cs
+    # NULL, a přesto model tvrdil, že osmá se jmenuje „Voda" a cituje anotaci.
+    annotated = any(c.get("heading_cs") or summary_for(c, detail) for c in view)
+    if not annotated:
+        lines.append("\nPOZNÁMKA: u těchto kapitol knihovna zatím nemá české názvy ani anotace "
+                     "(obohacení korpusu běží). Ve výpisu jsou jen původní nadpisy.")
     payload = {"work_id": w["id"], "name_cs": w.get("name_cs"), "title": w.get("title"), "total": total,
+               "annotated": annotated,
                "offset": offset, "items": [{"id": c["id"], "ordinal": c["ordinal"], "level": c["level"], "ref": c["ref"],
                                             "path": c["path"], "heading_cs": c.get("heading_cs"),
                                             "summary": summary_for(c, detail), "topics": [tnames.get(t, t) for t in (c.get("topic_ids") or [])]}

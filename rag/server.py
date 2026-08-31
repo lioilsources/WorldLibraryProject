@@ -578,9 +578,12 @@ class RAGServer:
                     ctx, payload = cat.build_chapters(conn, w, tnames, detail=detail,
                                                       group_by=plan.group_by, topic=(plan.topics or [None])[0])
                     out["catalog_context"], out["payload"] = ctx, {"chapters": payload}
-                    out["instruction"] = ("Vypiš kapitoly z výpisu: zachovej pořadí a úrovně, nadpisy v původním písmu "
-                                          "opisuj doslova znak po znaku (nepřepisuj do jiné podoby), český nadpis a anotaci "
-                                          "uveď jen tam, kde ve výpisu jsou. Nic nedomýšlej.")
+                    out["instruction"] = (
+                        "Vypiš kapitoly z výpisu: zachovej pořadí a úrovně, nadpisy v původním písmu "
+                        "opisuj doslova znak po znaku (nepřepisuj do jiné podoby). "
+                        "Český název ani anotaci kapitoly NEUVÁDĚJ, pokud nejsou ve výpisu, a nikdy netvrď, "
+                        "že něco ve výpisu je, když to tam není. O obsahu kapitoly smíš říct, co víš sám, "
+                        "ale musíš u toho napsat, že to není z knihovny.")
                     out["routed"] = {"works": [w["id"]], "groups": [], "intent": intent}
                     return out
                 if intent == "chapter_detail":
