@@ -731,16 +731,33 @@ class RAGServer:
             stream=True,
             **extra,
         )
-        parts = []
+        parts, reasoning = [], []
         for chunk in stream:
             if getattr(chunk, "model", None):
                 model = chunk.model.strip() or model   # skutečný respondent (fallback?)
             if not chunk.choices:
                 continue  # závěrečný usage chunk apod.
-            delta = chunk.choices[0].delta.content or ""
+            choice_delta = chunk.choices[0].delta
+            # Server s --reasoning-parser (u nás swarm-director v nočním režimu)
+            # neposílá přemýšlení jako <think> v textu, ale zvláštním polem.
+            # Sbíráme ho stranou: uživateli patří odpověď, ne přemýšlení.
+            reasoning.append(getattr(choice_delta, "reasoning_content", None) or "")
+            delta = choice_delta.content or ""
             if delta:
                 parts.append(delta)
                 yield "data: " + json.dumps({"delta": delta}, ensure_ascii=False) + "\n\n"
+
+        # Záchrana: když nepřišla ani jedna content delta, ale reasoning ano,
+        # parser zaklasifikoval celý výstup jako přemýšlení (pozorováno na
+        # swarm-directorovi ve streamu; bez streamu tentýž dotaz vrací content
+        # správně). Bez tohohle klient dostane prázdno a čeká do timeoutu.
+        if not parts and any(reasoning):
+            salvaged = THINK_RE.sub("", "".join(reasoning)).strip()
+            if salvaged:
+                parts.append(salvaged)
+                yield "data: " + json.dumps({"delta": salvaged}, ensure_ascii=False) + "\n\n"
+                print(f"model {model} poslal odpověď jen v reasoning_content "
+                      f"({len(salvaged)} znaků) — zachráněno ze streamu")
 
         # <think> bloky řeší LiteLLM config; regex je pojistka pro přímé vLLM
         answer = THINK_RE.sub("", "".join(parts)).strip()
