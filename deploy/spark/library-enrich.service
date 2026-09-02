@@ -24,9 +24,15 @@ After=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=%h/deploy/WorldLibraryProject/rag
+# --workers MUSÍ zůstat pod --max-num-seqs directora (16), jinak obohacení
+# obsadí všechny sloty a chat knihovny čeká ve frontě: 2. 9. 2026 naměřeno
+# `Running: 16 reqs, Waiting: 2`, průchodnost na dotaz spadla z 15,6 na
+# ~3 tok/s a odpověď nedorazila do dvou minut. 12 nechává čtyři sloty chatu;
+# obohacení je o čtvrtinu pomalejší, ale běží celou noc, kdežto na chat se
+# čeká živý člověk.
 ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 enrich_chunks.py \
     --llm-url http://localhost:8012/v1 --model swarm-director \
-    --workers 16 --max-tokens 1300 --order breadth --priority 1
+    --workers 12 --max-tokens 1300 --order breadth --priority 1
 Restart=on-failure
 RestartSec=60
 # Ať se log dá číst po chuncích, ne až na konci
