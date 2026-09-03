@@ -11,6 +11,9 @@
 # noci má tedy kus obohacení KAŽDÉ dílo a katalog i témata fungují napříč
 # knihovnou — místo aby byla po prvním týdnu hotová jen Avesta.
 #
+# Klient sám skončí (kód 3), když z 60+ pokusů uspěje míň než 10 % — rozbitý
+# model se pozná až podle výstupu, ne podle /v1/models.
+#
 # Restart=on-failure schválně: `systemctl --user stop` (denní režim) i čistý
 # konec po dojetí fronty mají službu nechat stát. Pád modelu naopak vede
 # k opakování — resume je v Postgresu přes input_sha, takže se nic nezopakuje.
@@ -20,6 +23,11 @@
 [Unit]
 Description=Obohacení knihovního korpusu (swarm-director, priorita 1)
 After=network-online.target
+# Když klient skončí s ModelUnusable (rozbitý model), nemá smysl ho pouštět
+# dokola celou noc — tři pokusy za hodinu a dost, v journalu je pak jedna
+# jasná hláška místo sedmi set řádků „500 Internal server error".
+StartLimitIntervalSec=3600
+StartLimitBurst=3
 
 [Service]
 Type=simple
