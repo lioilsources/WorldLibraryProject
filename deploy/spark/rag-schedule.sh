@@ -37,6 +37,29 @@ log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 # Okno buď přechází půlnoc (22→08), nebo ne (02→06) — a plete se to snadno:
 # s naivním `h >= NIGHT_START || h < DAY_START` by okno 02–06 platilo i ve
 # 13:00 a stroj by v nočním režimu uvízl napořád.
+# Health check nestačí: 3. 9. 2026 director na /v1/models odpověděl 200,
+# ale generoval degenerovaný text („ÚСудиСудиСуди…") a 500. Za celé noční
+# okno vzniklo 16 chunků místo ~1 550. Krátký dotaz na JSON to odhalí —
+# rozbitá instance vrátí buď smetí, nebo nic.
+smoke_test() {
+  local port="$1" name="$2" out
+  out=$(curl -s -m 120 "http://localhost:${port}/v1/chat/completions" \
+        -H 'Content-Type: application/json' \
+        -d "{\"model\":\"${name}\",\"messages\":[{\"role\":\"user\",\"content\":\"Vrať jen JSON {\\\"a\\\":1}\"}],\"max_tokens\":200,\"temperature\":0,\"chat_template_kwargs\":{\"enable_thinking\":false}}" \
+        | python3 -c 'import sys,json
+try:
+    d = json.load(sys.stdin)
+    t = (d["choices"][0]["message"]["content"] or "").strip()
+except Exception as e:
+    print("CHYBA " + str(e)[:60]); raise SystemExit
+# rozbitá instance vrací dlouhou smyčku opakovaného tokenu
+print("OK " + t[:60] if len(t) < 200 and "\"a\"" in t and "1" in t else "SMETI " + t[:60])' 2>&1)
+  case "$out" in
+    OK*) log "$name smoke test ok"; return 0 ;;
+    *)   log "$name smoke test SELHAL: ${out:0:120}"; return 1 ;;
+  esac
+}
+
 mode_for_hour() {
   local h="$1" night="$2" day="$3"
   if [ "$night" -lt "$day" ]; then          # 02–06, uvnitř jednoho dne
@@ -93,10 +116,20 @@ case "$mode" in
     log "noční režim: ComfyUI i translate dole, director nahoru, obohacení jede"
     systemctl --user stop comfyui || true
     # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
-    # když je volné paměti míň než util × total (0.80 = 97 GiB)
+    # když je volné paměti míň než util × total (0.75 = 91 GiB)
     ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
     ( cd "$AISTACK" && make up-director-night >/dev/null )
     wait_endpoint 8012 swarm-director || true
+    if ! smoke_test 8012 swarm-director; then
+      log "director naběhl rozbitý — zkouším ho jednou přehodit"
+      ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
+      ( cd "$AISTACK" && make up-director-night >/dev/null )
+      wait_endpoint 8012 swarm-director || true
+      if ! smoke_test 8012 swarm-director; then
+        log "CHYBA: director je rozbitý i po restartu — obohacení NESPOUŠTÍM"
+        exit 1
+      fi
+    fi
     systemctl --user start library-enrich
     ;;
   *)
