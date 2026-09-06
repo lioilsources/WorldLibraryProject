@@ -65,3 +65,20 @@ def test_source_line_prefers_czech_name_dedups_and_caps():
 
 def test_source_line_empty_hits():
     assert RAGServer._source_line([]) == ""
+
+
+def test_dangling_sentence_is_dropped():
+    from server import drop_dangling_sentence
+    got = drop_dangling_sentence("Seneca byl filozof. V úryvcích se zabývá hodnotou")
+    assert got == "Seneca byl filozof."
+
+
+def test_dangling_drop_keeps_text_when_it_would_eat_everything():
+    from server import drop_dangling_sentence
+    text = "Ano. A pak přišla velmi dlouhá věta, která se nedopověděla, protože"
+    assert drop_dangling_sentence(text) == text
+
+
+def test_dangling_drop_without_any_sentence_end():
+    from server import drop_dangling_sentence
+    assert drop_dangling_sentence("Bez tečky to nejde useknout") == "Bez tečky to nejde useknout"

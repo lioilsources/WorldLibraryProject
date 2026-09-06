@@ -69,6 +69,22 @@ MD_INLINE_RE = re.compile(r"[*_`#>]+")
 WS_RE = re.compile(r"\s+")
 
 
+def drop_dangling_sentence(text: str) -> str:
+    """Useknutou poslední větu radši zahodit.
+
+    Když model narazí na max_tokens, skončí uprostřed slova („zabývá se
+    hodnotou"). Na obrazovce to vypadá jako chyba a „Speak Text" to přečte
+    nahlas i s tím pahýlem. Když by ořez nechal skoro nic, vrátí se původní
+    text — půl věty je pořád lepší než prázdno.
+    """
+    text = (text or "").strip()
+    end = max(text.rfind("."), text.rfind("!"), text.rfind("?"), text.rfind("…"))
+    if end < 0:
+        return text
+    trimmed = text[: end + 1].strip()
+    return trimmed if len(trimmed) >= len(text) // 2 else text
+
+
 def to_plain(text: str, limit: int = 600) -> str:
     """Odpověď LLM → jedna věta za druhou, bez formátování.
 
@@ -771,7 +787,10 @@ class RAGServer:
             temperature=self.args.temperature,
             max_tokens=max(32, min(max_tokens, 1024)),
         )
-        answer = to_plain(completion.choices[0].message.content or "", limit)
+        choice = completion.choices[0]
+        answer = to_plain(choice.message.content or "", limit)
+        if getattr(choice, "finish_reason", None) == "length":
+            answer = drop_dangling_sentence(answer)
         if session_id:
             history.append(("user", question))
             history.append(("assistant", answer))
