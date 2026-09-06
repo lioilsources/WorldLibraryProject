@@ -262,6 +262,37 @@ def build_alias_index(catalog_keys) -> list[tuple[str, tuple[str, ...]]]:
     )
 
 
+# Otázky, u kterých plánovač nese víc než jen směrování: ptají se na
+# strukturu díla, na jeho popis, nebo chtějí číst dál. Bez plánovače je intent
+# vždycky „content", takže by se odpověď hledala v pasážích místo v katalogu
+# nebo v seznamu kapitol.
+#
+# Seznam je schválně úzký. Testuje se až ve chvíli, kdy aliasy **už** vyřešily
+# konkrétní dílo — obecné katalogové dotazy („jaké máš buddhistické texty")
+# žádné dílo nejmenují, takže se k téhle otázce vůbec nedostanou.
+_STRUCTURE_RE = re.compile(
+    r"\b("
+    r"kapitol\w*|oddil\w*|obsah\w*|struktur\w*|casti?\b|knih[ay]\b|knize\b|"
+    r"precti\w*|cti\b|prectes|pokracuj\w*|dalsi\b|nasleduj\w*|"
+    r"shrn\w*|anotac\w*|o cem\b|kdo napsal|kdy vznikl\w*|jak dlouh\w*|"
+    r"vers\w*|sutt\w*"
+    r")"
+)
+# „kniha 7", „kapitola 3", „verš 12" — odkaz na konkrétní místo v díle
+_REF_RE = re.compile(r"\b(kniha|kapitola|kapitole|oddil|cast|vers|sutta)\s*\.?\s*\d")
+
+
+def asks_about_structure(query: str) -> bool:
+    """Ptá se otázka na stavbu díla, jeho popis, nebo na čtení dál?
+
+    Používá se jen jako pojistka před přeskočením plánovače — viz
+    `RAGServer._prepare`. Falešné „ano" stojí čas navíc, falešné „ne" vrátí
+    odpověď ve špatném tvaru, takže se v pochybnostech odpovídá „ano".
+    """
+    folded = fold(query)
+    return bool(_STRUCTURE_RE.search(folded) or _REF_RE.search(folded))
+
+
 def route(query: str, index, max_works: int = 80) -> list[str]:
     """Díla, na která otázka ukazuje. Prázdný seznam = hledej všude.
 
@@ -447,6 +478,36 @@ def _selftest() -> None:
     assert is_not_czech("")
     assert not is_not_czech("Šel a za ním vládce Agamemnón, očima podobný Diovi")
     assert not is_echo("δʼ ἰέναι, μετὰ δὲ κρείων", "Šel a za ním vládce")
+
+    # --- asks_about_structure: pojistka před přeskočením plánovače ---------
+    # obsahové otázky — plánovač se smí přeskočit, když aliasy našly dílo
+    for q in ("Co říká Seneca o hněvu?",
+              "Co učí Zhuangzi o svobodě?",
+              "Jak Marcus Aurelius mluví o smrti?",
+              "Co znamená nibbána v Dhammapadě?",
+              "Proč je podle Platóna spravedlnost dobrá?"):
+        assert not asks_about_structure(q), q
+
+    # strukturní a katalogové — plánovač musí běžet
+    for q in ("Jaké kapitoly má Dhammapada?",
+              "Ukaž obsah Tao te ťingu",
+              "O čem je Bhagavadgíta?",
+              "Shrň mi Ústavu",
+              "Přečti mi další kus",
+              "Pokračuj ve čtení",
+              "Co je v knize 7 Ústavy?",
+              "Kdo napsal Enneady?",
+              "Kdy vznikla Dhammapada?",
+              "Jak dlouhá je Mahábhárata?",
+              "Ukaž verš 12",
+              "Které části Vinaji jsou o mniších?"):
+        assert asks_about_structure(q), q
+
+    # diakritika nesmí rozhodovat
+    assert asks_about_structure("jake kapitoly ma dhammapada")
+    assert asks_about_structure("JAKÉ KAPITOLY MÁ DHAMMAPADA")
+    # „často" se nesmí splést s „část"
+    assert not asks_about_structure("Jak často Seneca mluví o hněvu?")
 
     print("retrieval.py: selftest ok")
 

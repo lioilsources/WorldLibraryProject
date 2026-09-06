@@ -38,8 +38,8 @@ from pydantic import BaseModel
 
 from embeddings import DEFAULT_MODEL as DEFAULT_EMBED_MODEL
 from embeddings import format_query, make_embedder
-from retrieval import (build_alias_index, diversify, fold, is_echo, is_not_czech, looks_tabular,
-                       route, route_groups)
+from retrieval import (asks_about_structure, build_alias_index, diversify, fold, is_echo,
+                       is_not_czech, looks_tabular, route, route_groups)
 from retriever import Plan, Retriever, context_block
 import catalog as cat
 from planner import Planner, QueryPlan, find_chapter
@@ -559,7 +559,19 @@ class RAGServer:
             out["hits"], out["routed"] = self.retrieve(req.message, req.top_k)
             return out
         plan = QueryPlan()
-        if self.planner is not None and use_planner:
+        # Aliasy jsou tabulkové vyhledání, plánovač je LLM roundtrip za 25-40 s
+        # a je to největší kus čekání na první token (naměřeno na /chat/stream:
+        # „Co říká Seneca o hněvu?" první token 55 s, tatáž otázka s plánovačem
+        # z cache 14 s). Tak se nejdřív zeptáme aliasů.
+        alias_ids = [self.legacy_to_id[w] for w in route(req.message, self.alias_index)
+                     if w in self.legacy_to_id]
+        # Přeskočit se smí jen když aliasy vyřešily konkrétní dílo A otázka
+        # nechce strukturu ani čtení dál — bez plánovače je intent vždycky
+        # „content", takže „jaké kapitoly má Dhammapada?" by se hledalo
+        # v pasážích místo v seznamu kapitol.
+        skip_planner = (self.args.planner == "auto" and bool(alias_ids)
+                        and not asks_about_structure(req.message))
+        if self.planner is not None and use_planner and not skip_planner:
             tail = [c for r, c in list(history)[-6:] if r == "user"]
             # fallback (Qwen3-4B) se přijímá taky: horší plán je lepší než žádný —
             # bez plánu by katalogová otázka spadla do obyčejného hledání
@@ -567,8 +579,8 @@ class RAGServer:
         out["plan"] = plan
         work_ids = cat.resolve_work(self.catalog, self.legacy_to_id, self.alias_index, plan.work_hint, None)
         if not work_ids and not plan.work_hint:
-            # bez jmenovaného díla zkusit aliasy přímo na otázku (jako dřív)
-            work_ids = [self.legacy_to_id[w] for w in route(req.message, self.alias_index) if w in self.legacy_to_id]
+            # bez jmenovaného díla platí, na co ukázaly aliasy (jako dřív)
+            work_ids = alias_ids
         intent = plan.intent
         detail = plan.detail
         with self.pool.connection() as conn:
@@ -1151,8 +1163,11 @@ def main():
     p.add_argument("--channels", default="vec,gloss,fts,fts_cs",
                    help="kanály hybridního retrievalu (PG režim)")
     p.add_argument("--rrf-k", type=int, default=60)
-    p.add_argument("--planner", default=os.getenv("PLANNER", "on"), choices=["on", "off"],
-                   help="LLM plánovač dotazu (intent + přepis) před retrievalem; rag/.env: PLANNER=off")
+    p.add_argument("--planner", default=os.getenv("PLANNER", "auto"), choices=["auto", "on", "off"],
+                   help="LLM plánovač dotazu (intent + přepis) před retrievalem. "
+                        "auto = přeskočit ho, když aliasy vyřešily dílo a otázka "
+                        "nechce strukturu (ušetří 25-40 s); on = vždycky (chování "
+                        "do 7. 9. 2026); off = nikdy. rag/.env: PLANNER=on")
     p.add_argument("--planner-model", default=os.getenv("PLANNER_MODEL", "translate"))
     p.add_argument("--planner-timeout", type=float, default=25.0)
     p.add_argument("--rewrite", default="terms+hyde", choices=["off", "terms", "terms+hyde"],
