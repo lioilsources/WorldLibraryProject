@@ -74,15 +74,19 @@ def drop_dangling_sentence(text: str) -> str:
 
     Když model narazí na max_tokens, skončí uprostřed slova („zabývá se
     hodnotou"). Na obrazovce to vypadá jako chyba a „Speak Text" to přečte
-    nahlas i s tím pahýlem. Když by ořez nechal skoro nic, vrátí se původní
-    text — půl věty je pořád lepší než prázdno.
+    nahlas i s tím pahýlem.
+
+    Pahýl se zahodí vždycky, když po něm zbyde aspoň jedna celá věta. Práh je
+    absolutní, ne poměrný: „Seneca byl římský filozof." je pořádná odpověď,
+    i když je kratší než useknutý zbytek. Pod 15 znaků (typicky „Ano.") už to
+    odpověď není a vrátí se původní text.
     """
     text = (text or "").strip()
     end = max(text.rfind("."), text.rfind("!"), text.rfind("?"), text.rfind("…"))
     if end < 0:
         return text
     trimmed = text[: end + 1].strip()
-    return trimmed if len(trimmed) >= len(text) // 2 else text
+    return trimmed if len(trimmed) >= 15 else text
 
 
 def to_plain(text: str, limit: int = 600) -> str:

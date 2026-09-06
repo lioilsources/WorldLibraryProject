@@ -73,10 +73,10 @@ def test_dangling_sentence_is_dropped():
     assert got == "Seneca byl filozof."
 
 
-def test_dangling_drop_keeps_text_when_it_would_eat_everything():
+def test_dangling_drop_keeps_text_when_nothing_useful_would_remain():
     from server import drop_dangling_sentence
     text = "Ano. A pak přišla velmi dlouhá věta, která se nedopověděla, protože"
-    assert drop_dangling_sentence(text) == text
+    assert drop_dangling_sentence(text) == text   # „Ano." není odpověď
 
 
 def test_dangling_drop_without_any_sentence_end():
