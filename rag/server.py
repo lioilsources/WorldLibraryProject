@@ -737,7 +737,7 @@ class RAGServer:
                 "session_id": session_id, "model": model,
                 "intent": routed.get("intent"), "plan": prep["plan"].brief() if prep["plan"] else None, **prep["payload"]}
 
-    def ask(self, question: str, *, top_k: int = 3, max_tokens: int = 220,
+    def ask(self, question: str, *, top_k: int = 6, max_tokens: int = 220,
             model: str | None = None, deep: bool = False, with_sources: bool = False,
             session_id: str | None = None, limit: int = 600) -> str:
         """Jedno kolo otázka → krátká odpověď v prostém textu.
@@ -920,7 +920,7 @@ def create_app(args) -> FastAPI:
             return "Knihovník teď neodpovídá, zkus to za chvíli."
 
     @app.get("/ask", response_class=PlainTextResponse)
-    def ask_get(q: str = "", k: int = 3, n: int = 220, src: int = 0, deep: int = 0,
+    def ask_get(q: str = "", k: int = 6, n: int = 220, src: int = 0, deep: int = 0,
                 model: str | None = None, s: str | None = None, limit: int = 600):
         """Odpověď v prostém textu pro Apple Watch / Siri Shortcuts.
 
@@ -928,7 +928,9 @@ def create_app(args) -> FastAPI:
         nebo „Speak Text" — žádné Get Dictionary Value.
 
             q      otázka
-            k      kolik úryvků do kontextu (1-8, výchozí 3)
+            k      kolik úryvků do kontextu (1-8, výchozí 6 — při 3 se
+                   „Co říká Buddha o utrpení?" netrefilo do nikáj a
+                   knihovník odpověděl, že o tom úryvky nejsou)
             n      strop tokenů odpovědi (32-1024, výchozí 220)
             src    1 = připojit řádek „Zdroje: …"
             deep   1 = zapnout LLM plánovač (lepší směrování, +~25 s)
@@ -939,7 +941,7 @@ def create_app(args) -> FastAPI:
         return _ask(q, k, n, src, deep, model, s, limit)
 
     @app.post("/ask", response_class=PlainTextResponse)
-    async def ask_post(request: Request, k: int = 3, n: int = 220, src: int = 0,
+    async def ask_post(request: Request, k: int = 6, n: int = 220, src: int = 0,
                        deep: int = 0, model: str | None = None, s: str | None = None,
                        limit: int = 600):
         """Totéž s otázkou v těle requestu — Zkratky tak nemusí URL-enkódovat
