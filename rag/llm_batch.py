@@ -38,6 +38,15 @@ from openai import OpenAI
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
+class ModelUnusable(RuntimeError):
+    """Model odpovídá, ale výstup je k ničemu — nemá smysl mlít dál.
+
+    3. 9. 2026 naběhl swarm-director, prošel health checkem (/v1/models
+    vrátilo 200) a pak čtyři hodiny vracel degenerovaný text
+    („ÚСудиСудиСуди…") a 500. Za celé noční okno vzniklo 16 chunků místo
+    ~1 550 a nikdo se to nedozvěděl do rána."""
+
+
 @dataclass
 class BatchStats:
     done: int = 0
@@ -107,7 +116,8 @@ def input_sha(prompt_version: str, *parts: str) -> str:
 class LLMBatch:
     def __init__(self, url: str, model: str, *, workers: int = 12, temperature: float = 0.2,
                  max_tokens: int = 600, timeout: float = 600.0, accept_models: set[str] | None = None,
-                 json_mode: bool = True, thinking: bool = False):
+                 json_mode: bool = True, thinking: bool = False,
+                 min_attempts: int = 60, min_success: float = 0.10):
         self.client = OpenAI(base_url=url, api_key="dummy", timeout=timeout, max_retries=0)
         self.model = model
         self.workers = workers
@@ -118,6 +128,9 @@ class LLMBatch:
         self.accept = accept_models or {model}
         self.json_mode = json_mode
         self.thinking = thinking
+        # pod min_success po min_attempts pokusech se běh ukončí (ModelUnusable)
+        self.min_attempts = min_attempts
+        self.min_success = min_success
         self.stats = BatchStats()
         self._consecutive_bad = 0
         self._shown_bad = False
@@ -211,8 +224,17 @@ class LLMBatch:
                     else:
                         self.stats.failed += 1
                     total = self.stats.done + self.stats.failed
+                    done = self.stats.done
                 if total % report_every == 0:
                     print(f"  [{label}] {self.stats.rate()}", flush=True)
+                # Pojistka: rozbitý model se pozná až podle výstupu, health
+                # check ho pustí. Radši skončit s jasnou hláškou než mlít noc.
+                if total >= self.min_attempts and done < total * self.min_success:
+                    pool.shutdown(wait=False, cancel_futures=True)
+                    raise ModelUnusable(
+                        f"{label}: z {total} pokusů uspělo jen {done} "
+                        f"({100 * done / total:.1f} %, práh {100 * self.min_success:.0f} %) — "
+                        f"model {self.model} nejspíš naběhl rozbitý; {self.stats.rate()}")
                 nxt = next(it, None)
                 if nxt is not None:
                     futures[submit(nxt)] = None

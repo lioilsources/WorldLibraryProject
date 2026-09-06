@@ -30,9 +30,9 @@ from urllib.parse import urlparse
 
 import chromadb
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, StreamingResponse
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -55,6 +55,56 @@ EXCERPT_PROMPT = (
     "ani konec, nevysvětluj, nekomentuj. Odpověz jen samotným překladem.\n\n"
     "---\n{text}\n---"
 )
+
+# /ask je pro Apple Watch: obrazovka na tři věty, odpověď se často jen
+# předčítá. Markdown, nadpisy ani odkazy „[1]" tam nedávají smysl.
+BRIEF_INSTRUCTION = (
+    "Odpovídáš na chytré hodinky. Nejvýš tři věty, prostý text — žádný "
+    "markdown, nadpisy, odrážky, uvozovkové bloky ani odkazy na čísla "
+    "úryvků. Když odpověď v úryvcích není, řekni to jednou větou."
+)
+
+CITE_RE = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
+MD_INLINE_RE = re.compile(r"[*_`#>]+")
+WS_RE = re.compile(r"\s+")
+
+
+def drop_dangling_sentence(text: str) -> str:
+    """Useknutou poslední větu radši zahodit.
+
+    Když model narazí na max_tokens, skončí uprostřed slova („zabývá se
+    hodnotou"). Na obrazovce to vypadá jako chyba a „Speak Text" to přečte
+    nahlas i s tím pahýlem.
+
+    Pahýl se zahodí vždycky, když po něm zbyde aspoň jedna celá věta. Práh je
+    absolutní, ne poměrný: „Seneca byl římský filozof." je pořádná odpověď,
+    i když je kratší než useknutý zbytek. Pod 15 znaků (typicky „Ano.") už to
+    odpověď není a vrátí se původní text.
+    """
+    text = (text or "").strip()
+    end = max(text.rfind("."), text.rfind("!"), text.rfind("?"), text.rfind("…"))
+    if end < 0:
+        return text
+    trimmed = text[: end + 1].strip()
+    return trimmed if len(trimmed) >= 15 else text
+
+
+def to_plain(text: str, limit: int = 600) -> str:
+    """Odpověď LLM → jedna věta za druhou, bez formátování.
+
+    Hodinky text buď zobrazí na dvou řádcích, nebo ho pošlou do „Speak
+    Text"; hvězdičky a „[2]" se v obou případech čtou jako šum. Ořez je na
+    hranici věty, ne uprostřed slova.
+    """
+    text = THINK_RE.sub("", text or "")
+    text = CITE_RE.sub("", text)
+    text = MD_INLINE_RE.sub("", text)
+    text = WS_RE.sub(" ", text).strip()
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    end = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+    return (cut[: end + 1] if end > limit // 2 else cut.rstrip()) + "…"
 
 
 class ChatRequest(BaseModel):
@@ -496,16 +546,20 @@ class RAGServer:
 
     # --- plán → kontext ------------------------------------------------------------
 
-    def _prepare(self, req: ChatRequest, session_id: str, history) -> dict:
+    def _prepare(self, req: ChatRequest, session_id: str, history,
+                 use_planner: bool = True) -> dict:
         """Rozhodne podle intentu, co jde do promptu. Vrací hits, routed,
-        catalog_context, instruction, payload (pro SSE) a plán."""
+        catalog_context, instruction, payload (pro SSE) a plán.
+
+        use_planner=False přeskočí LLM plánovač (na čerstvý dotaz ~25 s) a
+        spolehne se na aliasové směrování — to je cesta pro /ask."""
         out = {"hits": [], "routed": {"works": [], "groups": []}, "catalog_context": None,
                "instruction": None, "payload": {}, "plan": None}
         if self.retriever is None:
             out["hits"], out["routed"] = self.retrieve(req.message, req.top_k)
             return out
         plan = QueryPlan()
-        if self.planner is not None:
+        if self.planner is not None and use_planner:
             tail = [c for r, c in list(history)[-6:] if r == "user"]
             # fallback (Qwen3-4B) se přijímá taky: horší plán je lepší než žádný —
             # bez plánu by katalogová otázka spadla do obyčejného hledání
@@ -703,6 +757,65 @@ class RAGServer:
                 "session_id": session_id, "model": model,
                 "intent": routed.get("intent"), "plan": prep["plan"].brief() if prep["plan"] else None, **prep["payload"]}
 
+    def ask(self, question: str, *, top_k: int = 6, max_tokens: int = 220,
+            model: str | None = None, deep: bool = False, with_sources: bool = False,
+            session_id: str | None = None, limit: int = 600) -> str:
+        """Jedno kolo otázka → krátká odpověď v prostém textu.
+
+        Proti chat(): bez plánovače (deep=False), bez překladu úryvků a s
+        nízkým stropem tokenů. Naměřeno na SPARKu: /chat 2 m 25 s, tohle
+        ~10-15 s — Zkratka na hodinkách delší request nepřežije.
+
+        Stateless, pokud nedostane session_id: hodinková otázka je jednorázová
+        a historie by jen nafukovala prefill.
+        """
+        req = ChatRequest(message=question, session_id=session_id,
+                          top_k=max(1, min(top_k, 8)), model=model)
+        if session_id:
+            history = self.sessions.setdefault(
+                session_id, deque(maxlen=2 * self.args.history_turns))
+            sid = session_id
+        else:
+            history, sid = deque(), str(uuid.uuid4())
+
+        prep = self._prepare(req, sid, history, use_planner=deep)
+        instruction = "\n\n".join(
+            x for x in (prep["instruction"], BRIEF_INSTRUCTION) if x)
+        messages = self.build_messages(question, prep["hits"], history,
+                                       prep["catalog_context"], instruction)
+        completion = self.llm.with_options(
+            timeout=self.args.ask_timeout
+        ).chat.completions.create(
+            model=model or self.args.llm_model,
+            messages=messages,
+            temperature=self.args.temperature,
+            max_tokens=max(32, min(max_tokens, 1024)),
+        )
+        choice = completion.choices[0]
+        answer = to_plain(choice.message.content or "", limit)
+        if getattr(choice, "finish_reason", None) == "length":
+            answer = drop_dangling_sentence(answer)
+        if session_id:
+            history.append(("user", question))
+            history.append(("assistant", answer))
+        if with_sources and prep["hits"]:
+            answer = f"{answer}\n\nZdroje: {self._source_line(prep['hits'])}"
+        return answer
+
+    @staticmethod
+    def _source_line(hits, n: int = 3) -> str:
+        """„Hovory k sobě · Enneady" — na hodinky se vejdou tak tři názvy."""
+        names, seen = [], set()
+        for h in hits:
+            m = h["meta"]
+            name = m.get("name_cs") or m.get("title") or m.get("work")
+            if name and name not in seen:
+                seen.add(name)
+                names.append(str(name))
+            if len(names) >= n:
+                break
+        return " · ".join(names)
+
     def chat_stream(self, req: ChatRequest):
         """SSE generátor: eventy {"delta": ...} po tokenech, na závěr
         {"done": true, sources, session_id, model} — pro Ol1nLLM streaming UX."""
@@ -813,6 +926,58 @@ def create_app(args) -> FastAPI:
         return StreamingResponse(
             server.chat_stream(req), media_type="text/event-stream"
         )
+
+    def _ask(question: str, k: int, n: int, src: int, deep: int,
+             model: str | None, s: str | None, limit: int) -> str:
+        """Společné tělo GET i POST /ask. Chyby se vracejí jako text s HTTP 200:
+        na hodinkách je čitelná věta lepší než červený dialog Zkratek."""
+        question = (question or "").strip()
+        if not question:
+            return "Neslyšel jsem otázku."
+        try:
+            return server.ask(question, top_k=k, max_tokens=n, model=model,
+                              deep=bool(deep), with_sources=bool(src),
+                              session_id=s, limit=limit)
+        except Exception as exc:  # noqa: BLE001 — hodinky nesmí dostat stacktrace
+            print(f"/ask selhalo: {exc}")
+            return "Knihovník teď neodpovídá, zkus to za chvíli."
+
+    @app.get("/ask", response_class=PlainTextResponse)
+    def ask_get(q: str = "", k: int = 6, n: int = 220, src: int = 0, deep: int = 0,
+                model: str | None = None, s: str | None = None, limit: int = 600):
+        """Odpověď v prostém textu pro Apple Watch / Siri Shortcuts.
+
+        Jedna akce „Get Contents of URL" a výsledek jde rovnou do „Show Result"
+        nebo „Speak Text" — žádné Get Dictionary Value.
+
+            q      otázka
+            k      kolik úryvků do kontextu (1-8, výchozí 6 — při 3 se
+                   „Co říká Buddha o utrpení?" netrefilo do nikáj a
+                   knihovník odpověděl, že o tom úryvky nejsou)
+            n      strop tokenů odpovědi (32-1024, výchozí 220)
+            src    1 = připojit řádek „Zdroje: …"
+            deep   1 = zapnout LLM plánovač (lepší směrování, +~25 s)
+            model  role v LiteLLM (translate|swarm-director|lab|…)
+            s      session_id — bez něj je dotaz bez paměti (doporučeno)
+            limit  strop délky výsledného textu ve znacích (výchozí 600)
+        """
+        return _ask(q, k, n, src, deep, model, s, limit)
+
+    @app.post("/ask", response_class=PlainTextResponse)
+    async def ask_post(request: Request, k: int = 6, n: int = 220, src: int = 0,
+                       deep: int = 0, model: str | None = None, s: str | None = None,
+                       limit: int = 600):
+        """Totéž s otázkou v těle requestu — Zkratky tak nemusí URL-enkódovat
+        diktovaný text. Tělo smí být holý text i {"q": "..."}."""
+        raw = (await request.body()).decode("utf-8", "replace").strip()
+        question = raw
+        if raw.startswith("{"):
+            try:
+                data = json.loads(raw)
+                question = data.get("q") or data.get("message") or ""
+            except json.JSONDecodeError:
+                pass
+        return _ask(question, k, n, src, deep, model, s, limit)
 
     @app.get("/works")
     def works(group: str | None = None, subgroup: str | None = None, topic: str | None = None,
@@ -1014,6 +1179,9 @@ def main():
     p.add_argument("--no-translate-excerpts", action="store_true",
                    help="posílat úryvky jen v originále")
     p.add_argument("--history-turns", type=int, default=10, help="párů otázka+odpověď v paměti")
+    p.add_argument("--ask-timeout", type=float, default=45.0,
+                   help="strop na jeden LLM request z /ask; Zkratka na hodinkách "
+                        "stejně dřív vzdá, tak ať server nedrží spojení naprázdno")
     p.add_argument("--temperature", type=float, default=0.4)
     p.add_argument("--max-tokens", type=int, default=1024)
     p.add_argument("--no-think", action="store_true",

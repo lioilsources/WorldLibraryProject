@@ -26,7 +26,7 @@ import psycopg
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
-from llm_batch import LLMBatch, input_sha  # noqa: E402
+from llm_batch import LLMBatch, ModelUnusable, input_sha  # noqa: E402
 from retrieval import fold  # noqa: E402
 
 PROMPT_VERSION = "chunk-v1"
@@ -247,12 +247,21 @@ def main() -> int:
             upsert(conn_w, item, enr, model)
             return True
 
-        stats = llm.run(pending(conn, args.priority, args.work, args.group, limit, args.profile, args.order),
-                        lambda it: build_messages(it, hint), on_result, label="chunks")
+        broken = None
+        try:
+            stats = llm.run(pending(conn, args.priority, args.work, args.group, limit, args.profile, args.order),
+                            lambda it: build_messages(it, hint), on_result, label="chunks")
+        except ModelUnusable as exc:
+            broken, stats = str(exc), llm.stats
+            print(f"KONEC: {broken}", file=sys.stderr, flush=True)
         with conn_w.cursor() as cur:
-            cur.execute("UPDATE enrich_runs SET finished_at = now(), done = %s, failed = %s, rejected_fallback = %s WHERE id = %s",
-                        (stats.done, stats.failed, stats.rejected_fallback, run_id))
+            cur.execute("UPDATE enrich_runs SET finished_at = now(), done = %s, failed = %s, "
+                        "rejected_fallback = %s, note = coalesce(note, '') || %s WHERE id = %s",
+                        (stats.done, stats.failed, stats.rejected_fallback,
+                         f" | {broken}" if broken else "", run_id))
         conn_w.commit()
+        if broken:
+            return 3
 
     dt = time.time() - t0
     if args.benchmark and stats.done:
