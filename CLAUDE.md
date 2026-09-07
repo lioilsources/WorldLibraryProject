@@ -39,6 +39,7 @@ dosažitelná jako `joda`).
 - `rag/planner.py` + `rag/catalog.py` — intent dotazu a katalogové odpovědi z Postgresu
 - `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na TRT-LLM :8004, fallback se zahazuje)
 - `rag/sql/` + `rag/pg_migrate.py` — schéma Postgresu; `rag/.env` (mimo git): `PG_DSN`, `CHROMA_URL`, `COLLECTION`
+- `rag/export_bundle.py` — export díla z Postgresu do bundlu pro Kindlify (čtečka); kontrakt hlídá `validate_bundle()`
 - `rag/eval/` — měření retrievalu bez LLM proti zlatému standardu; baseline
   a výsledky režimů v `rag/eval/results/`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)
