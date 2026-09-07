@@ -137,7 +137,10 @@ def build_messages(item: dict, topics_hint: str) -> list[dict]:
 def validate(item: dict, parsed: dict | None, slugs: set[str]) -> dict | None:
     if not parsed or not isinstance(parsed, dict):
         return None
-    gloss = (parsed.get("gloss_cs") or "").strip()
+    gloss = parsed.get("gloss_cs") or ""
+    if isinstance(gloss, list):  # director občas zabalí glosu do listu (8. 9. 2026)
+        gloss = " ".join(str(x) for x in gloss)
+    gloss = str(gloss).strip()
     if not gloss:
         return None
     def lst(key, n=8):
