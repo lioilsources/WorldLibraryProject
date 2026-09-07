@@ -276,6 +276,47 @@ překlady do knihovny nepatří. Překládá se až výstup (odpověď a `excerp
   otázka/odpověď per session, drží se v RAM serveru.
 - **Model**: per dotaz nebo `--llm-model` (viz tabulka výše).
 
+## Bundly pro Kindlify (čtečka)
+
+`export_bundle.py` vyexportuje dílo z Postgresu do bundlu, který čte
+[Kindlify](https://github.com/lioilsources/Kindlify) — Flutter čtečka,
+co jedno dílo nezobrazuje lineárně, ale jako strom uzlů s word cloudem
+místo obsahu. Druhá cesta ke stejnému korpusu: Knihovník odpovídá na
+otázku napříč knihovnou, Kindlify nechá projít jedno dílo offline.
+
+```bash
+make bundles BUNDLE_ARGS="--work zh.daodejing"          # jedno dílo do build/bundles
+make bundles                                            # všechna kanonická (priorita 1)
+make bundles BUNDLE_OUT=../../Kindlify/assets/bundles   # rovnou do assetů appky
+```
+
+Co odkud pochází:
+
+| Bundle | Postgres |
+|---|---|
+| `manifest.tree` | `chapters` (ordinal, level, parent_id) — kořen je dílo |
+| `label` uzlu | `heading_cs`, jinak `heading`, jinak `ref` |
+| `summaries[uzel].cs` | `works.summary_long` / `chapters.summary_medium` (fallback na kratší) |
+| `words[uzel].terms` | `chunk_enrichment` — `keywords_cs` (`word`), `keywords_orig` (`orig`), `entities` (`entity`) |
+| `score` termu | TF-IDF přes uzly díla, normalizované na 0.3–1.0 |
+
+Žádný LLM ani GPU — export je jen přerovnání. Kvalita cloudu proto stojí
+na obohacení: **bez `enrich_chunks` vypadne bundle jen s kurátorskými
+klíčovými slovy**, bez `enrich_chapters` bez souhrnů kapitol. Termy se
+sčítají zdola nahoru, takže vnitřní uzly (parva → sekce) mají cloud
+i tehdy, když chunky visí až na listech; `quality = 0` (patičky,
+rejstříky) se nepočítá stejně jako v retrievalu.
+
+`pipelineVersion` nese otisk obsahu (`pg-1+<sha>`), podle kterého appka
+pozná, že má knihu reimportovat — pouhý re-export beze změny ji tedy
+nepřepíše. Formát je kontrakt s Dart modelem `BookBundle.fromJson`;
+hlídá ho `validate_bundle()` a `tests/test_export_bundle.py`, aby se
+rozchod poznal při exportu, ne až pádem importu v telefonu.
+
+Zatím se neexportuje text díla: `byteStart`/`byteEnd` jsou 0, protože
+Postgres drží text v chuncích, ne offsety do zdrojového souboru. Až
+bude v Kindlify čtenářský mód, přibalí se text chunků.
+
 ## TODO / známá omezení
 
 - **OCR**: většina PDF (zejm. Tipiṭaka, BORI Mahábhárata) jsou skeny bez
@@ -284,5 +325,6 @@ překlady do knihovny nepatří. Překládá se až výstup (odpověď a `excerp
   bude potřeba jiná cesta (např. `ocrmypdf`).
 - Paměť konverzací je jen v RAM — restart serveru ji smaže.
 - Perseus submoduly (řečtina/latina, TEI XML) zatím nejsou napojené.
+- Bundly pro Kindlify neobsahují text díla (viz výše) a locale jen `cs`.
 - Chatbot jde případně zaregistrovat do AiStack `litellm_config.yaml`
   / Go gatewaye, aby byl dostupný přes Cloudflare tunel.

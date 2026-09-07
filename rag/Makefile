@@ -28,6 +28,8 @@ MODE        ?= full
 SERVER_URL  ?= http://localhost:8090
 PRIORITY    ?= 1
 NO_TRGM     ?=
+BUNDLE_OUT  ?= build/bundles
+BUNDLE_ARGS ?= --all --priority $(PRIORITY)
 
 EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
 
@@ -35,7 +37,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog serve restart-chat install-unit mode deploy-spark
+        eval eval-catalog bundles serve restart-chat install-unit mode deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -132,6 +134,12 @@ enrich-chapters:
 enrich-works:
 	mkdir -p logs && nohup $(PY) enrich_works.py --llm-url $(GATEWAY_URL) --model swarm-director > logs/enrich_works.log 2>&1 &
 	@echo "běží na pozadí: tail -f logs/enrich_works.log"
+
+# Bundly pro Kindlify (čtečka) — jen přerovnání Postgresu, žádný LLM.
+# Jedno dílo: make bundles BUNDLE_ARGS="--work zh.daodejing"
+# Rovnou do assetů appky: make bundles BUNDLE_OUT=../../Kindlify/assets/bundles
+bundles:
+	$(PY) export_bundle.py $(BUNDLE_ARGS) --out $(BUNDLE_OUT)
 
 eval:
 	$(PY) eval/eval_retrieval.py --retrieve-mode $(MODE) --collection $(COLLECTION) --compare eval/results/baseline.json
