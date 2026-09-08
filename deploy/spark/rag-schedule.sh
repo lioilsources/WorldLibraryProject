@@ -60,6 +60,20 @@ print("OK " + t[:60] if len(t) < 200 and "\"a\"" in t and "1" in t else "SMETI "
   esac
 }
 
+# Ani smoke test nestačí: 3.–8. 9. 2026 director krátký prompt zvládl, ale na
+# obohacovacím promptu kazil ~0,4 % tokenů (FULL CUDA grafy na GB10) — smyčky
+# „Суди…", EOS uprostřed věty, překlepy v klíčích. Sonda posílá skutečný
+# prompt na 4 chunky × 3 varianty a musí projít všech 12 (rag/probe_llm.py).
+RAG="${RAG:-$HOME/deploy/WorldLibraryProject/rag}"
+probe_test() {
+  local out
+  if out=$( cd "$RAG" && .venv/bin/python3 probe_llm.py --limit 4 --workers 6 2>&1 ); then
+    log "sonda ok: $(printf '%s\n' "$out" | tail -1)"; return 0
+  fi
+  log "sonda SELHALA: $(printf '%s\n' "$out" | grep -E 'fin=|EXC|HOTOVO|Traceback' | grep -v 'parse=OK' | head -3 | tr '\n' ' ' | cut -c1-300)"
+  return 1
+}
+
 mode_for_hour() {
   local h="$1" night="$2" day="$3"
   if [ "$night" -lt "$day" ]; then          # 02–06, uvnitř jednoho dne
@@ -129,6 +143,10 @@ case "$mode" in
         log "CHYBA: director je rozbitý i po restartu — obohacení NESPOUŠTÍM"
         exit 1
       fi
+    fi
+    if ! probe_test; then
+      log "CHYBA: director generuje poškozené odpovědi — obohacení NESPOUŠTÍM"
+      exit 1
     fi
     systemctl --user start library-enrich
     ;;
