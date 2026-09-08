@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Denní/noční režim SPARKu — ComfyUI přes den, obohacení korpusu v noci.
 #
-#   den (06:00)  ComfyUI + translate úsporný (~36 GiB), obohacení stojí
-#                → Image Studio i chat mají GPU pro sebe
-#   noc (02:00)  ComfyUI i translate dole, nahoru swarm-director (~93 GiB),
-#                obohacení korpusu jede na něm
+#   den (06:00)  ComfyUI + translate úsporný (~36 GiB) + audio (~25 GiB),
+#                obohacení stojí → Image Studio i chat mají GPU pro sebe
+#   noc (02:00)  ComfyUI, translate i audio dole, nahoru swarm-director
+#                (~93 GiB), obohacení korpusu jede na něm
 #
 # Proč v noci director a ne translate, když je 2,8× pomalejší (6,7 vs 18,9
 # chunku/min): obohacení se zapéká do databáze NATRVALO, takže rozhoduje
@@ -31,6 +31,11 @@ set -euo pipefail
 AISTACK="${AISTACK:-$HOME/deploy/AiStack}"
 DAY_START="${DAY_START:-6}"     # hodina, od které platí denní režim
 NIGHT_START="${NIGHT_START:-2}"
+# Kontejnery AiStacku mimo tenhle rozvrh, které se v noci musí uhnout:
+# audio-music + audio-sfx (nasazené 7. 9. 2026) drží ~25 GiB a director
+# (0.75 × 121,7 = 91,3 GiB) se vedle nich nevejde — 8. 9. 00:13 padal
+# v restart-loopu na „Free memory 75 GiB < 91 GiB".
+AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 
@@ -119,16 +124,18 @@ wait_endpoint() {
 
 case "$mode" in
   day)
-    log "denní režim: obohacení stop, director dole, translate úsporný, ComfyUI nahoru"
+    log "denní režim: obohacení stop, director dole, translate úsporný, ComfyUI a audio nahoru"
     systemctl --user stop library-enrich || true
     ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
     ( cd "$AISTACK" && make up-translate-lean >/dev/null )
     wait_endpoint 8004 translate || true
     systemctl --user start comfyui
+    docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     ;;
   night)
-    log "noční režim: ComfyUI i translate dole, director nahoru, obohacení jede"
+    log "noční režim: ComfyUI, translate i audio dole, director nahoru, obohacení jede"
     systemctl --user stop comfyui || true
+    docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
     # když je volné paměti míň než util × total (0.75 = 91 GiB)
     ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
