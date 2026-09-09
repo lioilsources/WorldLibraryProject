@@ -121,6 +121,15 @@ class ResetRequest(BaseModel):
 class RAGServer:
     def __init__(self, args):
         self.args = args
+        # Důvěryhodní respondenti pro plánovač i překlad úryvků (jedna množina,
+        # ať se obě kontroly nerozejdou). 30. 8. 2026 (b250f366) byl za translate
+        # jediný fallback 4B nouzovka a guard ji správně zahazoval; 31. 8.
+        # (AiStack 1b1f7d4) se do řetězu vsunul swarm-director s lepší češtinou
+        # — a guard ho zahazoval taky, takže noční chat byl bez excerpt_cs.
+        # Explicitní --accept-model výchozí seznam NAHRAZUJE (jako enrich_*.py).
+        self.accept_models: set[str] = set(getattr(args, "accept_model", None) or [
+            args.llm_model, args.planner_model, args.excerpt_model, "swarm-director",
+        ])
         self.system_prompt = Path(args.prompt_file).read_text(encoding="utf-8")
 
         url = urlparse(args.chroma_url)
@@ -438,10 +447,14 @@ class RAGServer:
         except Exception as exc:  # noqa: BLE001 — překlad je bonus, ne podmínka
             print(f"překlad úryvku selhal: {exc}")
             return
-        if got and got != self.args.excerpt_model and not got.startswith(self.args.excerpt_model):
-            # LiteLLM přepadl na fallback (Qwen3-4B): buď úryvek opíše, nebo
-            # vyrobí paskvil — ani jedno nevydávat za překlad
-            print(f"překlad úryvku: odpověděl {got!r}, ne {self.args.excerpt_model!r} — přeskakuji")
+        accept = self.accept_models
+        if got and got not in accept and not any(got.startswith(a) for a in accept):
+            # LiteLLM přepadl až na 4B nouzovku ('fallback'): buď úryvek opíše,
+            # nebo vyrobí paskvil — ani jedno nevydávat za překlad. Noční
+            # swarm-director (řetěz translate → swarm-director → fallback,
+            # AiStack litellm_config.yaml) je v accept_models a projde —
+            # do 9. 9. 2026 ho guard zahazoval a noční chat byl bez excerpt_cs.
+            print(f"překlad úryvku: odpověděl {got!r}, ne {sorted(accept)} — přeskakuji")
             return
         answer = EXCERPT_LEAD_RE.sub("", answer).strip()
         if not answer or is_echo(text, answer) or is_not_czech(answer):
@@ -575,7 +588,7 @@ class RAGServer:
             tail = [c for r, c in list(history)[-6:] if r == "user"]
             # fallback (Qwen3-4B) se přijímá taky: horší plán je lepší než žádný —
             # bez plánu by katalogová otázka spadla do obyčejného hledání
-            plan = self.planner.plan(req.message, tail, accept_models={self.args.planner_model, self.args.llm_model, "fallback"})
+            plan = self.planner.plan(req.message, tail, accept_models=self.accept_models | {"fallback"})
         out["plan"] = plan
         work_ids = cat.resolve_work(self.catalog, self.legacy_to_id, self.alias_index, plan.work_hint, None)
         if not work_ids and not plan.work_hint:
@@ -1079,7 +1092,7 @@ def create_app(args) -> FastAPI:
         """Jen plánovač — ladění intentu a přepisu."""
         if server.planner is None:
             raise HTTPException(status_code=404, detail="plánovač neběží (jen PG režim)")
-        p = server.planner.plan(req.message, [], accept_models={args.planner_model, args.llm_model, "fallback"})
+        p = server.planner.plan(req.message, [], accept_models=server.accept_models | {"fallback"})
         return p.to_dict()
 
     @app.get("/search")
@@ -1112,6 +1125,7 @@ def create_app(args) -> FastAPI:
             "pg": _pg_status(server),
             "gloss_collection": (args.gloss_collection if server.gloss is not None else None),
             "llm_model": args.llm_model,
+            "accept_models": sorted(server.accept_models),
             "llm_url": args.llm_url,
             "embed_model": args.embed_model,
             "active_sessions": len(server.sessions),
@@ -1193,6 +1207,14 @@ def main():
                    help="jak dlouho po dogenerování odpovědi čekat na překlad")
     p.add_argument("--no-translate-excerpts", action="store_true",
                    help="posílat úryvky jen v originále")
+    p.add_argument("--accept-model", action="append",
+                   help="povolené názvy modelu v odpovědi plánovače a překladu "
+                        "úryvků; výchozí = --llm-model, --planner-model, "
+                        "--excerpt-model a swarm-director (v noci translate "
+                        "neběží a LiteLLM ho na directora přesměruje schválně, "
+                        "viz deploy/spark/rag-schedule.sh). 4B nouzovka "
+                        "'fallback' tu není: její překlad úryvku se zahazuje, "
+                        "plánovač ji bere zvlášť (horší plán > žádný)")
     p.add_argument("--history-turns", type=int, default=10, help="párů otázka+odpověď v paměti")
     p.add_argument("--ask-timeout", type=float, default=45.0,
                    help="strop na jeden LLM request z /ask; Zkratka na hodinkách "
