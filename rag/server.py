@@ -1152,7 +1152,7 @@ def _load_dotenv(path: Path) -> None:
 def main():
     _load_dotenv(Path(__file__).parent / ".env")
     p = argparse.ArgumentParser(description="RAG chatbot server")
-    p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://192.168.88.88:8006"),
+    p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://127.0.0.1:8007"),
                    help="Chroma na JODA (AiStack swarm.nas)")
     p.add_argument("--collection", default=os.getenv("COLLECTION", "books"),
                    help="Chroma kolekce pasáží; PG režim chce books_v2 (rag/.env: COLLECTION)")

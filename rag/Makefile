@@ -1,8 +1,9 @@
 # RAG chatbot — cíle pro jednotlivé stroje.
 #
 #   M2    ingest (registry + kapitoly + Perseus) → JSONL → rsync na SPARK; migrace PG; deploy
-#   JODA  Postgres :5433 + Chroma knihovny :8007 (deploy/joda); AiStack Chroma :8006 drží legacy `books`
-#   SPARK load do PG, embedding, obohacení (LLM), server
+#   JODA  Postgres :5433 (deploy/joda)
+#   SPARK load do PG, embedding, obohacení (LLM), server, Chroma knihovny :8007
+#         (deploy/spark; přesunuto z JODY 2026-09-12, viz PLAN-spark-library-storage.md)
 #
 # Tajemství jsou v rag/.env (PG_DSN) a deploy/joda/.env (heslo) — mimo git.
 # Přepiš proměnné podle prostředí, např.: make embed COLLECTION=books_v2
@@ -10,7 +11,7 @@
 -include .env
 export PG_DSN
 
-CHROMA_URL  ?= http://192.168.88.88:8006
+CHROMA_URL  ?= http://127.0.0.1:8007
 LLM_URL     ?= http://localhost:4000/v1
 GATEWAY_URL ?= http://localhost:8080/v1
 TRT_URL     ?= http://localhost:8004/v1

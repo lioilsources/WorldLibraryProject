@@ -1,5 +1,11 @@
 # PLAN — ChromaDB na JODA
 
+**Nahrazeno.** Chroma je od 2026-09-12 na SPARKu (JODĚ docházela paměť —
+index se stránkoval ze swapu na 3,8 GB stroji), viz
+`PLAN-spark-library-storage.md`. Tenhle plán je ponechán jako historie
+kroku, který na :8006 postavil legacy kolekci `books`; ta služba
+(`swarm-chromadb`) je od téhož data zrušená.
+
 Plán pro Claude Code (nebo ruční provedení) na JODA — Ubuntu server
 s Dockerem, `192.168.88.88`. Cíl: ChromaDB v server režimu na portu
 **8006**, dostupná z LAN pro SPARK (embedding, chatbot) a M2.

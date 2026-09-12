@@ -7,25 +7,30 @@ JSONL kontrakt a embedding model), LLM a vektorovou DB zajišťuje
 
 ## Architektura
 
+**Tahle sekce je z 1. vlny a je zastaralá** — Chroma dnes běží na SPARKu, ne
+na JODĚ (přesun 2026-09-12, `PLAN-spark-library-storage.md`), a k tomu
+přibyl Postgres + hybridní retrieval. Aktuální rozložení je v „2. vlna" níž;
+tahle sekce zůstává pro historii jednotlivých kroků `make ingest`/`make embed`.
+
 ```
 M2 (orchestrátor)         JODA (Ubuntu + Docker)         SPARK (AiStack)
 ─────────────────         ──────────────────────         ───────────────
-run_pipeline.sh           ChromaDB :8006                 LiteLLM gateway :4000
-ingest_books.py           (AiStack swarm.nas)      ◀──   ├─ translate (Qwen3-32B-AWQ)
-  → books.jsonl ──rsync──────────────────────────▶      ├─ swarm-director (on-demand)
-                                                         └─ ...
-                                                         embed_books.py ──▶ Chroma (JODA)
-                                                         server.py :8090 ◀── klient
+run_pipeline.sh           library_postgres :5433          LiteLLM gateway :4000
+ingest_books.py           (deploy/joda)                   ├─ translate (Qwen3-32B-AWQ)
+  → books.jsonl ──rsync──────────────────────────▶       ├─ swarm-director (on-demand)
+                                                          └─ ...
+                                                          library_chroma :8007 (deploy/spark)
+                                                          embed_books.py ──▶ Chroma (lokálně)
+                                                          server.py :8090 ◀── klient
 ```
 
 - **M2**: stáhne korpus, vytáhne text z TXT/PDF, rozseká na chunky a
   `books.jsonl` pošle rsyncem na SPARK.
-- **JODA**: samostatný Ubuntu server s Dockerem (žádné sdílené disky) —
-  jediná role je Chroma v server režimu, nasazuje AiStack
-  (`deploy/docker-compose.swarm.nas.yaml`, port **8006**). Knihy jdou do
-  vlastní kolekce `books`, se SwarmBattle daty se nemíchají.
-- **SPARK**: AiStack drží LLM park za LiteLLM (:4000); tady běží i
-  `embed_books.py` a chatbot `server.py` (:8090 — 8080 má Go gateway).
+- **JODA**: samostatný Ubuntu server s Dockerem (žádné sdílené disky, 3,8 GB
+  RAM) — role je jen Postgres (`deploy/joda`, viz „2. vlna").
+- **SPARK**: AiStack drží LLM park za LiteLLM (:4000); tady běží i Chroma
+  (`deploy/spark`), `embed_books.py` a chatbot `server.py` (:8090 — 8080 má
+  Go gateway).
 
 ## Výběr modelu (z AiStack parku)
 
@@ -59,10 +64,10 @@ SPARKu:
   `CF_ACCESS_CLIENT_ID` a `CF_ACCESS_CLIENT_SECRET` (server je pošle
   jako `CF-Access-Client-Id/Secret` hlavičky).
 
-Pozor: ChromaDB na JODA (`192.168.88.88:8006`) je jen v LAN — retrieval
-tedy vyžaduje, aby server běžel v domácí síti (M2 stačí; embedding
-jednoho dotazu zvládne i MPS/CPU). Přes internet by musel i Chroma port
-do tunelu.
+Pozor: Chroma na SPARKu (`192.168.88.66:8007`) i Postgres na JODĚ
+(`192.168.88.88:5433`) jsou jen v LAN — retrieval tedy vyžaduje, aby server
+běžel v domácí síti (M2 stačí; embedding jednoho dotazu zvládne i MPS/CPU).
+Přes internet by musely oba porty do tunelu.
 
 ## Zprovoznění
 
@@ -71,11 +76,11 @@ do tunelu.
 Korpus je v gitu jako Git LFS pointery — nejdřív `git lfs pull`, nebo
 `./run_pipeline.sh` pro čerstvé stažení.
 
-### 1. JODA — Chroma (přes AiStack)
+### 1. SPARK — Chroma
 
 ```bash
-# na JODA (ubuntu server), z AiStack repa:
-docker compose -f deploy/docker-compose.swarm.nas.yaml up -d   # :8006
+# na SPARKu, z tohohle repa:
+docker compose -f deploy/spark/docker-compose.library.yaml up -d   # :8007
 ```
 
 ### 2. M2 — ingest
@@ -94,7 +99,7 @@ z archive.org — potřebují OCR, viz TODO).
 
 ```bash
 cd rag && pip install -r requirements.txt
-make embed             # CHROMA_URL má výchozí http://192.168.88.88:8006
+make embed             # CHROMA_URL má výchozí http://127.0.0.1:8007 (lokální, na SPARKu)
 ```
 
 Idempotentní — už vložené chunky přeskakuje, jde navázat po přerušení.
@@ -146,11 +151,16 @@ pamatuje kontext konverzace. `POST /reset` paměť smaže. Swagger UI na
 ```
 M2      ingest_books.py (registry + kapitoly + Perseus TEI) → books.jsonl / works.jsonl / chapters.jsonl
 JODA    library_postgres :5433   katalog děl, kapitoly, chunky + fulltext, obohacení, témata
-        library_chroma   :8007   books_v2 (pasáže ≤ 450 tokenů) + books_gloss (české glosy)   ← SSD
-        swarm-chromadb   :8006   legacy kolekce `books` (režim bez PG)                          ← HDD
-SPARK   load_pg.py → PG;  embed_books.py → Chroma;  enrich_*.py (translate/director) → PG
+SPARK   library_chroma   :8007   books_v2 (pasáže ≤ 450 tokenů) + books_gloss (české glosy, zatím prázdné)
+        load_pg.py → PG;  embed_books.py → Chroma;  enrich_*.py (translate/director) → PG
         server.py: plánovač (LLM) → katalog z PG | hybrid (vec + gloss + fts + fts_cs → RRF) → LLM
 ```
+
+Chroma knihovny byla do 2026-09-12 na JODĚ (SSD, `deploy/joda`) vedle
+Postgresu; legacy `swarm-chromadb` (:8006, kolekce `books`, „režim bez PG")
+tam běžela taky, ale nic ji nepoužívalo a je zrušená. Přesun na SPARK
+(`deploy/spark`, `PLAN-spark-library-storage.md`) ulevil JODĚ, která má
+jen 3,8 GB RAM a index se jí stránkoval ze swapu.
 
 - **Registr** (`registry/`): `works.yaml` — kurátorská metadata 93 dnešních děl (název_cs, autor,
   `lang_original` vs `lang_corpus` — poctivě, u překladů `en`), `topics.yaml` — 33 témat pro
@@ -164,7 +174,8 @@ SPARK   load_pg.py → PG;  embed_books.py → Chroma;  enrich_*.py (translate/d
 - **ID**: `work_id` slug (`zh.daodejing`, `grc.tlg0012.tlg001`), kapitola `…:0008`, chunk
   `…:0008:0001` — nezávislé na cestě souboru. Vše NFC.
 - **Embedding**: pasáže ≤ 450 tokenů s prefixem „Dílo › Kapitola", fp16 na CUDA (95 pasáží/s).
-  Chroma knihovny běží z SSD (`deploy/joda`) — SwarmBattle Chroma na /media (HDD) dávala 2 upserty/s.
+  Chroma knihovny běží na SPARKu (NVMe, `deploy/spark`) — než se přesunula
+  z JODY, na jejím /media (HDD) dávala 2 upserty/s.
 - **Retrieval** (`retriever.py`, `pg_search.py`, `hybrid.py`): kanály vektor-originál, vektor-glosy,
   fulltext-originál (prefixy termínů, bigramy pro čínštinu), fulltext-glosy → Reciprocal Rank
   Fusion → filtr balastu (`looks_tabular`, `quality = 0`) → diverzita. Bez plánu bere termíny

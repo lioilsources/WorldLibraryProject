@@ -15,8 +15,8 @@ výstup: odpověď knihovníka a pole `excerpt_cs` u zdrojů.
 | Jméno | Co to je | Role |
 |---|---|---|
 | **M2** | Mac Mini M2 | orchestrátor: stahování korpusu (`run_pipeline.sh`), ingest (`rag/ingest_books.py` → `books.jsonl`), rsync na SPARK |
-| **JODA** | Ubuntu server s Dockerem, `192.168.88.88` (LAN only, žádné sdílené disky; 3,8 GB RAM, 2 CPU) | **`deploy/joda/`** tohoto repa: `library_postgres` :5433 (katalog, kapitoly, fulltext, obohacení; data na /media) a `library_chroma` :8007 (books_v2 + books_gloss; data na SSD /home — /media je plotnový disk, 2 upserty/s). AiStack `swarm-chromadb` :8006 drží jen legacy kolekci `books` |
-| **SPARK** | DGX Spark (GB10 Grace Blackwell, 128 GB UMA, aarch64) | AiStack LLM park za LiteLLM :4000, veřejně https://llm.ol1n.com; embedding + chatbot `rag/server.py` :8090 (chystá se https://chat.ol1n.com) |
+| **JODA** | Ubuntu server s Dockerem, `192.168.88.88` (LAN only, žádné sdílené disky; 3,8 GB RAM, 2 CPU) | **`deploy/joda/`** tohoto repa: jen `library_postgres` :5433 (katalog, kapitoly, fulltext, obohacení; data na /media). Chroma se odsud 2026-09-12 přesunula na SPARK (viz `PLAN-spark-library-storage.md`) — JODĚ na 3,8 GB RAM docházela paměť, index se stránkoval ze swapu |
+| **SPARK** | DGX Spark (GB10 Grace Blackwell, 128 GB UMA, aarch64) | AiStack LLM park za LiteLLM :4000, veřejně https://llm.ol1n.com; embedding + chatbot `rag/server.py` :8090 (chystá se https://chat.ol1n.com); **`deploy/spark/`** tohoto repa: `library_chroma` :8007 (books_v2 + books_gloss, na NVMe) |
 
 Data mezi stroji tečou přes ssh/rsync (ssh alias `spark`, JODA
 dosažitelná jako `joda`).
