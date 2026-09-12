@@ -1,0 +1,32 @@
+# Chroma knihovny na SPARKu — přesun z JODY, důvody v PLAN-spark-library-storage.md.
+#
+#   cd ~/deploy/WorldLibraryProject && docker compose -f deploy/spark/docker-compose.library.yaml up -d
+#
+# Proč tak, jak to je:
+# - image přišpendlený na DIGEST arm64 buildu téhož `latest` (2026-05-05), na
+#   kterém běží JODA (:8007 i bývalé :8006); klient chromadb 1.5.9 s ním mluví.
+#   Verzované tagy jsou jen dev buildy, `latest` by se mohl pohnout pod námi.
+# - bind 0.0.0.0:8007: na SPARKu takhle běží i 8080/8090/8188; M2 dělá
+#   make eval / chroma-drop po LAN. SPARK není vystavený ven — žádný
+#   cloudflared na tenhle port.
+# - data na NVMe pod ~/deploy/WorldLibraryProject/chroma-data
+#   (stejná konvence jako deploy/joda; docker adresář založí sám)
+# - mem_limit 4g: HNSW 231 526 × 1024 × fp32 ≈ 0,95 GB + rezerva. Strop je
+#   tu proto, aby Chroma v unified memory nesoutěžila s modely bez hranice,
+#   ne proto, že by se do 1 GB nevešla — přesně to byl problém na JODĚ.
+# - bez healthchecku: image nemá curl ani python3 (na JODĚ proto :8006 dřív
+#   hlásilo unhealthy a fungovalo). Zdraví hlídá heartbeat zvenku a /status
+#   serveru. Důsledek: container-healer.timer na SPARKu ho nevidí (stav "none").
+services:
+  library-chroma:
+    image: chromadb/chroma@sha256:bd21353aee6ccdf4a57bd91e6001626826700f3838e1f230d4aae75bfd4889a1
+    container_name: library_chroma
+    restart: unless-stopped
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    ports:
+      - "0.0.0.0:8007:8000"
+    volumes:
+      - ${LIBRARY_CHROMA_DATA:-/home/ol1n/deploy/WorldLibraryProject/chroma-data}:/data
+    mem_limit: 4g
