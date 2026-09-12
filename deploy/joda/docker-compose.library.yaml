@@ -1,5 +1,12 @@
-# Postgres pro knihovní katalog a fulltext (RAG, 2. vlna). Běží na JODA
-# vedle Chromy — JODA je storage, SPARK je LLM.
+# Postgres pro knihovní katalog a fulltext (RAG, 2. vlna). Běží na JODA —
+# JODA je teď jen storage pro Postgres, SPARK nese LLM i Chromu.
+#
+# Chroma knihovny (books_v2 + books_gloss) tu běžela do 2026-09-12
+# (`library-chroma`, :8007, SSD); přesunuta na SPARK, JODĚ na 3,8 GB RAM
+# docházela paměť pod HNSW indexem — viz PLAN-spark-library-storage.md.
+# Data i kontejner na JODĚ smazané, ne jen zastavené: rollback (kdyby byl
+# potřeba) znamená znovu postavit index přes `make embed`, ne obnovit tenhle
+# soubor — SPARKova Chroma je teď jediná pravda.
 #
 # Nasazení z M2 (rag/Makefile: make deploy-joda):
 #   rsync -a --exclude .env deploy/joda/ joda:~/deploy/WorldLibraryProject/deploy/joda/
@@ -14,36 +21,12 @@
 # - bind 0.0.0.0: na PG sahá server na SPARKu a loader z M2 po LAN;
 #   JODA není vystavená ven (žádný cloudflared pro tenhle stack)
 # - mem_limit 768m a shared_buffers 256MB: stroj má 3,8 GB RAM a 2 CPU
-#   a dělí se o ně s Chromou, bipolar Postgresem, MinIO a media stackem
+#   a dělí se o ně s bipolar Postgresem, MinIO a media stackem
 # - maintenance_work_mem 192MB kvůli stavbě GIN indexů — ty se tvoří až
 #   PO načtení dat (rag/sql/0003_indexes.sql), ne při CREATE TABLE
 # - záloha 3:30, ne 3:00 — bipolar zálohuje ve 3:00 a CPU jsou jen dvě
-# - library-chroma (:8007) na SSD — viz komentář u služby
 
 services:
-  # Vektorový index knihovny (books_v2 pasáže + books_gloss glosy). Vlastní
-  # instance vedle SwarmBattle Chromy (:8006) — ta má data na /media, což je
-  # plotnový disk: měřeno 2 upserty/s, 250 000 pasáží by trvalo dva dny.
-  # Tahle jede z SSD systémového disku (/home). Image přišpendlená na
-  # verzi, kterou má i :8006 (1.4.4), ať klient 1.5.x mluví s obojím stejně.
-  # Bez healthchecku: image nemá curl a heartbeat zvenku je spolehlivější
-  # (viz PLAN-joda-chroma.md — u :8006 healthcheck hlásí unhealthy a funguje).
-  library-chroma:
-    # pull_policy missing: vezme se lokálně cachovaný image (= tentýž, na
-    # kterém běží :8006, v době nasazení 1.4.4); tag s verzí Chroma nevydává
-    image: chromadb/chroma:latest
-    pull_policy: missing
-    container_name: library_chroma
-    restart: unless-stopped
-    environment:
-      - IS_PERSISTENT=TRUE
-      - ANONYMIZED_TELEMETRY=FALSE
-    ports:
-      - "0.0.0.0:8007:8000"
-    volumes:
-      - ${LIBRARY_CHROMA_DATA:-/home/oli/deploy/WorldLibraryProject/chroma-data}:/data
-    mem_limit: 1g
-
   library-postgres:
     image: postgres:16-alpine
     container_name: library_postgres
