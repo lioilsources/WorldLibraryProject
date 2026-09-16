@@ -1,5 +1,7 @@
 # Jednorázový přepínač režimu; spouští ho rag-schedule.timer.
 [Unit]
+# Selhání hlásí Clown botem (notify-failure@.service)
+OnFailure=notify-failure@%n.service
 Description=Přepnutí SPARKu do denního/nočního režimu
 
 [Service]

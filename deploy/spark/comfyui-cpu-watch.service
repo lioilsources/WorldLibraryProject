@@ -1,0 +1,16 @@
+# Sledovač „ComfyUI počítá na CPU“ (viz comfyui-cpu-watch.sh) — hlásí Clown botem.
+#
+#   scp deploy/spark/comfyui-cpu-watch.service spark:.config/systemd/user/
+#   ssh spark 'systemctl --user daemon-reload && systemctl --user enable --now comfyui-cpu-watch'
+[Unit]
+Description=SPARK: hlídač renderů ComfyUI na CPU
+After=comfyui.service
+
+[Service]
+Type=simple
+ExecStart=%h/deploy/WorldLibraryProject/deploy/spark/comfyui-cpu-watch.sh
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

@@ -21,6 +21,8 @@
 # Postup po dojetí priority 1: přepsat --priority na 2 a znovu enable/start.
 
 [Unit]
+# Selhání hlásí Clown botem (notify-failure@.service)
+OnFailure=notify-failure@%n.service
 Description=Obohacení knihovního korpusu (swarm-director, priorita 1)
 After=network-online.target
 # Když klient skončí s ModelUnusable (rozbitý model), nemá smysl ho pouštět

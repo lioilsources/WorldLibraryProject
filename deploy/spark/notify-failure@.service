@@ -1,0 +1,12 @@
+# Hlášení selhání jiné unity přes Clown bota. Zapojuje se řádkem
+#   OnFailure=notify-failure@%n.service
+# v [Unit] hlídané služby; %n = její jméno je pak instance (%i) tady.
+#
+#   scp deploy/spark/notify*.sh deploy/spark/notify-failure@.service spark:.config/systemd/user/  # jen unit
+#   ssh spark 'systemctl --user daemon-reload'
+[Unit]
+Description=SPARK: hlášení selhání %i přes Clown bota
+
+[Service]
+Type=oneshot
+ExecStart=%h/deploy/WorldLibraryProject/deploy/spark/notify-failure.sh %i

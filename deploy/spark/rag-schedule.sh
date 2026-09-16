@@ -38,6 +38,29 @@ NIGHT_START="${NIGHT_START:-2}"
 AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# Selhání se hlásí Clown botem (notify.sh) — 15. a 16. 9. 2026 spadl noční
+# režim dvě noci po sobě a přišlo se na to náhodou. Jednotka má k tomu ještě
+# OnFailure=, tohle je navíc s důvodem v lidské řeči.
+notify() { "$HERE/notify.sh" "$@" >/dev/null 2>&1 || true; }
+fail() { log "CHYBA: $*"; notify "❌ <b>rag-schedule</b> ($mode): $*"; exit 1; }
+
+# Director chce při startu volné DIRECTOR_GPU_UTIL × celkem (vLLM jinak
+# odmítne start a docker ho točí v restart-loopu; smoke test pak vidí jen
+# prázdnou odpověď). Zkontrolovat dřív a říct, kdo paměť drží — 15. a 16. 9.
+# 2026 to byl qwen36-agent (0.30 × 121,7 = 36,5 GiB), který v seznamu
+# kontejnerů k uhnutí nebyl, a dvě noci selhaly bez jediného slova o paměti.
+memory_check() {
+  local util="${DIRECTOR_GPU_UTIL:-0.75}" total avail need holders comfy
+  read -r total avail < <(awk '/^MemTotal:/ {t=$2} /^MemAvailable:/ {a=$2} END {printf "%d %d", t/1048576, a/1048576}' /proc/meminfo)
+  need=$(awk -v u="$util" -v t="$total" 'BEGIN {printf "%d", u * t + 2}')
+  if [ "$avail" -ge "$need" ]; then
+    log "paměť: k dispozici ${avail} GiB, director chce ${need} GiB — ok"; return 0
+  fi
+  holders="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'translate|director|qwen|agent|audio|comfy' | sort | paste -sd ', ' -)"
+  comfy="$(systemctl --user is-active comfyui 2>/dev/null)"
+  fail "director se nevejde: k dispozici ${avail} GiB, potřebuje ${need} GiB (util ${util} × ${total}). Drží: kontejnery ${holders:-žádné}; comfyui ${comfy}"
+}
 
 # Okno buď přechází půlnoc (22→08), nebo ne (02→06) — a plete se to snadno:
 # s naivním `h >= NIGHT_START || h < DAY_START` by okno 02–06 platilo i ve
@@ -139,6 +162,8 @@ case "$mode" in
     # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
     # když je volné paměti míň než util × total (0.75 = 91 GiB)
     ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
+    sleep 5
+    memory_check
     ( cd "$AISTACK" && make up-director-night >/dev/null )
     wait_endpoint 8012 swarm-director || true
     if ! smoke_test 8012 swarm-director; then
@@ -147,13 +172,11 @@ case "$mode" in
       ( cd "$AISTACK" && make up-director-night >/dev/null )
       wait_endpoint 8012 swarm-director || true
       if ! smoke_test 8012 swarm-director; then
-        log "CHYBA: director je rozbitý i po restartu — obohacení NESPOUŠTÍM"
-        exit 1
+        fail "director je rozbitý i po restartu — obohacení NESPOUŠTÍM"
       fi
     fi
     if ! probe_test; then
-      log "CHYBA: director generuje poškozené odpovědi — obohacení NESPOUŠTÍM"
-      exit 1
+      fail "director generuje poškozené odpovědi — obohacení NESPOUŠTÍM"
     fi
     systemctl --user start library-enrich
     ;;

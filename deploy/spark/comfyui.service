@@ -8,6 +8,8 @@
 #   ssh spark 'systemctl --user daemon-reload && systemctl --user enable --now comfyui'
 
 [Unit]
+# Selhání hlásí Clown botem (notify-failure@.service)
+OnFailure=notify-failure@%n.service
 Description=ComfyUI (port 8188)
 After=network-online.target
 
