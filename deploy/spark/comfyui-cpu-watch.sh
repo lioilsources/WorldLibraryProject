@@ -28,6 +28,9 @@ report() {
 ${mem}
 ComfyUI drží ${comfy:-?}, fronta: ${queue}
 kontejnery s modely: ${containers:-žádné}"
+  # Do journalu taky: bez toho nejde zpětně říct, jestli hlášení odešlo, nebo
+  # jestli hlídač jen nic neviděl — a tichý hlídač je horší než žádný.
+  echo "hlášení odesláno: ${count}× CPU render, ${mem}"
 }
 
 journalctl --user -u comfyui -f -n 0 -o cat 2>/dev/null | while IFS= read -r line; do
