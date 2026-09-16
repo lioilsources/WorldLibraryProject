@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Denní/noční režim SPARKu — ComfyUI přes den, obohacení korpusu v noci.
+# Rozvrh SPARKu — tři okna, v každém jeden velký model. 121,7 GiB unified
+# nestačí na dva: director (0.75 = 91 GiB) ani ComfyUI (52) se vedle
+# qwen36-agenta (0.30 = 36,5) nevejdou, a vLLM při startu odmítne cokoli pod
+# util × total.
 #
 #   den (06:00)  ComfyUI + translate úsporný (~36 GiB) + audio (~25 GiB),
 #                obohacení stojí → Image Studio i chat mají GPU pro sebe
-#   noc (02:00)  ComfyUI, translate i audio dole, nahoru swarm-director
+#   promo (00:00)  ComfyUI a audio dole, nahoru qwen36-agent (ClownPROMO)
+#   rag   (01:00)  qwen36 i translate dole, nahoru swarm-director, obohacení jede
+#   comfy (07:00)  director i qwen36 dole, translate úsporný, ComfyUI a audio nahoru
 #                (~93 GiB), obohacení korpusu jede na něm
 #
 # Proč v noci director a ne translate, když je 2,8× pomalejší (6,7 vs 18,9
@@ -17,25 +22,34 @@
 # na directora — tedy na LEPŠÍ model, ne na 4B nouzovku.
 #
 # Volá se z rag-schedule.service (timer 08:00 a 22:00 + po bootu). Ručně:
-#   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh day|night|auto
+#   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh comfy|rag|promo|auto
+#   (day = comfy a night = rag zůstávají jako synonyma, ať staré ruční volání
+#   a `make mode MODE=day` v rag/ nepřestanou fungovat)
 # Vypnout rozvrh:  systemctl --user stop rag-schedule.timer
 #
 # `auto` odvodí režim z hodin, takže timer smí mít Persistent=true —
 # po restartu stroje ve 3 ráno se srovná do nočního režimu, ne do denního.
-# Okno smí, ale nemusí přecházet půlnoc (02–06 i 22–08), viz mode_for_hour.
+# Okna se čtou z proměnných níž a nesmí se překrývat; mode_for_hour je řadí
+# podle hodiny a zvládne i okno přes půlnoc (comfy 07–00).
 #
 # Kontrola logiky bez zásahu do stroje:  rag-schedule.sh selftest
 
 set -euo pipefail
 
 AISTACK="${AISTACK:-$HOME/deploy/AiStack}"
-DAY_START="${DAY_START:-6}"     # hodina, od které platí denní režim
-NIGHT_START="${NIGHT_START:-2}"
+DAY_START="${DAY_START:-7}"       # comfy: ComfyUI + translate + audio
+NIGHT_START="${NIGHT_START:-1}"   # rag: swarm-director + obohacení
+PROMO_START="${PROMO_START:-0}"   # promo: qwen36-agent pro ClownPROMO
 # Kontejnery AiStacku mimo tenhle rozvrh, které se v noci musí uhnout:
 # audio-music + audio-sfx (nasazené 7. 9. 2026) drží ~25 GiB a director
 # (0.75 × 121,7 = 91,3 GiB) se vedle nich nevejde — 8. 9. 00:13 padal
 # v restart-loopu na „Free memory 75 GiB < 91 GiB".
 AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
+# qwen36-agent (ClownPROMO, vLLM --gpu-memory-utilization 0.30 = 36,5 GiB
+# zabraných bez ohledu na zátěž) — 15. a 16. 9. 2026 v tomhle seznamu chyběl
+# a director se vedle něj dvě noci po sobě nevešel. Promo běží jen ve svém
+# okně, přes den ani při obohacení ho nikdo nepotřebuje.
+AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -102,25 +116,32 @@ probe_test() {
   return 1
 }
 
+# Hodina → okno. Začátky se seřadí a hodina spadne do posledního okna, které
+# ještě začalo; když je před prvním začátkem dne, patří do okna, které přešlo
+# půlnoc (to poslední). Díky tomu je jedno, jestli okno přes půlnoc přechází.
 mode_for_hour() {
-  local h="$1" night="$2" day="$3"
-  if [ "$night" -lt "$day" ]; then          # 02–06, uvnitř jednoho dne
-    if [ "$h" -ge "$night" ] && [ "$h" -lt "$day" ]; then echo night; else echo day; fi
-  else                                       # 22–08, přes půlnoc
-    if [ "$h" -ge "$night" ] || [ "$h" -lt "$day" ]; then echo night; else echo day; fi
-  fi
+  local h="$1" promo="$2" rag="$3" comfy="$4" best="" best_start=-1 last="" last_start=-1
+  local name start
+  for pair in "promo:$promo" "rag:$rag" "comfy:$comfy"; do
+    name="${pair%%:*}"; start="${pair##*:}"
+    if [ "$start" -gt "$last_start" ]; then last="$name"; last_start="$start"; fi
+    if [ "$h" -ge "$start" ] && [ "$start" -gt "$best_start" ]; then best="$name"; best_start="$start"; fi
+  done
+  echo "${best:-$last}"
 }
 
 if [ "${1:-}" = selftest ]; then
   fail=0
-  check() { # hodina noc den očekávané
-    got=$(mode_for_hour "$1" "$2" "$3")
-    [ "$got" = "$4" ] || { echo "CHYBA: h=$1 okno $2–$3 → $got, čekáno $4"; fail=1; }
+  check() { # hodina promo rag comfy očekávané
+    got=$(mode_for_hour "$1" "$2" "$3" "$4")
+    [ "$got" = "$5" ] || { echo "CHYBA: h=$1 okna $2/$3/$4 → $got, čekáno $5"; fail=1; }
   }
-  for h in 2 3 5; do check $h 2 6 night; done
-  for h in 0 1 6 7 13 21 23; do check $h 2 6 day; done      # okno bez půlnoci
-  for h in 22 23 0 3 7; do check $h 22 8 night; done
-  for h in 8 12 21; do check $h 22 8 day; done              # okno přes půlnoc
+  # ostrý rozvrh: promo 00–01, rag 01–07, comfy 07–00 (přes půlnoc)
+  check 0 0 1 7 promo
+  for h in 1 2 6; do check $h 0 1 7 rag; done
+  for h in 7 8 13 23; do check $h 0 1 7 comfy; done
+  # okno, které přechází půlnoc, smí být kterékoli: promo 23–01 → 0:xx je promo
+  check 0 23 1 7 promo; check 23 23 1 7 promo; check 22 23 1 7 comfy
   [ $fail = 0 ] && echo "rag-schedule.sh: selftest ok"
   exit $fail
 fi
@@ -128,8 +149,8 @@ fi
 mode="${1:-auto}"
 if [ "$mode" = auto ]; then
   h=$(date +%-H)
-  mode=$(mode_for_hour "$h" "$NIGHT_START" "$DAY_START")
-  log "auto → $mode (je ${h}:xx, noční okno ${NIGHT_START}–${DAY_START})"
+  mode=$(mode_for_hour "$h" "$PROMO_START" "$NIGHT_START" "$DAY_START")
+  log "auto → $mode (je ${h}:xx; promo ${PROMO_START}, rag ${NIGHT_START}, comfy ${DAY_START})"
 fi
 
 # Čeká, až model zase odpovídá — bez toho by chat i obohacení chvíli mlely
@@ -146,19 +167,34 @@ wait_endpoint() {
 }
 
 case "$mode" in
-  day)
-    log "denní režim: obohacení stop, director dole, translate úsporný, ComfyUI a audio nahoru"
+  comfy|day)
+    log "režim comfy: obohacení stop, director i promo dole, translate úsporný, ComfyUI a audio nahoru"
     systemctl --user stop library-enrich || true
     ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
+    docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
     ( cd "$AISTACK" && make up-translate-lean >/dev/null )
     wait_endpoint 8004 translate || true
     systemctl --user start comfyui
     docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     ;;
-  night)
-    log "noční režim: ComfyUI, translate i audio dole, director nahoru, obohacení jede"
+  promo)
+    # Translate zůstává: Knihovník má přes promo okno odpovídat pořád, a
+    # 36,5 (agent) + 36 (translate lean) + ~15 (chat, fallback, chroma)
+    # se do 121,7 vejde. ComfyUI a audio ne — ty jsou 52 + 25.
+    log "režim promo: ComfyUI a audio dole, qwen36-agent nahoru, translate úsporný zůstává"
     systemctl --user stop comfyui || true
     docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
+    systemctl --user stop library-enrich || true
+    ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
+    ( cd "$AISTACK" && make up-translate-lean >/dev/null )
+    docker start $AGENT_CONTAINERS >/dev/null 2>&1 || true
+    wait_endpoint 8040 qwen36-agent || fail "qwen36-agent nenaběhl — promo okno bez modelu"
+    ;;
+  rag|night)
+    log "režim rag: ComfyUI, promo, translate i audio dole, director nahoru, obohacení jede"
+    systemctl --user stop comfyui || true
+    docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
+    docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
     # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
     # když je volné paměti míň než util × total (0.75 = 91 GiB)
     ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
@@ -181,7 +217,7 @@ case "$mode" in
     systemctl --user start library-enrich
     ;;
   *)
-    echo "použití: $0 day|night|auto" >&2; exit 2
+    echo "použití: $0 comfy|rag|promo|auto (day/night = comfy/rag)" >&2; exit 2
     ;;
 esac
 log "hotovo ($mode)"
