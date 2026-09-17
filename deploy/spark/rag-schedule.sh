@@ -50,6 +50,11 @@ AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
 # a director se vedle něj dvě noci po sobě nevešel. Promo běží jen ve svém
 # okně, přes den ani při obohacení ho nikdo nepotřebuje.
 AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
+# flux-schnell (NIM, ~17 GiB) naběhne s ComfyUI v comfy okně a nikde se
+# nezastavuje — 17.–18. 9. 2026 tak přes noc mlel naprázdno a director se
+# vedle něj (89 GiB < potřebných 92) dvě noci nevešel. Startuje ho něco
+# mimo tenhle skript (spolu s comfyui službou), tady se jen ruší před rag.
+FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -66,13 +71,21 @@ fail() { log "CHYBA: $*"; notify "❌ <b>rag-schedule</b> ($mode): $*"; exit 1; 
 # kontejnerů k uhnutí nebyl, a dvě noci selhaly bez jediného slova o paměti.
 memory_check() {
   local util="${DIRECTOR_GPU_UTIL:-0.75}" total avail need holders comfy
-  read -r total avail < <(awk '/^MemTotal:/ {t=$2} /^MemAvailable:/ {a=$2} END {printf "%d %d", t/1048576, a/1048576}' /proc/meminfo)
+  # awk musí tisknout \n: bez ní read narazí na EOF bez řádku a vrátí 1,
+  # i když total/avail vyplnil správně — pod set -e to potichu, beze
+  # slova, zabije celý skript. 17. a 18. 9. 2026 dvě noci za sebou spadlo
+  # okno rag hned na startu, bez jediného CHYBA/log řádku navíc.
+  read -r total avail < <(awk '/^MemTotal:/ {t=$2} /^MemAvailable:/ {a=$2} END {printf "%d %d\n", t/1048576, a/1048576}' /proc/meminfo)
   need=$(awk -v u="$util" -v t="$total" 'BEGIN {printf "%d", u * t + 2}')
   if [ "$avail" -ge "$need" ]; then
     log "paměť: k dispozici ${avail} GiB, director chce ${need} GiB — ok"; return 0
   fi
-  holders="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'translate|director|qwen|agent|audio|comfy' | sort | paste -sd ', ' -)"
-  comfy="$(systemctl --user is-active comfyui 2>/dev/null)"
+  # `|| true` na obou: grep bez zásahu (pipefail) a `is-active` na neběžící
+  # službu (vrací 3) jsou tu OČEKÁVANÝ výsledek, ne chyba — pod set -e bez
+  # toho umřou potichu úplně stejně jako řádek s read výš, jen o pár řádků
+  # dál a bez jediného CHYBA hlášení. Přesně to se stalo 18. 9. 2026 01:05.
+  holders="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'translate|director|qwen|agent|audio|comfy' | sort | paste -sd ', ' -)" || true
+  comfy="$(systemctl --user is-active comfyui 2>/dev/null)" || true
   fail "director se nevejde: k dispozici ${avail} GiB, potřebuje ${need} GiB (util ${util} × ${total}). Drží: kontejnery ${holders:-žádné}; comfyui ${comfy}"
 }
 
@@ -195,6 +208,7 @@ case "$mode" in
     systemctl --user stop comfyui || true
     docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
+    docker stop $FLUX_CONTAINERS >/dev/null 2>&1 || true
     # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
     # když je volné paměti míň než util × total (0.75 = 91 GiB)
     ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
