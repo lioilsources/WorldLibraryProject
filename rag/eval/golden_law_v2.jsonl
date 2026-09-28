@@ -1,0 +1,18 @@
+{"q": "Komu soud přizná náhradu nákladů, když spor vyhraje?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 142"}
+{"q": "Chci podat k soudu žalobu na dlužníka, co v ní musí být?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 79"}
+{"q": "Jde si předem ujednat, u kterého soudu se bude obchodní spor řešit?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 89a"}
+{"q": "Kdo podává návrh, aby soud povolil oddlužení?", "area": "insolvence", "expect_work": "182/2006 Sb.", "expect_ref": "§ 389"}
+{"q": "Kdy mi vzniká povinnost přiznat DPH u dodaného zboží?", "area": "danove", "expect_work": "235/2004 Sb.", "expect_ref": "§ 21"}
+{"q": "Pronajímatel mi po roce chce zvednout nájem, může?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2249"}
+{"q": "Jakou peněžitou jistotu můžu po nájemci žádat?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2254"}
+{"q": "Rozbila se v nájmu baterie u umyvadla, kdo to hradí?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2257"}
+{"q": "Nájemce chce odejít z bytu dřív, než skončí sjednaná doba — může?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2287"}
+{"q": "Do kolika dnů musí prodejce reklamaci vyřídit?", "area": "spotrebitel", "expect_work": "634/1992 Sb.", "expect_ref": "§ 19"}
+{"q": "Můžu vrátit tričko koupené v e-shopu bez důvodu?", "area": "spotrebitel", "expect_work": "89/2012 Sb.", "expect_ref": "§ 1829"}
+{"q": "Kolik nejvýš můžu odpracovat na DPP za rok?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 75"}
+{"q": "Můžu pracovat z domova i bez písemné dohody?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 317"}
+{"q": "Patří firmě software, který pro ni napsal její programátor v pracovní době?", "area": "autorske", "expect_work": "121/2000 Sb.", "expect_ref": "§ 58"}
+{"q": "Odpovídá jednatel za škodu, když se rozhodl po poradě s odborníkem?", "area": "korporace", "expect_work": "90/2012 Sb.", "expect_ref": "§ 51"}
+{"q": "Jaká je odměna za hodinu práce přesčas?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 114"}
+{"q": "Kdy zaměstnavatel může vyhodit zaměstnance na hodinu?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 55"}
+{"q": "Objednal jsem rekonstrukci a firma chce víc, než řekla — musím doplatit?", "area": "dilo", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2612"}

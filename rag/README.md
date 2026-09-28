@@ -85,7 +85,20 @@ law/{works,chapters,books}.jsonl       tentýž kontrakt jako knihy; chunk = §,
    │ embed_books.py --collection law_v1   Chroma na SPARKu :8007
    ▼
 server.py --port 8098 --prompt-file prompts/pravnik_cs.md --cite-registry … --channels vec --planner off
+          --law-terms registry/law/legal_terms.yaml --sibling-window 1 --sibling-top 3
 ```
+
+Dvě věci přidané 28. 9. 2026 po evalu (obě měřené, viz „Eval Právníka"):
+
+- `--sibling-window 1 --sibling-top 3`: k prvním třem hitům se do kontextu přidá
+  **přilehlý § téhož předpisu** (`pg_search.sibling_sections`, ±1 v pořadí §, ne
+  v `ordinal` — mezi § stojí nadpisy dílů). Právní text se čte v okolí a eval
+  ukázal, že 3 z 8 minutých otázek mají v top-5 přímo sousední §. V promptu jsou
+  na vlastním řádku za `↳` s vlastním §, aby je model citoval správně.
+- `--law-terms registry/law/legal_terms.yaml`: mapa laických pojmů → právní
+  terminologie (`law_terms.py`). Termíny se přilepí k dotazu před embeddingem
+  („kauce" → „jistota"), předpis smí doporučit jen jako **zálohu**, když si ho
+  dotaz nejmenuje sám. Bez LLM, bez latence.
 
 `make ingest-law` (M2) → `make sync-law` → na SPARKu `make load-pg-law pg-index-law
 embed-law` → `make install-unit` (kopíruje i `law-chat.service`) → `make
@@ -136,12 +149,27 @@ je bug). Dva režimy:
 `eval/check_golden_law.py` ověří, že každý očekávaný § v korpusu existuje —
 spustit po každém rozšíření zlatého standardu.
 
-Baseline 28. 9. 2026 (65 otázek, produkční konfig): cite 1,00 · work-hit@8 1,00
-· **ref-hit@8 0,860** (MRR 0,618) · **ref-hit@5 0,825** (MRR 0,613). Slabá
-místa podle `by_area`: procesní 0,25 (vektor nerozliší OSŘ / ZŘS / SŘS),
-insolvence 0,00, daňové 0,667, nájem 0,714. Tři z osmi minutých otázek mají
-v top-5 **sousední §** (§ 2236 vs. 2235, §§ 20a a 22 vs. 21, §§ 390 a 391 vs.
-389) — rozbor a další nálezy v `docs/lawyer/CURRENT_STATE.md`.
+Druhá sada `eval/golden_law_v2.jsonl` (18 otázek) je psaná **až po** mapě pojmů
+a jinými slovy — kontrola, že mapa není ušitá na míru první sadě (stejný princip
+jako `golden_v2.jsonl` u knihovny). Spouští se `--golden eval/golden_law_v2.jsonl`.
+
+Naměřeno 28. 9. 2026 (65 otázek, `--channels vec`, `--max-per-work 6`):
+
+| konfigurace | ref-hit@8 | MRR@8 | ref-hit@5 | § v promptu @8 |
+|---|---|---|---|---|
+| baseline (stav 23. 9.) | 0,860 | 0,618 | 0,825 | 0,860 |
+| `--sibling-window 1` | 0,860 | 0,618 | — | **0,912** |
+| `--law-terms` | 0,895 | 0,702 | 0,877 | — |
+| **oboje (nasazeno)** | **0,895** | **0,702** | **0,877** | **0,947** |
+
+`ref-hit` je § **mezi hity**, „§ v promptu" (`ref_hit_ctx`) i mezi přilehlými §,
+které expanze přidá do kontextu — měří se zvlášť schválně, aby se recall nedal
+vylepšit nafouknutím kontextu. Na holdout sadě: 0,611 → 0,667 ref-hit
+(0,778 v promptu), tj. **expanze se přenáší, mapa pojmů skoro ne** — její
+zisk na první sadě je z velké části fitovaný. Rozbor v `docs/lawyer/CURRENT_STATE.md`.
+
+Co pořád nesedí: insolvence 0,00 (§ 390 „kdy" vytlačí § 389 „kdo"), daňové 0,667,
+nájem 0,714, autorské se trefí až na 5. místě (MRR 0,20).
 
 ## Zprovoznění
 

@@ -109,6 +109,10 @@ def main() -> int:
     p.add_argument("--max-per-work", type=int, default=6)
     p.add_argument("--candidate-factor", type=int, default=4)
     p.add_argument("--no-routing", action="store_true")
+    p.add_argument("--sibling-window", type=int, default=0,
+                   help="±N přilehlých § téhož předpisu do kontextu (měří se zvlášť jako ref_hit_ctx)")
+    p.add_argument("--sibling-top", type=int, default=3)
+    p.add_argument("--law-terms", default="", help="mapa laických pojmů (registry/law/legal_terms.yaml)")
     p.add_argument("--out", help="výstup JSON (default eval/results/law_<ts>.json)")
     p.add_argument("--label", default="")
     args = p.parse_args()
@@ -126,6 +130,7 @@ def main() -> int:
     retriever = None
     if not args.service:
         import chromadb
+        from law_terms import TermsMap
         from retriever import Plan, Retriever
 
         url = urlparse(args.chroma_url)
@@ -133,7 +138,9 @@ def main() -> int:
         embedder = make_embedder(args.embed_model, device=args.device)
         retriever = Retriever(orig=collection, gloss=None, pool=pool, embedder=embedder, embed_model=args.embed_model,
                               alias_index=index, channels=MODES[args.mode], candidate_factor=args.candidate_factor,
-                              max_per_work=args.max_per_work, no_routing=args.no_routing, legacy_to_id=legacy_to_id)
+                              max_per_work=args.max_per_work, no_routing=args.no_routing, legacy_to_id=legacy_to_id,
+                              sibling_window=args.sibling_window, sibling_top=args.sibling_top,
+                              terms_map=TermsMap.load(args.law_terms) if args.law_terms else None)
 
     rows = []
     for item in questions:
@@ -151,11 +158,14 @@ def main() -> int:
                          "act_hint": cit.act_hint if cit else None, "hit": ok,
                          "top": [f"{id_to_legacy.get(h['work_id'], h['work_id'])} {h['ref_start']}" for h in hits[:3]]})
             continue
+        ctx_pairs: list[tuple[str | None, str | None]] = []
         if args.service:
             # Produkční cesta: hity nese server, § se bere z ref_start úryvku.
             hits, routed = search_service(args.service, item["q"], args.top_k)
             pairs = [(legacy_to_id.get(h.get("work"), h.get("work")), ref_head(h.get("ref_start"))) for h in hits]
             dists = [h.get("distance") for h in hits]
+            ctx_pairs = [(legacy_to_id.get(h.get("work"), h.get("work")), s.get("ref"))
+                         for h in hits for s in (h.get("siblings") or [])]
         else:
             hits, routed = retriever.retrieve(item["q"], args.top_k, Plan())
             chap_ids = [h["meta"].get("chapter_id") for h in hits]
@@ -164,13 +174,23 @@ def main() -> int:
                 refs = dict(cur.fetchall())
             pairs = [(h["meta"].get("work_id"), refs.get(h["meta"].get("chapter_id"))) for h in hits]
             dists = [h["distance"] for h in hits]
+            # přilehlé § (--sibling-window): jsou v promptu, ale nejsou hit —
+            # měří se zvlášť, aby se ref_hit@k nedal „vylepšit" nafouknutím kontextu
+            ctx_pairs = [(h["meta"].get("work_id"), s.get("ref"))
+                         for h in hits for s in (h.get("siblings") or [])]
         work_hit = any(w == want_work for w, _ in pairs)
         ref_hit = any(w == want_work and r == want_ref for w, r in pairs)
         rank = next((i + 1 for i, (w, r) in enumerate(pairs) if w == want_work and r == want_ref), None)
-        rows.append({"q": item["q"], "kind": "content", "area": area,
-                     "work_hit": work_hit, "ref_hit": ref_hit, "rank": rank,
-                     "routed": routed.get("works"),
-                     "top": [f"{id_to_legacy.get(w, w)} {r} @{d:.3f}" for (w, r), d in zip(pairs[:5], dists)]})
+        row = {"q": item["q"], "kind": "content", "area": area,
+               "work_hit": work_hit, "ref_hit": ref_hit, "rank": rank,
+               "routed": routed.get("works"),
+               "top": [f"{id_to_legacy.get(w, w)} {r} @{d:.3f}" for (w, r), d in zip(pairs[:5], dists)]}
+        if routed.get("terms"):
+            row["terms"] = routed["terms"]
+        if ctx_pairs:
+            row["ref_hit_ctx"] = ref_hit or any(w == want_work and r == want_ref for w, r in ctx_pairs)
+            row["ctx_n"] = len(ctx_pairs)
+        rows.append(row)
 
     cite_rows = [r for r in rows if r["kind"] == "cite"]
     content = [r for r in rows if r["kind"] == "content"]
@@ -183,6 +203,8 @@ def main() -> int:
             out |= {"work_hit": round(sum(r["work_hit"] for r in c) / len(c), 3),
                     "ref_hit": round(sum(r["ref_hit"] for r in c) / len(c), 3),
                     "ref_mrr": round(sum(1 / r["rank"] for r in c if r["rank"]) / len(c), 3)}
+            if any("ref_hit_ctx" in r for r in c):
+                out["ref_hit_ctx"] = round(sum(r.get("ref_hit_ctx", r["ref_hit"]) for r in c) / len(c), 3)
         if s:
             out |= {"cite_n": len(s), "cite_hit": round(sum(r["hit"] for r in s) / len(s), 3)}
         return out
@@ -198,8 +220,13 @@ def main() -> int:
         "ref_hit_rate": round(sum(r["ref_hit"] for r in content) / len(content), 3) if content else None,
         "ref_mrr": round(sum(1 / r["rank"] for r in content if r["rank"]) / len(content), 3) if content else None,
         "questions": len(rows),
+        "sibling_window": args.sibling_window or None,
+        "law_terms": args.law_terms or None,
         "by_area": {a: stats(rs) for a, rs in sorted(areas.items())},
     }
+    if any("ref_hit_ctx" in r for r in content):
+        summary["ref_hit_ctx_rate"] = round(
+            sum(r.get("ref_hit_ctx", r["ref_hit"]) for r in content) / len(content), 3)
     for r in rows:
         mark = "✓" if r.get("hit") or r.get("ref_hit") else ("~" if r.get("work_hit") else "✗")
         print(f"{mark} [{r['kind']:<7}] {r.get('area', '—'):<12} {r['q'][:52]:<52} "

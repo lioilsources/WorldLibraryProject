@@ -19,6 +19,8 @@ ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 server.py \
   --pg-dsn ${LAW_PG_DSN} \
   --cite-registry registry/law/tier1.yaml \
   --planner off --rewrite off \
+  --law-terms registry/law/legal_terms.yaml \
+  --sibling-window 1 --sibling-top 3 \
   --max-per-work 6 --no-translate-excerpts \
   --summaries-file law/summaries.json \
   --llm-url http://localhost:8080/v1

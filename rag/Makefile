@@ -49,6 +49,8 @@ test:
 	$(PY) chapters.py
 	$(PY) clean_text.py
 	$(PY) hybrid.py
+	$(PY) law_terms.py
+	$(PY) cite.py
 	$(PY) -m pytest -q tests
 
 # eval plánovače a katalogu přes běžící server (PG režim)
@@ -112,7 +114,9 @@ serve-law:
 	$(PY) server.py --port 8098 --prompt-file prompts/pravnik_cs.md \
 		--chroma-url $(CHROMA_URL) --collection $(LAW_COLLECTION) --gloss-collection law_gloss_none \
 		--channels vec --pg-dsn $(LAW_PG_DSN) --cite-registry registry/law/tier1.yaml \
-		--planner off --rewrite off --max-per-work 6 --no-translate-excerpts --summaries-file $(LAW_DIR)/summaries.json \
+		--planner off --rewrite off --law-terms registry/law/legal_terms.yaml \
+		--sibling-window 1 --sibling-top 3 \
+		--max-per-work 6 --no-translate-excerpts --summaries-file $(LAW_DIR)/summaries.json \
 		--llm-url $(LLM_URL) --llm-model $(LLM_MODEL) $(EMBED_FLAGS)
 
 restart-law-chat:

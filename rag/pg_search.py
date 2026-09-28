@@ -186,6 +186,41 @@ def neighbors(conn, chunk_id: str, window: int = 1) -> list[dict]:
         return [{"id": i, "text": t, "seq_in_chapter": s} for i, t, s in cur.fetchall()]
 
 
+SIBLINGS_SQL = """
+WITH sec AS (
+    SELECT id, ref, heading, chunk_count, row_number() OVER (ORDER BY ordinal) AS rn
+      FROM chapters WHERE work_id = %(work)s AND ref IS NOT NULL
+), anchor AS (
+    SELECT rn FROM sec WHERE id = %(chapter)s
+)
+SELECT s.id, s.ref, s.heading, c.text, (s.rn - a.rn) AS delta, s.chunk_count
+  FROM sec s CROSS JOIN anchor a
+  LEFT JOIN LATERAL (
+      SELECT text FROM chunks WHERE chapter_id = s.id ORDER BY seq_in_chapter LIMIT 1
+  ) c ON true
+ WHERE s.rn BETWEEN a.rn - %(w)s AND a.rn + %(w)s AND s.id <> %(chapter)s
+ ORDER BY s.rn
+"""
+
+
+def sibling_sections(conn, work_id: str, chapter_id: str, window: int = 1) -> list[dict]:
+    """Přilehlé **paragrafy** téhož předpisu (±window v pořadí §, ne ±1 v ordinalu —
+    mezi dvěma § stojí i nadpisy dílů, které samy ref nemají).
+
+    Proti `neighbors()`, které přidává odstavce téhož §: právní text se čte
+    v okolí a eval 28. 9. 2026 ukázal, že 3 z 8 minutých otázek mají v top-5
+    přímo sousední § (§ 2236 vs. 2235, §§ 20a a 22 vs. 21, §§ 390 a 391 vs. 389).
+    Bere se první chunk kapitoly: u krátkého § je to celý §.
+    """
+    if not work_id or not chapter_id or window < 1:
+        return []
+    with conn.cursor() as cur:
+        cur.execute(SIBLINGS_SQL, {"work": work_id, "chapter": chapter_id, "w": window})
+        return [{"id": i, "ref": ref, "heading": heading, "text": text, "delta": delta,
+                 "truncated": (n or 1) > 1}
+                for i, ref, heading, text, delta, n in cur.fetchall() if text]
+
+
 def known_groups(conn) -> set[str]:
     with conn.cursor() as cur:
         cur.execute('SELECT DISTINCT "group" FROM works')

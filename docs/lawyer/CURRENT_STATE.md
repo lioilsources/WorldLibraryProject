@@ -104,6 +104,8 @@ z 2026-09-23:
 --no-translate-excerpts
 --cite-registry registry/law/tier1.yaml
 --prompt-file prompts/pravnik_cs.md
+--law-terms registry/law/legal_terms.yaml     (přidáno 28. 9., viz N8)
+--sibling-window 1 --sibling-top 3            (přidáno 28. 9., viz N8)
 ```
 
 Cesty dotazu:
@@ -166,7 +168,8 @@ nejsou klikací.
 | **ref-hit = recall** | **0,860** | **0,825** |
 | ref-MRR | 0,618 | 0,613 |
 
-Cíl plánu je recall@5 ≥ 0,85 — chybí 2,5 bodu a je jasně adresný. Rozpad
+Cíl plánu je recall@5 ≥ 0,85 — chybí 2,5 bodu a je jasně adresný (o pár hodin
+později splněno: **0,877**, viz N8). Rozpad
 po oblastech (ref-hit@8 / MRR): pracovní 1,00/0,86 · trestní 1,00/1,00 ·
 ústavní 1,00/1,00 · závazky 1,00/0,90 · kupní 1,00/0,61 · správní 1,00/0,75 ·
 dílo 1,00/0,75 · korporace 1,00/0,58 · **autorské 1,00/0,20** ·
@@ -194,11 +197,11 @@ v `eval/results/law_20260923-131029.json` na SPARKu).
 | §3 BM25 + dense → RRF | **změřeno jako horší**: fulltext v Postgresu jede na konfiguraci `simple` bez českého stemmingu a tahá do RRF šum (74 % vs. 91 %). Buď český slovník/stemmer, nebo to nechat vypnuté — samo přidání kanálu kvalitu srazí |
 | §3 reranker (`bge-reranker-v2-m3`) | **nezkoušeno, smysluplné.** Fúzní funkce `combine_rerank()` v `hybrid.py` existuje (α·rerank + (1−α)·RRF) a je otestovaná, ale do `Retriever` není zapojená a žádná rerank služba neběží. MRR 0,62 při recall 0,86 říká, že se má co přerovnávat |
 | §3 embedding bge-m3 / multilingual-e5-large | běží **multilingual-e5-large** (jedna ze dvou variant plánu); bge-m3 by znamenal reindex celé kolekce a dal by se změřit až proti tomuhle baseline |
-| §3 expanze na sousední odstavce | **poloviční**: `pg_search.neighbors()` + `Retriever(context_window=…)` + CLI `--context-window` existují, ale (a) expandují jen odstavce **téhož §**, ne sousední §§, (b) `h["neighbors"]` **nikdo nečte** — do promptu se to nedostane. Dnes je to no-op |
+| §3 expanze na sousední odstavce | **hotovo 28. 9.** jako expanze na přilehlé **§** (`pg_search.sibling_sections`, `--sibling-window 1 --sibling-top 3`), nasazeno. Původní `neighbors()` / `--context-window` (odstavce téhož §) zůstává no-op: `h["neighbors"]` nikdo nečte |
 | §3 expanze po křížových odkazech | **chybí** (není z čeho — viz `paragraf_odkazy`) |
 | §3 filtr `ucinnost_do IS NULL`, parametr `k_datu` | **nejde** bez verzování dat |
 | §4 LLM query rewriting jako největší přínos | **změřeno jako škodlivé v dnešní podobě**: knihovní plánovač překládá právní termíny do jazyků tradic (vyšlo „Vertragsende", „Arbeitsverhältnis") a stojí ~10 s na první token → `--planner off --rewrite off`. Právní plánovač je otevřený follow-up, ne hotová výhra — a měřit se musí proti `vec`-only baseline |
-| §4 statická mapa pojmů `legal_terms.yaml` | **chybí** — a data z §6 ukazují, kde by pomohla (procesní 0,25) |
+| §4 statická mapa pojmů `legal_terms.yaml` | **hotovo 28. 9.** (`law_terms.py`, 24 položek, `--law-terms`), nasazeno — ale zisk se na holdout sadě nepotvrdil, viz nález N8 |
 | §5 odpovídat jen z chunků, citace, disclaimer | **hotovo** v promptu |
 | §5 klikací citace na e-Sbírku | **chybí** poslední kus: `stale_url` se do appky neposílá a `LibrarySource` nemá pole pro URL |
 | §5 „confidence" z reranker score | **nejde z dnešních čísel** — viz nález N1 |
@@ -236,6 +239,35 @@ restart-law-chat` (restart maže konverzace v RAM).
 **N5 — katalogový intent je vypnutý spolu s plánovačem.** „Které trestní
 předpisy znáš" jde do vektoru. V evalu jsou dvě katalogové otázky, ale
 `eval_law.py` je přeskakuje — katalog se dnes neměří vůbec.
+
+**N8 — mapa pojmů se na nových formulacích nepotvrdila, expanze na přilehlé § ano.**
+Dvě změny nasazené 28. 9. měřené zvlášť na hlavní sadě (65 otázek) a na holdout
+sadě `golden_law_v2.jsonl` (18 otázek, psaná až po mapě, jinými slovy):
+
+| | hlavní ref-hit@8 | hlavní MRR | holdout ref-hit@8 | holdout § v promptu |
+|---|---|---|---|---|
+| baseline | 0,860 | 0,618 | 0,611 | 0,611 |
+| přilehlé § | 0,860 | 0,618 | 0,611 | **0,722** |
+| mapa pojmů | 0,895 | 0,702 | 0,611 | — |
+| oboje | 0,895 | 0,702 | 0,667¹ | 0,778¹ |
+
+¹ po přidání zkratek DPP/DPČ, které holdout odhalil — tou položkou přestal být
+out-of-sample, je to v `legal_terms.yaml` poznamenané.
+
+Čtení bez vytáček: **expanze na přilehlé § se přenáší** (na holdoutu dokonce
+víc: +11,1 bodu proti +5,2 na hlavní sadě), protože nic nevytáhne z dotazu —
+jen dá do promptu okolí. **Mapa pojmů zvedla hlavní sadu o 3,5 bodu recall
+a 8,4 bodu MRR, na holdoutu 0 bodů recall a 0,8 MRR.** Neškodí (žádná regrese),
+ale její naměřený přínos je z velké části fitovaný na sadu, proti které jsem ji
+psal — tvrzení plánu, že rewriting je „největší dopad na kvalitu", tím pořád
+potvrzené není. Čemu věřit až dál: položkám z **logů reálných dotazů** (§6 plánu),
+ne dalším, které vymyslím proti evalu.
+
+Mimochodem, holdout ukázal tři konkrétní mezery: zkratky DPP/DPČ vůbec nebyly
+známé (dotaz skončil v důchodovém pojištění), víceslovné kmeny jsou lámavé
+(„odpovednost jednatele" netrefí „odpovídá jednatel za škodu") a „vrátit tričko
+z e-shopu bez důvodu" míří na § 1832 (následek odstoupení) místo § 1829 — na to
+`--sibling-window 1` nedosáhne, jsou tři § daleko.
 
 **N7 — kurátorský registr zákonů tiše nebyl ve gitu.** `rag/.gitignore` měl
 vzor `law/` bez úvodního lomítka, takže kromě zamýšleného `rag/law/` (cache
@@ -281,6 +313,24 @@ to obě potřebné.
 - `rag/registry/law/tier1.yaml`: zkratka `DPH` u 235/2004 (nález N4).
 - `rag/.gitignore`: `law/` → `/law/` (nález N7).
 - `rag/README.md` sekce „Eval Právníka", `CLAUDE.md` odkazy.
+
+Druhá vlna (po rozhodnutí o dalším kroku), obojí **nasazené na SPARKu**
+(`law-chat` restartován 11:20, RAM konverzace se tím smazaly):
+
+- `rag/pg_search.py`: `sibling_sections()` — přilehlé § téhož předpisu (±N
+  v pořadí §). `rag/retriever.py`: `sibling_window`/`sibling_top`, render `↳`
+  v `context_block()`, mapa pojmů před embeddingem, `routed["terms"]`.
+- `rag/law_terms.py` + `rag/registry/law/legal_terms.yaml` (24 položek) — mapa
+  laických pojmů; `--law-terms`, `--sibling-window`, `--sibling-top` v serveru,
+  v `serve-law` i v `deploy/spark/law-chat.service`.
+- `rag/prompts/pravnik_cs.md`: jak citovat přilehlý § za `↳`.
+- `rag/server.py`: `/search` posílá `siblings` (jen § a nadpis), aby šla
+  produkční konfigurace měřit celá.
+- `rag/eval/golden_law_v2.jsonl` (18 otázek, holdout), `--sibling-window`,
+  `--sibling-top`, `--law-terms` a metrika `ref_hit_ctx` v evalu.
+- Výsledky: `law_20260928-{A-siblings,B-terms,B2-terms,C-both-k8,C-both-k5,
+  D-final-k8,D-final-k5,v2-baseline,v2-both,v2-both-dpp,deployed-k8}.json`.
+- `make test` prochází (76 testů + selftesty `law_terms.py` a `cite.py`).
 - `rag/eval/results/law_20260928-baseline-k8.json`, `-k5.json` (před opravou)
   a `law_20260928-dph-fix-k8.json` (po ní).
 - `make test` prochází (76 testů).

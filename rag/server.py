@@ -138,6 +138,13 @@ class RAGServer:
             from cite import LawRegistry
             self.cite_registry = LawRegistry(Path(args.cite_registry))
 
+        # Mapa laických pojmů → právní terminologie (levný krok před embeddingem)
+        self.terms_map = None
+        if getattr(args, "law_terms", ""):
+            from law_terms import TermsMap
+            self.terms_map = TermsMap.load(args.law_terms)
+            print(f"Mapa právních pojmů: {len(self.terms_map)} položek z {args.law_terms}")
+
         url = urlparse(args.chroma_url)
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
         self.collection = client.get_collection(args.collection)
@@ -222,6 +229,8 @@ class RAGServer:
                 candidate_factor=args.candidate_factor, max_per_work=args.max_per_work,
                 rrf_k=args.rrf_k, no_routing=args.no_routing, context_window=args.context_window,
                 legacy_to_id=self.legacy_to_id,
+                sibling_window=args.sibling_window, sibling_top=args.sibling_top,
+                terms_map=self.terms_map,
             )
         # plánovač dotazu (intent + přepis) — jen v PG režimu a když není vypnutý
         self.planner = None
@@ -423,6 +432,10 @@ class RAGServer:
                 "lang_original": h["meta"].get("lang_original"),
                 "lang_corpus": h["meta"].get("lang_corpus"),
                 "score": h["meta"].get("score"),
+                # přilehlé § (--sibling-window): jsou v promptu, ne mezi hity —
+                # posílají se jen jako odkaz (§ + nadpis), aby to šlo měřit evalem
+                "siblings": [{"ref": s.get("ref"), "heading": s.get("heading")}
+                             for s in (h.get("siblings") or [])] or None,
                 "channels": h["meta"].get("channels"),
             }
             for h in hits
@@ -1250,6 +1263,12 @@ def main():
                    help="díla s prioritou ≥ N se v katalogu jen sečtou (fragmenty, scholia)")
     p.add_argument("--context-window", type=int, default=0,
                    help="±N sousedních chunků téže kapitoly do kontextu (0 = vypnuto)")
+    p.add_argument("--sibling-window", type=int, default=0,
+                   help="Právník: ±N přilehlých § téhož předpisu do kontextu (0 = vypnuto)")
+    p.add_argument("--sibling-top", type=int, default=3,
+                   help="u kolika prvních hitů expandovat přilehlé § (--sibling-window)")
+    p.add_argument("--law-terms", default="",
+                   help="mapa laických pojmů → právní terminologie (registry/law/legal_terms.yaml)")
     p.add_argument("--candidate-factor", type=int, default=4,
                    help="kolikrát víc kandidátů než top_k načíst před "
                         "prořezáním na diverzitu")
