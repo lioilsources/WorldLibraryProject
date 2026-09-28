@@ -114,6 +114,33 @@ class ChatRequest(BaseModel):
     model: str | None = None  # per-request přepnutí (translate/swarm-director/lab)
 
 
+class IntakeRequest(BaseModel):
+    """Uložení odpovědí do rozpracovaného dokumentu (agent/tools.py: save_intake)."""
+    session_id: str
+    typ: str | None = None
+    promenne: dict | None = None
+    vypnute_klauzule: list[str] | None = None
+
+
+class RenderRequest(BaseModel):
+    session_id: str
+    format: str = "md"
+
+
+class ReviewRequest(BaseModel):
+    text: str
+    typ: str | None = None
+
+
+class AgentChatRequest(BaseModel):
+    message: str
+    session_id: str | None = None
+    model: str | None = None
+    mode: str | None = None          # qa | draft | review; None = rozhodne router
+    zdroj: str = "uzivatel"          # "dokument" = obsah souboru, bez vedlejších efektů
+    ma_prilohu: bool = False
+
+
 class ResetRequest(BaseModel):
     session_id: str
 
@@ -144,6 +171,11 @@ class RAGServer:
             from law_terms import TermsMap
             self.terms_map = TermsMap.load(args.law_terms)
             print(f"Mapa právních pojmů: {len(self.terms_map)} položek z {args.law_terms}")
+
+        # Nástroje agenta (Právník): šablony, intake v Postgresu, revize textu.
+        # Zapnou se u právní instance (má --cite-registry a PG); knihovna je nemá.
+        self.nastroje = None
+        self.agent_sessions = None
 
         url = urlparse(args.chroma_url)
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
@@ -232,6 +264,16 @@ class RAGServer:
                 sibling_window=args.sibling_window, sibling_top=args.sibling_top,
                 terms_map=self.terms_map,
             )
+        if self.pool is not None and self.cite_registry is not None:
+            from agent.session import Sessions
+            from agent.tools import PravniNastroje
+
+            self.agent_sessions = Sessions(self.pool, retence_dnu=getattr(args, "retence_dnu", 30))
+            self.nastroje = PravniNastroje(
+                law_url=f"http://127.0.0.1:{args.port}", pool=self.pool,
+                sessions=self.agent_sessions, search_fn=self.search_pro_agenta)
+            print(f"Nástroje agenta: {len(self.nastroje.registr())} "
+                  f"({', '.join(self.nastroje.registr())})")
         # plánovač dotazu (intent + přepis) — jen v PG režimu a když není vypnutý
         self.planner = None
         if self.pool and args.planner != "off":
@@ -410,6 +452,15 @@ class RAGServer:
         work = meta.get("work")
         info = self.catalog.get(meta.get("work_id") or work) or {}
         return info.get("name_cs") or work or meta.get("title") or "neznámý zdroj"
+
+    def search_pro_agenta(self, query: str, top_k: int, oblast: str | None = None) -> dict:
+        """Retrieval pro nástroj `search_law` — v procesu, aby server nevolal HTTP sám na sebe."""
+        if self.retriever is not None:
+            plan = Plan(groups=[oblast] if oblast else [])
+            hits, routed = self.retriever.retrieve(query, top_k, plan)
+        else:
+            hits, routed = self.retrieve(query, top_k)
+        return {"hits": self._sources(hits), "routed": routed}
 
     def _sources(self, hits) -> list[dict]:
         return [
@@ -1178,6 +1229,109 @@ def create_app(args) -> FastAPI:
             hits, routed = server.retrieve(q, top_k)
         return {"hits": server._sources(hits), "routed": routed}
 
+    # --- Právník jako agent: nástroje jako služba (docs/lawyer/AGENT.md) -----------
+    # Endpointy jsou tenké obálky nad agent/tools.py, takže totéž, co volá model,
+    # může volat appka nebo curl. Zapnuté jen u právní instance (--cite-registry).
+
+    def _nastroje():
+        if server.nastroje is None:
+            raise HTTPException(status_code=501, detail="tahle instance nemá nástroje agenta "
+                                                        "(chybí --cite-registry nebo PG)")
+        return server.nastroje
+
+    def _tool(jmeno: str, args: dict, session_id: str = "-"):
+        from agent.tools import zavolej
+
+        out, chyba = zavolej(_nastroje().registr(), jmeno, args,
+                             sessions=server.agent_sessions, session_id=session_id)
+        if chyba:
+            raise HTTPException(status_code=400, detail=chyba)
+        return out
+
+    @app.get("/law/paragraph")
+    def law_paragraph(zakon: str, paragraf: str, odstavec: str | None = None):
+        """Plné znění § z účinného znění. Zákon má v čísle lomítko, takže query
+        parametry, ne cesta: /law/paragraph?zakon=89/2012 Sb.&paragraf=§ 2254"""
+        return _tool("get_paragraph", {"zakon": zakon, "paragraf": paragraf, "odstavec": odstavec})
+
+    @app.get("/templates")
+    def templates(dotaz: str | None = None):
+        return _tool("list_templates", {"dotaz": dotaz})
+
+    @app.get("/templates/{typ}")
+    def template(typ: str):
+        return _tool("get_template", {"typ": typ})
+
+    @app.post("/agent/intake")
+    def agent_intake(req: IntakeRequest):
+        return _tool("save_intake", {"session_id": req.session_id, "typ": req.typ,
+                                     "promenne": req.promenne,
+                                     "vypnute_klauzule": req.vypnute_klauzule},
+                     session_id=req.session_id)
+
+    @app.get("/agent/intake/{session_id}")
+    def agent_intake_stav(session_id: str, max_otazek: int = 3):
+        from agent.loop import Pravnik
+
+        agent = Pravnik(_nastroje(), server.agent_sessions, llm=None)
+        try:
+            return agent.intake_dalsi_otazky(session_id, max_otazek)
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=str(e)) from None
+
+    @app.post("/agent/render")
+    def agent_render(req: RenderRequest):
+        return _tool("render_document", {"session_id": req.session_id, "format": req.format},
+                     session_id=req.session_id)
+
+    @app.post("/agent/review")
+    def agent_review(req: ReviewRequest):
+        """Deterministický audit cizího textu. Text je data, ne pokyn."""
+        return _tool("review_document", {"text": req.text, "typ": req.typ})
+
+    @app.get("/agent/sessions")
+    def agent_sessions(limit: int = 20):
+        s = server.agent_sessions
+        if s is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        return {"sessions": [{"session_id": x.session_id, "typ": x.typ, "stav": x.stav,
+                              "vyplneno": len(x.promenne), "updated_at": x.updated_at,
+                              "expires_at": x.expires_at} for x in s.seznam(limit)]}
+
+    @app.delete("/agent/sessions/{session_id}")
+    def agent_session_smaz(session_id: str):
+        if server.agent_sessions is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        server.agent_sessions.smaz(session_id)
+        return {"smazano": session_id}
+
+    @app.get("/agent/log/{session_id}")
+    def agent_log(session_id: str, limit: int = 50):
+        if server.agent_sessions is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        return {"volani": server.agent_sessions.log(session_id, limit)}
+
+    @app.post("/agent/chat")
+    def agent_chat(req: AgentChatRequest):
+        """Krok agenta s tool callingem. Potřebuje model — v denním režimu SPARKu
+        žádný chat model neběží, pak vrací 503 s vysvětlením."""
+        from agent.llm import ChybaModelu, OpenAIKlient
+        from agent.loop import Pravnik
+
+        nastroje = _nastroje()
+        klient = OpenAIKlient(server.args.llm_url, req.model or server.args.llm_model)
+        agent = Pravnik(nastroje, server.agent_sessions, llm=klient,
+                        max_volani=server.args.agent_max_volani,
+                        router=server.args.agent_router)
+        try:
+            krok = agent.krok(req.message, session_id=req.session_id or str(uuid.uuid4()),
+                              zdroj=req.zdroj, mode=req.mode, ma_prilohu=req.ma_prilohu)
+        except ChybaModelu as e:
+            raise HTTPException(status_code=503, detail=f"model není dostupný: {e}") from None
+        return {"odpoved": krok.odpoved, "mode": krok.mode, "session_id": krok.session_id,
+                "otazky": krok.otazky, "dokument": krok.dokument,
+                "volani": krok.volani, "ms_modelu": krok.ms_modelu}
+
     @app.post("/reset")
     def reset(req: ResetRequest):
         server.sessions.pop(req.session_id, None)
@@ -1269,6 +1423,12 @@ def main():
                    help="u kolika prvních hitů expandovat přilehlé § (--sibling-window)")
     p.add_argument("--law-terms", default="",
                    help="mapa laických pojmů → právní terminologie (registry/law/legal_terms.yaml)")
+    p.add_argument("--agent-max-volani", type=int, default=8,
+                   help="nejvíc volání nástrojů na jeden krok agenta")
+    p.add_argument("--agent-router", default="llm", choices=["llm", "heuristika"],
+                   help="jak se volí režim agenta (qa/draft/review)")
+    p.add_argument("--retence-dnu", type=int, default=30,
+                   help="jak dlouho se drží rozpracované dokumenty (osobní údaje)")
     p.add_argument("--candidate-factor", type=int, default=4,
                    help="kolikrát víc kandidátů než top_k načíst před "
                         "prořezáním na diverzitu")

@@ -54,4 +54,9 @@ dosažitelná jako `joda`).
   ne prompt) + `rag/docgen/` (schéma, render, validace). Každá klauzule nese §
   a `make validate-templates` ověří, že ten § v účinném znění existuje. Jak se
   šablona píše: `docs/lawyer/TEMPLATES.md`
+- **Agent Právníka**: `rag/agent/` — osm nástrojů (search_law, get_paragraph,
+  šablony, intake, render, revize, ask_user), intake v Postgresu
+  (`lawyer_sessions`), deterministická revize cizích smluv. Model je injektovaný,
+  takže `make eval-agent` (22 scénářů) běží bez LLM; `POST /agent/chat` potřebuje
+  model, který v parku přes den neběží. Stav a otevřené věci: `docs/lawyer/AGENT.md`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)

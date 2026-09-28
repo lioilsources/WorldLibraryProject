@@ -196,34 +196,84 @@ def promenne_indexu(sablona: dict) -> dict[str, dict]:
     return {p["id"]: p for p in sablona.get("promenne") or []}
 
 
-def zkontroluj_vstup(sablona: dict, vstup: dict) -> dict:
-    """Doplní chybějící nepovinné na None, ohlásí chybějící povinné, špatné enum
-    hodnoty a porušené kogentní limity (`kontroly`). Vrací normalizované hodnoty."""
+VYRAZ_JMENA = re.compile(r"\b[a-z_][a-z0-9_]*\b")
+VYRAZ_NE_JMENA = {"null", "true", "false", "min", "max", "abs", "and", "or", "not"}
+
+
+def jmena_ve_vyrazu(vyraz: str) -> set[str]:
+    """Proměnné, o kterých výraz mluví (bez klíčových slov a funkcí)."""
+    return {m.group(0) for m in VYRAZ_JMENA.finditer(vyraz or "")} - VYRAZ_NE_JMENA
+
+
+def stav_vstupu(sablona: dict, vstup: dict) -> dict:
+    """Co ve vstupu chybí a co porušuje zákon — **bez výjimky**, aby se na tom dal
+    postavit intake agenta (`agent/tools.py`).
+
+    → {hodnoty, chybi[{id, otazka, napoveda}], nezname[], spatny_enum[],
+       porusene[{vyraz, zprava, zaklad}], ok}
+    """
     prom = promenne_indexu(sablona)
-    nezname = set(vstup) - set(prom)
-    if nezname:
-        raise ChybaVstupu(f"neznámé proměnné: {', '.join(sorted(nezname))}")
     hodnoty: dict = {}
-    chybi = []
+    chybi, spatny_enum = [], []
     for pid, p in prom.items():
         v = vstup.get(pid)
         if v in (None, ""):
             if p.get("povinna"):
-                chybi.append(f"{pid} ({p.get('otazka') or ''})".strip())
+                chybi.append({"id": pid, "otazka": p.get("otazka") or "",
+                              "napoveda": p.get("napoveda") or "", "typ": p["typ"],
+                              "hodnoty": p.get("hodnoty") or None})
             hodnoty[pid] = None
             continue
         if p["typ"] == "enum" and v not in (p.get("hodnoty") or []):
-            raise ChybaVstupu(f"{pid}: {v!r} není z {p.get('hodnoty')}")
+            spatny_enum.append({"id": pid, "hodnota": v, "povolene": p.get("hodnoty") or []})
+            hodnoty[pid] = None
+            continue
         hodnoty[pid] = v
-    if chybi:
-        raise ChybaVstupu("chybí povinné údaje: " + "; ".join(chybi))
 
     ev = Evaluator(hodnoty)
-    porusene = [k for k in sablona.get("kontroly") or [] if not ev.eval(k["vyraz"])]
-    if porusene:
+    porusene = []
+    for k in sablona.get("kontroly") or []:
+        # Kontrola se vyhodnotí teprve tehdy, když je vyplněná **aspoň jedna** proměnná,
+        # o které mluví. Jinak by intake hlásil „porušený zákonný limit" u otázky, na
+        # kterou se ještě nikdo nezeptal (`splatnost_den >= 5` s prázdným dnem).
+        # Stačí jedna, ne všechny: „jistota + smluvni_pokuta <= 3 * najemne" musí
+        # zabrat i tehdy, když je vyplněná jen jistota a pokuta zůstala prázdná.
+        jmena = jmena_ve_vyrazu(k["vyraz"]) & set(prom)
+        if jmena and not any(hodnoty.get(j) is not None for j in jmena):
+            continue
+        try:
+            ok = ev.eval(k["vyraz"])
+        except ChybaSablony:
+            continue                      # nevyhodnotitelné hlásí validate.py, ne intake
+        if not ok:
+            porusene.append({"vyraz": k["vyraz"], "zprava": k["zprava"],
+                             "zaklad": zaklad_text(k.get("zaklad"))})
+    return {"hodnoty": hodnoty, "chybi": chybi, "nezname": sorted(set(vstup) - set(prom)),
+            "spatny_enum": spatny_enum, "porusene": porusene,
+            "ok": not (chybi or porusene or spatny_enum)}
+
+
+def dalsi_otazky(sablona: dict, vstup: dict, max_otazek: int = 3) -> list[dict]:
+    """Nejvýš `max_otazek` otázek na chybějící povinné údaje — intake se podle plánu
+    ptá po malých skupinách, ne formulářem na třicet políček."""
+    return stav_vstupu(sablona, vstup)["chybi"][:max_otazek]
+
+
+def zkontroluj_vstup(sablona: dict, vstup: dict) -> dict:
+    """Jako `stav_vstupu`, ale při problému vyhodí `ChybaVstupu` — používá render."""
+    st = stav_vstupu(sablona, vstup)
+    if st["nezname"]:
+        raise ChybaVstupu(f"neznámé proměnné: {', '.join(st['nezname'])}")
+    if st["spatny_enum"]:
+        e = st["spatny_enum"][0]
+        raise ChybaVstupu(f"{e['id']}: {e['hodnota']!r} není z {e['povolene']}")
+    if st["chybi"]:
+        raise ChybaVstupu("chybí povinné údaje: " + "; ".join(
+            f"{c['id']} ({c['otazka']})".strip() for c in st["chybi"]))
+    if st["porusene"]:
         raise ChybaVstupu("porušené zákonné limity: " + " | ".join(
-            f"{k['zprava']} ({zaklad_text(k.get('zaklad'))})" for k in porusene))
-    return hodnoty
+            f"{p['zprava']} ({p['zaklad']})" for p in st["porusene"]))
+    return st["hodnoty"]
 
 
 def zaklad_text(zaklad) -> str:

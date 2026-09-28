@@ -38,7 +38,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog eval-law validate-templates update-template-snapshots render-doc \
+        eval eval-catalog eval-law eval-agent agent-uklid validate-templates update-template-snapshots render-doc \
         bundles serve restart-chat install-unit mode deploy-spark
 
 deps:
@@ -53,6 +53,7 @@ test:
 	$(PY) law_terms.py
 	$(PY) cite.py
 	$(PY) -m docgen.templates
+	$(PY) -m agent.review
 	$(PY) -m pytest -q tests
 
 # eval plánovače a katalogu přes běžící server (PG režim)
@@ -249,3 +250,16 @@ mode:
 deploy-spark:
 	ssh spark "cd $(SPARK_DIR) && git pull --ff-only && rag/.venv/bin/pip install -q -r rag/requirements.txt"
 	$(MAKE) restart-chat
+
+# --- Právník jako agent (nástroje, intake, revize; docs/lawyer/AGENT.md) ----------
+# Eval jede bez LLM: draft scénáře přes skriptovaného uživatele, review na
+# podstrčených vadách. Latenci a tool calling lze měřit teprve v okně s modelem.
+eval-agent:
+	$(PY) eval/lawyer_agent/run.py $(EVAL_AGENT_ARGS)
+
+agent-uklid:
+	$(PY) -c "import os,sys; sys.path.insert(0,'.'); \
+	from psycopg_pool import ConnectionPool; from agent.session import Sessions; \
+	from docgen.validate import load_dotenv; load_dotenv(); \
+	p=ConnectionPool(os.environ['LAW_PG_DSN'], min_size=1, max_size=2, open=True); \
+	print('smazáno expirovaných sessionů:', Sessions(p).uklid_expirovane())"
