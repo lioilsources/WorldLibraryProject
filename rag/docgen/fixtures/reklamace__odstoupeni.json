@@ -1,0 +1,18 @@
+{
+  "_popis": "Reklamace s odstoupením od smlouvy — vyžaduje účet pro vrácení peněz.",
+  "_k_datu": "2026-09-28",
+  "spotrebitel_jmeno": "Eva Horáková",
+  "spotrebitel_adresa": "Luční 1480/6, 616 00 Brno",
+  "prodavajici_jmeno": "Nábytek Rychlý s.r.o.",
+  "prodavajici_identifikace": "IČO 25896314",
+  "prodavajici_adresa": "Průmyslová 9, 618 00 Brno",
+  "zbozi": "jídelní stůl Dubík 160×90 cm, dub masiv",
+  "cislo_dokladu": "FV-2026-4471",
+  "datum_prevzeti": "2026-06-02",
+  "cena": 18900,
+  "popis_vady": "deska stolu se v místě spoje rozestupuje a praská; vada byla reklamována už v červenci a oprava provedená prodávajícím v srpnu ji neodstranila, praskliny se objevily znovu na stejném místě",
+  "datum_zjisteni": "2026-09-15",
+  "pozadavek": "odstoupeni",
+  "bankovni_ucet": "2801234567/2010",
+  "datum_odeslani": "2026-09-28"
+}

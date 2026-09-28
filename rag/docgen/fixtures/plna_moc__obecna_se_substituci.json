@@ -1,0 +1,15 @@
+{
+  "_popis": "Obecná plná moc pro vymezený okruh jednání, se substitucí, bez časového omezení.",
+  "_k_datu": "2026-09-28",
+  "zmocnitel_jmeno": "Ol1n Studio s.r.o.",
+  "zmocnitel_identifikace": "IČO 12345678",
+  "zmocnitel_adresa": "Nádražní 5, 602 00 Brno",
+  "zmocnenec_jmeno": "Ing. Eva Horáková",
+  "zmocnenec_identifikace": "nar. 2. 2. 1988",
+  "zmocnenec_adresa": "Luční 1480/6, 616 00 Brno",
+  "rozsah": "obecna",
+  "vymezeni": "zastupování ve věcech správy domén a hostingu společnosti, jednání s registrátory a poskytovateli připojení, uzavírání a ukončování smluv o těchto službách do hodnoty 50 000 Kč ročně",
+  "doba": "neurcita",
+  "substituce": true,
+  "datum_udeleni": "2026-09-28"
+}

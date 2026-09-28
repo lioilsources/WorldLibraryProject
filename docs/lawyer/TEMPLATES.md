@@ -57,7 +57,10 @@ Detaily, které se snadno přehlédnou:
 
 - **Strany** se v dokumentu vykreslí z konvence `<role>_jmeno`,
   `<role>_identifikace`, `<role>_adresa` — tyhle proměnné musí šablona
-  deklarovat, validátor to hlídá.
+  deklarovat, validátor to hlídá. U jednostranného dokumentu se k stranám
+  dopíše „(odesílatel)" a „(adresát)"; `oznaceni` to přepíše (plná moc má
+  „udílí plnou moc" / „přijímá plnou moc") a `podpisuje: true` přidá druhý
+  podpis, když dokument přijímá i druhá strana.
 - **Filtry** v textu: `{{ najemne|kc }}` → „16 500 Kč", `{{ den|datum }}` →
   „1. října 2026", `{{ vymera|cislo }}`. Bez filtru se vloží text.
 - **`kontroly`** jsou strojové: výraz nad proměnnými, chybějící číslo je nula,
@@ -96,20 +99,26 @@ Detaily, které se snadno přehlédnou:
 6. **Revize člověkem.** Tohle je místo, kde se rozhoduje kvalita — stroj ověří,
    že § existuje, ne že klauzule říká, co má.
 
-## Stav první sady
+## Stav první sady — hotová
 
-| # | Šablona | Stav |
-|---|---|---|
-| 1 | Nájemní smlouva — byt | **hotová** (14 klauzulí, 21 otázek, 4 kontroly) |
-| 2 | Kupní smlouva — movitá věc (+ spotřebitel) | chybí |
-| 3 | Smlouva o dílo | chybí (§§ 2586, 2604, 2612 už ověřené) |
-| 4 | NDA (jednostranná / vzájemná) | chybí |
-| 5 | Pracovní smlouva, DPP, DPČ | **DPP hotová** (7 klauzulí, 15 otázek); pracovní smlouva a DPČ chybí |
-| 6 | Výpověď z pracovního poměru | chybí (§ 52 ZP jako enum důvodů) |
-| 7 | Plná moc | chybí |
-| 8 | Smlouva o poskytování služeb (IT) | chybí |
-| 9 | Licenční smlouva k software | chybí (§ 2358 OZ vs. § 2371 OZ vs. § 12 AZ) |
-| 10 | Odstoupení, reklamace, předžalobní výzva | **odstoupení od smlouvy na dálku hotové**; reklamace a předžalobní výzva chybí |
+Startovní sada z plánu je celá napsaná: 10 položek pokrývá **14 šablon**,
+104 klauzulí, **362 odkazů na § ověřených proti indexu**, 24 fixtur se snapshoty.
+
+| # | Položka plánu | Šablona (`data/templates/…`) | Klauzulí / otázek / kontrol |
+|---|---|---|---|
+| 1 | Nájemní smlouva — byt | `najemni_smlouva_byt` | 14 / 21 / 4 |
+| 2 | Kupní smlouva — movitá věc (+ spotřebitel) | `kupni_smlouva_movita_vec` | 7 / 15 / 3 |
+| 3 | Smlouva o dílo | `smlouva_o_dilo` | 9 / 16 / 3 |
+| 4 | NDA (jednostranná / vzájemná) | `nda` | 9 / 12 / 2 |
+| 5 | Pracovní smlouva, DPP, DPČ | `pracovni_smlouva`, `dohoda_o_provedeni_prace`, `dohoda_o_pracovni_cinnosti` | 9 / 18 / 6 · 7 / 15 / 3 · 7 / 15 / 4 |
+| 6 | Výpověď z pracovního poměru | `vypoved_z_pracovniho_pomeru` | 4 / 12 / 2 |
+| 7 | Plná moc (obecná / speciální) | `plna_moc` | 4 / 12 / 1 |
+| 8 | Smlouva o poskytování služeb (IT) | `smlouva_o_poskytovani_sluzeb` | 10 / 17 / 4 |
+| 9 | Licenční smlouva k software | `licencni_smlouva_software` | 8 / 17 / 3 |
+| 10 | Odstoupení, reklamace, předžalobní výzva | `odstoupeni_od_smlouvy_na_dalku`, `reklamace`, `predzalobni_vyzva` | 7 / 14 / 1 · 4 / 15 / 2 · 5 / 14 / 2 |
+
+Co zbývá: **revize člověkem** (stroj ověřil existenci §, ne že klauzule říká, co má),
+export do .docx/.pdf a API pro agenta.
 
 ## Co plán říkal a co z toho vyšlo jinak
 
@@ -142,7 +151,26 @@ Detaily, které se snadno přehlédnou:
    („Mzda nebo odměna z dohody nesmí být nižší než minimální mzda“), protože
    dohody jsou základní pracovněprávní vztah podle § 3 ZP. Konkrétní částku ale
    stanoví nařízení vlády, které v indexu není → checklist žádá ruční kontrolu.
-4. **Chybějící předpisy v indexu se projevily hned**: rozúčtování služeb u nájmu
+4. **Zkušební doba je dnes 4 měsíce, ne 3** (8 u vedoucího místo 6) — § 35 odst. 2
+   v účinném znění. Starší vzory a články na webu mají staré číslo; šablona má
+   z obojího strojovou kontrolu.
+5. **Limit u DPČ není počet hodin za rok, ale průměr** — nejvýše polovina stanovené
+   týdenní pracovní doby posuzovaná za celou dobu dohody, nejdéle za 52 týdnů
+   (§ 76 odst. 2 a 3). Roční limit 300 hodin má jen DPP.
+6. **Licenci nelze poskytnout ke způsobům užití, které dnes nejsou známé** — § 2372
+   odst. 1 říká, že k opačnému ujednání se nepřihlíží. Formulace „všemi způsoby,
+   včetně budoucích", kterou vzory rády mají, tedy nefunguje. A § 2370 dává licenci
+   na dobu neurčitou roční výpovědní účinnost — kdo chce kratší, musí si ji ujednat.
+7. **Předžalobní výzva je podmínka, ne zdvořilost** — bez výzvy zaslané alespoň
+   7 dnů před podáním návrhu nemusí soud úspěšnému žalobci přiznat náhradu nákladů
+   řízení (§ 142a OSŘ). Šablona to hlídá kontrolou `lhuta_dni >= 7`.
+8. **Dílo na zakázku není zaměstnanecké dílo.** Bez licenční klauzule nemá klient
+   právo vzniklý kód užít — zaplacení samo majetková práva nepřevádí (§ 58 AZ
+   dopadá jen na zaměstnance). Proto má smlouva o poskytování služeb volitelnou
+   klauzuli o licenci k výsledkům.
+9. **Odměna z příkazu přísluší, i když výsledek nenastal** (§ 2438 odst. 2) — kdo
+   chce platit za výsledek, potřebuje smlouvu o dílo, ne smlouvu o službách.
+10. **Chybějící předpisy v indexu se projevily hned**: rozúčtování služeb u nájmu
    je v zák. č. 67/2013 Sb. (v indexu není), minimální mzda v nařízení vlády,
    dovolená u dohod se v ZP nedala dohledat na jednom místě. Všechno je v
    checklistech jako bod bez §, ať se na to nezapomene — a je to argument pro

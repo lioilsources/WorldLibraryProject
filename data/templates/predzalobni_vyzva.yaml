@@ -1,0 +1,150 @@
+# Předžalobní výzva k plnění. Není formalita: podle § 142a OSŘ má žalobce, který
+# uspěl v řízení o splnění povinnosti, právo na náhradu nákladů řízení proti
+# žalovanému **jen** tehdy, zaslal-li mu výzvu k plnění nejméně 7 dnů před podáním
+# návrhu na zahájení řízení, na adresu pro doručování nebo na poslední známou adresu.
+# Úrok z prodlení plyne ze zákona (§ 1970) od prodlení dlužníka (§ 1968), jeho výši
+# stanoví nařízení vlády, které v právním indexu není — proto se v textu nečísluje.
+typ: predzalobni_vyzva
+nazev: Předžalobní výzva k plnění
+verze: 1
+jazyk: cs
+druh: jednostranny_dokument
+popis: >-
+  Výzva dlužníkovi před podáním žaloby. Lhůta nejméně 7 dnů před podáním návrhu je
+  podmínkou náhrady nákladů řízení, ne slušnost.
+
+pravni_zaklad:
+  - {zakon: "99/1963 Sb.", paragrafy: "§ 142a", poznamka: "náhrada nákladů řízení po předžalobní výzvě"}
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 1968 a § 1970", poznamka: "prodlení dlužníka a úrok z prodlení"}
+
+strany:
+  - {role: veritel, nazev: Věřitel, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: dluznik, nazev: Dlužník, typ: [fyzicka, pravnicka]}
+
+promenne:
+  - {id: veritel_jmeno, typ: string, povinna: true, otazka: "Kdo pohledávku vymáhá (jméno nebo firma)?"}
+  - {id: veritel_identifikace, typ: string, povinna: false, otazka: "IČO nebo datum narození věřitele?"}
+  - {id: veritel_adresa, typ: string, povinna: true, otazka: "Adresa věřitele?"}
+  - {id: dluznik_jmeno, typ: string, povinna: true, otazka: "Kdo je dlužník (jméno nebo firma)?"}
+  - {id: dluznik_identifikace, typ: string, povinna: false, otazka: "IČO nebo datum narození dlužníka?"}
+  - id: dluznik_adresa
+    typ: string
+    povinna: true
+    otazka: "Na jakou adresu výzvu posíláte?"
+    napoveda: "Adresa pro doručování, případně poslední známá adresa — jinak výzva podmínku pro náhradu nákladů nesplní."
+    zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}
+
+  - id: dluh_duvod
+    typ: text
+    povinna: true
+    otazka: "Z čeho dluh vznikl? Popiš smlouvu, fakturu nebo jiný důvod."
+  - {id: dluh_castka, typ: money, povinna: true, otazka: "Jaká je dlužná částka v Kč?"}
+  - {id: cislo_dokladu, typ: string, povinna: false, otazka: "Číslo faktury nebo jiného dokladu?"}
+  - id: datum_splatnosti
+    typ: date
+    povinna: true
+    otazka: "Kdy byl dluh splatný?"
+    napoveda: "Od následujícího dne je dlužník v prodlení."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1968"}
+  - id: lhuta_dni
+    typ: int
+    povinna: true
+    otazka: "Jakou lhůtu k zaplacení dáváte (ve dnech)?"
+    napoveda: "Nejméně 7 dnů před podáním návrhu na zahájení řízení; delší lhůta je běžná a bezpečnější."
+    zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}
+  - {id: bankovni_ucet, typ: string, povinna: true, otazka: "Na jaký účet má dlužník zaplatit?"}
+  - id: pozaduji_uroky
+    typ: bool
+    povinna: false
+    otazka: "Požadujete i úrok z prodlení?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1970"}
+  - {id: datum_odeslani, typ: date, povinna: true, otazka: "Kterým dnem výzvu odesíláte?"}
+
+kontroly:
+  - vyraz: "dluh_castka > 0"
+    zprava: "Dlužná částka musí být větší než nula."
+  - vyraz: "lhuta_dni >= 7"
+    zprava: "Výzva musí být zaslána nejméně 7 dnů před podáním návrhu na zahájení řízení, jinak žalobci nemusí být přiznána náhrada nákladů řízení."
+    zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}
+
+klauzule:
+  - id: vyzva
+    nazev: Výzva k plnění
+    povinna: true
+    zaklad:
+      - {zakon: "99/1963 Sb.", par: "§ 142a"}
+      - {zakon: "89/2012 Sb.", par: "§ 1968"}
+    text: |
+      Vážený pane, vážená paní,
+
+      dne {{ datum_odeslani|datum }} vás tímto vyzývám k zaplacení dlužné částky
+      {{ dluh_castka|kc }}, která vznikla z tohoto důvodu: {{ dluh_duvod }}
+
+      Dluh byl splatný dne {{ datum_splatnosti|datum }} a dosud nebyl zaplacen; od následujícího
+      dne jste v prodlení.
+
+  - id: doklad
+    nazev: Doklad
+    povinna: false
+    podminka: "cislo_dokladu != null"
+    zaklad:
+      - {zakon: "99/1963 Sb.", par: "§ 142a"}
+    text: |
+      Dluh je vyúčtován dokladem č. {{ cislo_dokladu }}, jehož kopii k této výzvě přikládám.
+
+  - id: lhuta
+    nazev: Lhůta k zaplacení
+    povinna: true
+    zaklad:
+      - {zakon: "99/1963 Sb.", par: "§ 142a"}
+    text: |
+      Vyzývám vás, abyste dlužnou částku zaplatil(a) nejpozději do {{ lhuta_dni|cislo }} dnů od
+      doručení této výzvy na účet č. {{ bankovni_ucet }}.
+
+      Tato výzva se zasílá nejméně sedm dnů před případným podáním návrhu na zahájení soudního
+      řízení.
+
+  - id: uroky
+    nazev: Úrok z prodlení
+    povinna: false
+    podminka: "pozaduji_uroky == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1970"}
+    text: |
+      Vedle dlužné částky požaduji úrok z prodlení ve výši stanovené právním předpisem, a to
+      od prvního dne prodlení do zaplacení.
+
+  - id: nasledky
+    nazev: Následky nezaplacení
+    povinna: true
+    zaklad:
+      - {zakon: "99/1963 Sb.", par: "§ 142a"}
+      - {zakon: "99/1963 Sb.", par: "§ 142"}
+    text: |
+      Nebude-li dluh v uvedené lhůtě zaplacen, budu vymáhat pohledávku soudně. V takovém případě
+      vám vedle dluhu a úroku z prodlení vzniknou i náklady soudního řízení, jejichž náhradu
+      soud přiznává účastníkovi, který měl ve věci plný úspěch.
+
+      Věřím, že k soudnímu řízení nebude třeba přistoupit, a děkuji za vyrovnání dluhu ve lhůtě.
+
+checklist:
+  - {bod: "Výzva odeslána nejméně 7 dnů před podáním návrhu na zahájení řízení", zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}}
+  - {bod: "Odeslána na adresu pro doručování, případně na poslední známou adresu dlužníka", zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}}
+  - {bod: "Odeslání je prokazatelné (doporučeně, nejlépe s dodejkou, nebo do datové schránky)"}
+  - {bod: "Dluh je vymezen co do důvodu i výše a je přiložena kopie dokladu"}
+  - {bod: "Ověřeno, že pohledávka není promlčená — obecná promlčecí lhůta je tři roky", zaklad: {zakon: "89/2012 Sb.", par: "§ 629"}}
+  - {bod: "U podnikatelských vztahů zváženo, zda nejde o nárok na paušální náhradu nákladů spojených s uplatněním pohledávky — stanoví nařízení vlády mimo právní index"}
+
+upozorneni:
+  - text: >-
+      Bez předžalobní výzvy zaslané alespoň sedm dnů před podáním návrhu nemusí soud
+      úspěšnému žalobci přiznat náhradu nákladů řízení — výzva je tedy podmínka, ne zdvořilost.
+    zaklad: {zakon: "99/1963 Sb.", par: "§ 142a"}
+  - text: >-
+      Úrok z prodlení lze požadovat, jen pokud věřitel sám řádně splnil své smluvní a zákonné
+      povinnosti a dlužník je za prodlení odpovědný.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1970"}
+  - text: >-
+      Promlčenou pohledávku soud nepřizná, namítne-li dlužník promlčení — lhůtu je třeba
+      ověřit dřív, než se výzva pošle.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 629"}

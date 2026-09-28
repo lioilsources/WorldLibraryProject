@@ -37,7 +37,9 @@
         "properties": {
           "role": {"type": "string", "pattern": "^[a-z0-9_]+$"},
           "nazev": {"type": "string"},
-          "typ": {"type": "array", "minItems": 1, "items": {"enum": ["fyzicka", "pravnicka", "podnikatel", "spotrebitel"]}}
+          "typ": {"type": "array", "minItems": 1, "items": {"enum": ["fyzicka", "pravnicka", "podnikatel", "spotrebitel"]}},
+          "oznaceni": {"type": "string", "description": "co se u strany uvede v závorce; u jednostranného dokumentu bez něj vyjde „(odesílatel)“ a „(adresát)“"},
+          "podpisuje": {"type": "boolean", "description": "u jednostranného dokumentu: podepisuje i tato strana (např. zmocněnec přijímá plnou moc)"}
         }
       }
     },

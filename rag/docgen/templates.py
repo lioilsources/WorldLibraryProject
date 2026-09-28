@@ -285,11 +285,15 @@ def podpisy(sablona: dict, hodnoty: dict) -> list[str]:
         return []
     radky = ["V ……………………………… dne ………………………………", ""]
     if sablona["druh"] == "smlouva":
-        for s in strany:
-            radky += ["………………………………………………………………", f"{s['nazev']}: {hodnoty.get(s['role'] + '_jmeno') or ''}", ""]
+        podepisuji = strany
     else:
-        s = strany[0]
-        radky += ["………………………………………………………………", f"{hodnoty.get(s['role'] + '_jmeno') or ''}", ""]
+        # jednostranný dokument podepisuje odesílatel; šablona může přidat druhou
+        # stranu přes `podpisuje` (plná moc — zmocněnec zmocnění přijímá)
+        podepisuji = [s for i, s in enumerate(strany) if i == 0 or s.get("podpisuje")]
+    for s in podepisuji:
+        jmeno = hodnoty.get(s["role"] + "_jmeno") or ""
+        radky += ["………………………………………………………………",
+                  f"{s['nazev']}: {jmeno}" if len(podepisuji) > 1 else jmeno, ""]
     return radky
 
 
@@ -317,8 +321,10 @@ def render(sablona: dict, vstup: dict, vypnute: set[str] | None = None,
         ident = hodnoty.get(f"{role}_identifikace") or ""
         adresa = hodnoty.get(f"{role}_adresa") or ""
         detail = ", ".join(x for x in (ident, adresa) if x)
-        # u jednostranného dokumentu není „smluvní strana", ale kdo komu píše
-        label = s["nazev"] if smlouva else f"{s['nazev']} ({'odesílatel' if i == 0 else 'adresát'})"
+        # u jednostranného dokumentu není „smluvní strana", ale kdo komu píše;
+        # šablona to může přepsat vlastním `oznaceni` (plná moc: udílí / přijímá)
+        oznaceni = s.get("oznaceni") or ("" if smlouva else ("odesílatel" if i == 0 else "adresát"))
+        label = f"{s['nazev']} ({oznaceni})" if oznaceni else s["nazev"]
         radky += [f"**{label}:** {jmeno}" + (f", {detail}" if detail else ""), ""]
     if strany and smlouva:
         radky += ["(dále jen " + " a ".join(f"„{s['nazev']}“" for s in strany) + ")", ""]

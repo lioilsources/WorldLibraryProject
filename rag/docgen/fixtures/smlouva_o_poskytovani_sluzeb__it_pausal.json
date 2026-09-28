@@ -1,0 +1,20 @@
+{
+  "_popis": "IT správa na dobu neurčitou, měsíční paušál, licence k výsledkům, plná moc k jednání.",
+  "_k_datu": "2026-09-28",
+  "poskytovatel_jmeno": "Ol1n Studio s.r.o.",
+  "poskytovatel_identifikace": "IČO 12345678",
+  "poskytovatel_adresa": "Nádražní 5, 602 00 Brno",
+  "klient_jmeno": "Květinářství U Tří růží s.r.o.",
+  "klient_identifikace": "IČO 45678912",
+  "klient_adresa": "Masarykova 8, 602 00 Brno",
+  "sluzby": "správa a rozvoj webové prezentace a e-shopu klienta: aktualizace systému a rozšíření, zálohování, monitoring dostupnosti, drobné úpravy obsahu a šablon do osmi hodin měsíčně, reakce na incidenty do 24 hodin v pracovní dny; práce se zadává e-mailem nebo v systému úkolů",
+  "doba": "neurcita",
+  "odmena_rezim": "mesicni_pausal",
+  "odmena": 14000,
+  "splatnost_dni": 14,
+  "bankovni_ucet": "1029384756/0300",
+  "naklady_zvlast": true,
+  "licence_k_vysledkum": true,
+  "plna_moc_k_jednani": true,
+  "mlcenlivost_mesice": 24
+}

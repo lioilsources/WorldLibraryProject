@@ -1,0 +1,150 @@
+# Reklamace — uplatnění práva z vadného plnění spotřebitelem. Dvě vrstvy, které se
+# pletou: hmotná práva jsou v občanském zákoníku (§ 2161 jakost při převzetí, § 2165
+# dvouletá lhůta k vytknutí vady, § 2169 volba mezi opravou a novou věcí, § 2170
+# odstranění vady v přiměřené době, § 2172 komu se vada vytýká), zatímco lhůta pro
+# vyřízení reklamace a povinnost přijmout ji v provozovně jsou v zákoně o ochraně
+# spotřebitele (§ 13 a § 19).
+typ: reklamace
+nazev: Reklamace zboží
+verze: 1
+jazyk: cs
+druh: jednostranny_dokument
+popis: >-
+  Vytknutí vady zboží prodávajícímu a volba způsobu vyřízení. Pro odstoupení od
+  smlouvy do 14 dnů bez důvodu použij šablonu odstoupeni_od_smlouvy_na_dalku.
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 2161 a násl.", poznamka: "práva z vadného plnění u prodeje zboží spotřebiteli"}
+  - {zakon: "634/1992 Sb.", paragrafy: "§ 19", poznamka: "přijetí a vyřízení reklamace"}
+
+strany:
+  - {role: spotrebitel, nazev: Spotřebitel, typ: [fyzicka, spotrebitel]}
+  - {role: prodavajici, nazev: Prodávající, typ: [pravnicka, podnikatel]}
+
+promenne:
+  - {id: spotrebitel_jmeno, typ: string, povinna: true, otazka: "Vaše jméno?"}
+  - {id: spotrebitel_identifikace, typ: string, povinna: false, otazka: "E-mail nebo telefon pro vyrozumění?"}
+  - {id: spotrebitel_adresa, typ: string, povinna: true, otazka: "Vaše adresa?"}
+  - {id: prodavajici_jmeno, typ: string, povinna: true, otazka: "Název prodávajícího?"}
+  - {id: prodavajici_identifikace, typ: string, povinna: false, otazka: "IČO prodávajícího, pokud ho víte?"}
+  - {id: prodavajici_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo prodávajícího?"}
+
+  - {id: zbozi, typ: text, povinna: true, otazka: "Jaké zboží reklamujete (název, typ, výrobní číslo)?"}
+  - {id: cislo_dokladu, typ: string, povinna: true, otazka: "Číslo dokladu o zakoupení nebo objednávky?"}
+  - id: datum_prevzeti
+    typ: date
+    povinna: true
+    otazka: "Kdy jste zboží převzal(a)?"
+    napoveda: "Od převzetí běží dvouletá lhůta, ve které lze vadu vytknout."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}
+  - {id: cena, typ: money, povinna: true, otazka: "Kolik zboží stálo?"}
+  - id: popis_vady
+    typ: text
+    povinna: true
+    otazka: "Jak se vada projevuje? Popiš co nejkonkrétněji, kdy se objevila a za jakých okolností."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2161"}
+  - {id: datum_zjisteni, typ: date, povinna: true, otazka: "Kdy jste vadu zjistil(a)?"}
+  - id: pozadavek
+    typ: enum
+    hodnoty: [oprava, nova_vec, sleva, odstoupeni]
+    povinna: true
+    otazka: "Co požadujete — opravu, dodání nové věci, slevu, nebo odstoupení od smlouvy?"
+    napoveda: "U odstranění vady má spotřebitel volbu mezi opravou a novou věcí, ledaže je zvolený způsob nemožný nebo nepřiměřeně nákladný. Sleva a odstoupení mají zákonné podmínky."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2169"}
+  - {id: bankovni_ucet, typ: string, povinna: false, otazka: "Účet pro vrácení peněz (u slevy nebo odstoupení)?"}
+  - {id: datum_odeslani, typ: date, povinna: true, otazka: "Kterým dnem reklamaci podáváte?"}
+
+kontroly:
+  - vyraz: "cena > 0"
+    zprava: "Cena zboží musí být větší než nula."
+  - vyraz: "pozadavek == 'oprava' or pozadavek == 'nova_vec' or bankovni_ucet != null"
+    zprava: "U slevy nebo odstoupení chybí účet, na který se mají peníze vrátit."
+
+klauzule:
+  - id: reklamace
+    nazev: Uplatnění práva z vadného plnění
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2161"}
+      - {zakon: "89/2012 Sb.", par: "§ 2165"}
+      - {zakon: "89/2012 Sb.", par: "§ 2172"}
+    text: |
+      Dne {{ datum_odeslani|datum }} tímto u vás jako u prodávajícího uplatňuji právo z vadného
+      plnění (reklamaci) k tomuto zboží: {{ zbozi }}, doklad č. {{ cislo_dokladu }}, cena
+      {{ cena|kc }}.
+
+      Zboží jsem převzal(a) dne {{ datum_prevzeti|datum }}. Vadu jsem zjistil(a) dne
+      {{ datum_zjisteni|datum }} a vytýkám ji ve dvouleté lhůtě, ve které se vada na věci
+      projevila.
+
+  - id: vada
+    nazev: Popis vady
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2161"}
+    text: |
+      Vada se projevuje takto: {{ popis_vady }}
+
+      Zboží tedy neodpovídá tomu, co prodávající při převzetí odpovídá — zejména ujednanému
+      popisu, jakosti a funkčnosti a vhodnosti k účelu, k němuž se věc tohoto druhu obvykle
+      používá.
+
+  - id: pozadavek
+    nazev: Požadovaný způsob vyřízení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2169"}
+      - {zakon: "89/2012 Sb.", par: "§ 2170"}
+    varianty:
+      podle: pozadavek
+      hodnoty:
+        oprava: |
+          Požaduji odstranění vady opravou věci. Vadu odstraňte v přiměřené době po jejím
+          vytknutí tak, aby mi to nezpůsobilo značné obtíže, s ohledem na povahu věci a účel,
+          pro který jsem ji koupil(a). Věc k odstranění vady převezmete na svůj náklad.
+        nova_vec: |
+          Požaduji odstranění vady dodáním nové věci bez vady. Volbu mezi opravou a dodáním
+          nové věci mám jako kupující; dodání nové věci žádám proto, že oprava by mi způsobila
+          nepřiměřené obtíže.
+        sleva: |
+          Požaduji přiměřenou slevu z kupní ceny. Slevu žádám vyplatit na účet
+          č. {{ bankovni_ucet }}.
+        odstoupeni: |
+          Odstupuji od kupní smlouvy a požaduji vrácení kupní ceny {{ cena|kc }} na účet
+          č. {{ bankovni_ucet }}. Zboží vám vrátím po vzájemné dohodě o způsobu jeho vrácení.
+
+  - id: lhuta
+    nazev: Lhůta k vyřízení a potvrzení
+    povinna: true
+    zaklad:
+      - {zakon: "634/1992 Sb.", par: "§ 19"}
+      - {zakon: "634/1992 Sb.", par: "§ 13"}
+    text: |
+      Žádám o písemné potvrzení o přijetí reklamace s uvedením dne přijetí, obsahu reklamace
+      a požadovaného způsobu vyřízení, a dále o vyřízení reklamace ve lhůtě, kterou stanoví
+      zákon o ochraně spotřebitele, včetně odstranění vady.
+
+      O vyřízení reklamace mě prosím vyrozumějte na kontakt uvedený výše.
+
+checklist:
+  - {bod: "Reklamace podána do dvou let od převzetí zboží", zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}}
+  - {bod: "Vada je popsaná konkrétně, ne jen „nefunguje to“", zaklad: {zakon: "89/2012 Sb.", par: "§ 2161"}}
+  - {bod: "Vada vytknuta u prodávajícího, u kterého byla věc koupena, nebo u určené opravny", zaklad: {zakon: "89/2012 Sb.", par: "§ 2172"}}
+  - {bod: "Vyžádáno písemné potvrzení o přijetí reklamace", zaklad: {zakon: "634/1992 Sb.", par: "§ 19"}}
+  - {bod: "Doklad o zakoupení přiložen v kopii, originál zůstává vám"}
+  - {bod: "Zvoleno, co požaduji, a je to jeden z postupů, které zákon dovoluje", zaklad: {zakon: "89/2012 Sb.", par: "§ 2169"}}
+  - {bod: "U zboží s digitálními vlastnostmi ověřit zvláštní pravidla pro digitální obsah", zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}}
+
+upozorneni:
+  - text: >-
+      Dvouletá lhůta je lhůta k vytknutí vady, ne záruční doba: vada se v ní musí projevit,
+      reklamace se podává bez zbytečného odkladu po jejím zjištění.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}
+  - text: >-
+      Vadu je třeba vytknout prodávajícímu, u kterého byla věc koupena; je-li k opravě určena
+      jiná osoba v místě prodávajícího nebo blíž kupujícímu, vytkne se vada jí.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2172"}
+  - text: >-
+      Prodávající je povinen přijmout reklamaci v kterékoli provozovně, kde je to s ohledem na
+      sortiment možné, s výjimkou případů, kdy je k opravě určena jiná osoba.
+    zaklad: {zakon: "634/1992 Sb.", par: "§ 19"}

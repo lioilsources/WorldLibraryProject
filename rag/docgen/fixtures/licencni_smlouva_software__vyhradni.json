@@ -1,0 +1,21 @@
+{
+  "_popis": "Výhradní licence na dobu určitou, jednorázová odměna, se zdrojovými kódy, postoupení se souhlasem.",
+  "_k_datu": "2026-09-28",
+  "poskytovatel_jmeno": "Ol1n Studio s.r.o.",
+  "poskytovatel_identifikace": "IČO 12345678",
+  "poskytovatel_adresa": "Nádražní 5, 602 00 Brno",
+  "nabyvatel_jmeno": "DataMost a.s.",
+  "nabyvatel_identifikace": "IČO 29876543",
+  "nabyvatel_adresa": "Pobřežní 22, 186 00 Praha 8",
+  "software": "aplikace PhotoSort verze 2.4 pro dávkové třídění fotografií, včetně uživatelské dokumentace a konfiguračních skriptů",
+  "vyhradnost": "vyhradni",
+  "zpusoby_uziti": "instalace a provoz na serverech nabyvatele, užití pro interní zpracování dat nabyvatele i pro zpracování dat jeho zákazníků, rozmnožování pro účely záloh, úpravy a další rozvoj vlastními silami",
+  "teritorium": "celý svět",
+  "doba": "urcita",
+  "doba_do": "2031-09-30",
+  "odmena_rezim": "jednorazova",
+  "odmena": 750000,
+  "bankovni_ucet": "1029384756/0300",
+  "postoupeni_rezim": "se_souhlasem",
+  "zdrojove_kody": true
+}
