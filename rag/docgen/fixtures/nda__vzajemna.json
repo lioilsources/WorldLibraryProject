@@ -1,0 +1,16 @@
+{
+  "_popis": "Vzájemná NDA před společným projektem, se smluvní pokutou.",
+  "_k_datu": "2026-09-28",
+  "strana_a_jmeno": "Ol1n Studio s.r.o.",
+  "strana_a_identifikace": "IČO 12345678",
+  "strana_a_adresa": "Nádražní 5, 602 00 Brno",
+  "strana_b_jmeno": "DataMost a.s.",
+  "strana_b_identifikace": "IČO 29876543",
+  "strana_b_adresa": "Pobřežní 22, 186 00 Praha 8",
+  "rezim": "vzajemna",
+  "ucel": "posouzení možné spolupráce na společném produktu pro zpracování obrazu, včetně vzájemného předvedení prototypů a obchodních modelů",
+  "predmet_informaci": "zdrojové kódy a architektura prototypů, trénovací postupy modelů, ceníky a marže, obchodní plán, seznamy zákazníků a výsledky měření výkonu",
+  "trvani_mesice": 36,
+  "smluvni_pokuta": 100000,
+  "vraceni_do_dni": 30
+}

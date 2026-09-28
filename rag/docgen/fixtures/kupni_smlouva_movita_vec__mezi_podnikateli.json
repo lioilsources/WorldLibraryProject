@@ -1,0 +1,16 @@
+{
+  "_popis": "Použitá věc mezi podnikateli, hotově, bez záruky a bez výhrady vlastnictví.",
+  "_k_datu": "2026-09-28",
+  "prodavajici_jmeno": "Ol1n Studio s.r.o.",
+  "prodavajici_identifikace": "IČO 12345678",
+  "prodavajici_adresa": "Nádražní 5, 602 00 Brno",
+  "kupujici_jmeno": "Grafika Beran s.r.o.",
+  "kupujici_identifikace": "IČO 87654321",
+  "kupujici_adresa": "Sokolská 18, 120 00 Praha 2",
+  "predmet": "notebook Apple MacBook Pro 14\" M3 Pro, 36 GB RAM, 1 TB SSD, sériové číslo C02XL0ABCD, rok 2024, používaný, funkční, s opotřebením klávesnice",
+  "cena": 41000,
+  "zpusob_platby": "hotove",
+  "datum_predani": "2026-10-02",
+  "misto_predani": "sídlo prodávajícího",
+  "kupujici_je_spotrebitel": "ne"
+}

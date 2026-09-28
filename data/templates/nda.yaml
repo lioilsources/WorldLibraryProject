@@ -1,0 +1,217 @@
+# Dohoda o mlčenlivosti (NDA), jednostranná i vzájemná. Opora v OZ, ne ve vzorech:
+#  * § 504 definuje obchodní tajemství — chráněné je jen to, co vlastník skutečně
+#    utajuje, takže smlouva nemůže „udělat tajemství" z veřejně dostupného;
+#  * § 1730 odst. 2 ukládá dbát o důvěrné údaje získané při jednání o smlouvě
+#    i tehdy, když smlouva nakonec uzavřena není;
+#  * § 2985 a § 2988 dávají nástroje proti porušení obchodního tajemství
+#    (zdržení se, odstranění závadného stavu, zadostiučinění, náhrada škody);
+#  * § 2048 dovoluje smluvní pokutu, § 2051 ji nechává soudu snížit, je-li
+#    nepřiměřeně vysoká — proto v šabloně není žádná „astronomická" pokuta.
+typ: nda
+nazev: Dohoda o mlčenlivosti
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Ochrana důvěrných informací při spolupráci nebo při jednání o smlouvě.
+  Jednostranná (chrání informace jedné strany) i vzájemná.
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 504, § 1730 a § 2985", poznamka: "obchodní tajemství, důvěrné údaje, ochrana"}
+
+strany:
+  - {role: strana_a, nazev: Strana A, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: strana_b, nazev: Strana B, typ: [fyzicka, pravnicka, podnikatel]}
+
+promenne:
+  - {id: strana_a_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma strany A (u jednostranné NDA ta, která informace sděluje)?"}
+  - {id: strana_a_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození strany A?"}
+  - {id: strana_a_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo strany A?"}
+  - {id: strana_b_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma strany B (u jednostranné NDA ta, která informace přijímá)?"}
+  - {id: strana_b_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození strany B?"}
+  - {id: strana_b_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo strany B?"}
+
+  - id: rezim
+    typ: enum
+    hodnoty: [jednostranna, vzajemna]
+    povinna: true
+    otazka: "Chrání dohoda informace jen jedné strany, nebo obou?"
+  - {id: ucel, typ: text, povinna: true, otazka: "K jakému účelu se informace poskytují (jaká spolupráce, jaké jednání)?"}
+  - id: predmet_informaci
+    typ: text
+    povinna: true
+    otazka: "Jaké informace jsou důvěrné? Popiš okruh konkrétně."
+    napoveda: "Chráněné je to, co je skutečně utajované a v obchodních kruzích nedostupné — obecné „vše, co se dozví“ soud nemusí uznat."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 504"}
+  - {id: trvani_mesice, typ: int, povinna: true, otazka: "Jak dlouho po skončení spolupráce mlčenlivost trvá (v měsících)?"}
+  - id: smluvni_pokuta
+    typ: money
+    povinna: false
+    otazka: "Smluvní pokuta za porušení mlčenlivosti v Kč, pokud ji chcete?"
+    napoveda: "Nepřiměřeně vysokou pokutu může soud snížit; pokuta se sjednává za každé jednotlivé porušení."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2048"}
+  - {id: vraceni_do_dni, typ: int, povinna: true, otazka: "Do kolika dnů po skončení se vrací nebo likvidují podklady?"}
+
+kontroly:
+  - vyraz: "trvani_mesice > 0"
+    zprava: "Doba trvání mlčenlivosti musí být větší než nula."
+  - vyraz: "vraceni_do_dni >= 1"
+    zprava: "Lhůta k vrácení podkladů musí být alespoň jeden den."
+
+klauzule:
+  - id: ucel
+    nazev: Účel a předmět dohody
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+    varianty:
+      podle: rezim
+      hodnoty:
+        jednostranna: |
+          Strany spolupracují nebo jednají za tímto účelem: {{ ucel }}. V souvislosti s tím
+          sděluje strana A straně B důvěrné informace a strana B se zavazuje zachovávat o nich
+          mlčenlivost za podmínek této dohody.
+
+          Povinnosti z této dohody platí i tehdy, nebude-li mezi stranami uzavřena žádná další
+          smlouva.
+        vzajemna: |
+          Strany spolupracují nebo jednají za tímto účelem: {{ ucel }}. V souvislosti s tím si
+          vzájemně sdělují důvěrné informace a obě se zavazují zachovávat o nich mlčenlivost
+          za podmínek této dohody; každá strana je v roli sdělující i přijímající.
+
+          Povinnosti z této dohody platí i tehdy, nebude-li mezi stranami uzavřena žádná další
+          smlouva.
+
+  - id: duverne_informace
+    nazev: Důvěrné informace
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 504"}
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+    text: |
+      Důvěrnými informacemi se pro účely této dohody rozumí: {{ predmet_informaci }}.
+
+      Důvěrnými informacemi jsou zejména skutečnosti tvořící obchodní tajemství, tedy
+      konkurenčně významné, určitelné, ocenitelné a v příslušných obchodních kruzích běžně
+      nedostupné skutečnosti související se závodem, jejichž utajení jejich vlastník
+      odpovídajícím způsobem zajišťuje.
+
+  - id: mlcenlivost
+    nazev: Povinnost mlčenlivosti
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+      - {zakon: "89/2012 Sb.", par: "§ 2985"}
+    varianty:
+      podle: rezim
+      hodnoty:
+        jednostranna: |
+          Strana B se zavazuje, že důvěrné informace nesdělí ani nezpřístupní třetí osobě,
+          nevyužije je pro sebe ani pro jiného k jinému než sjednanému účelu a bude dbát, aby
+          nebyly zneužity nebo prozrazeny.
+
+          Strana B zpřístupní důvěrné informace jen těm svým zaměstnancům, společníkům
+          a poradcům, kteří je potřebují znát pro sjednaný účel, a zaváže je ke stejné
+          mlčenlivosti; za porušení povinnosti těmito osobami odpovídá strana B.
+        vzajemna: |
+          Každá strana se zavazuje, že důvěrné informace druhé strany nesdělí ani nezpřístupní
+          třetí osobě, nevyužije je pro sebe ani pro jiného k jinému než sjednanému účelu
+          a bude dbát, aby nebyly zneužity nebo prozrazeny.
+
+          Každá strana zpřístupní důvěrné informace druhé strany jen těm svým zaměstnancům,
+          společníkům a poradcům, kteří je potřebují znát pro sjednaný účel, a zaváže je ke
+          stejné mlčenlivosti; za porušení povinnosti těmito osobami odpovídá.
+
+  - id: vyjimky
+    nazev: Výjimky z mlčenlivosti
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 504"}
+    text: |
+      Povinnost mlčenlivosti se nevztahuje na informace, které
+      a) jsou v době sdělení veřejně známé nebo se veřejně známými staly bez porušení této
+      dohody,
+      b) strana prokazatelně znala už před jejich sdělením nebo je vyvinula nezávisle
+      a bez použití důvěrných informací druhé strany,
+      c) je strana povinna zpřístupnit na základě zákona nebo rozhodnutí orgánu veřejné moci;
+      v takovém případě o tom druhou stranu bez zbytečného odkladu informuje a zpřístupní
+      jen to, co je nutné.
+
+  - id: trvani
+    nazev: Trvání mlčenlivosti
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+    text: |
+      Povinnost mlčenlivosti trvá po dobu {{ trvani_mesice|cislo }} měsíců od skončení
+      spolupráce nebo od ukončení jednání, pro které byly informace poskytnuty. U informací
+      tvořících obchodní tajemství trvá ochrana i po této době, dokud trvají zákonné podmínky
+      obchodního tajemství.
+
+  - id: vraceni
+    nazev: Vrácení podkladů
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+    text: |
+      Do {{ vraceni_do_dni|cislo }} dnů od skončení spolupráce nebo na výzvu druhé strany vrátí
+      strana všechny hmotné nosiče důvěrných informací, které od druhé strany obdržela, a jejich
+      kopie zlikviduje, nestanoví-li právní předpis povinnost je uchovat.
+
+  - id: smluvni_pokuta
+    nazev: Smluvní pokuta
+    povinna: false
+    podminka: "smluvni_pokuta != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2048"}
+      - {zakon: "89/2012 Sb.", par: "§ 2051"}
+    text: |
+      Poruší-li strana povinnost mlčenlivosti, zaplatí druhé straně smluvní pokutu ve výši
+      {{ smluvni_pokuta|kc }} za každé jednotlivé porušení. Zaplacením smluvní pokuty není
+      dotčeno právo na náhradu škody v rozsahu přesahujícím smluvní pokutu.
+
+  - id: nahrada_skody
+    nazev: Náhrada škody a další nároky
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2951"}
+      - {zakon: "89/2012 Sb.", par: "§ 2985"}
+      - {zakon: "89/2012 Sb.", par: "§ 2988"}
+    text: |
+      Porušením této dohody není dotčeno právo poškozené strany požadovat, aby se rušitel
+      porušování zdržel a odstranil závadný stav, ani její právo na přiměřené zadostiučinění,
+      náhradu škody a vydání bezdůvodného obohacení.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+    text: |
+      Dohoda je vyhotovena ve dvou vyhotoveních; každá strana obdrží jedno. Změny vyžadují
+      písemnou formu.
+
+      Dohoda nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Okruh důvěrných informací je popsaný konkrétně, ne jen „vše, co se druhá strana dozví“", zaklad: {zakon: "89/2012 Sb.", par: "§ 504"}}
+  - {bod: "Účel, ke kterému lze informace použít, je vymezený", zaklad: {zakon: "89/2012 Sb.", par: "§ 1730"}}
+  - {bod: "Jsou uvedené výjimky (veřejně známé, vlastní vývoj, zákonná povinnost)"}
+  - {bod: "Doba trvání mlčenlivosti je uvedená a přiměřená účelu"}
+  - {bod: "Smluvní pokuta, je-li sjednána, není nepřiměřeně vysoká — soud ji může snížit", zaklad: {zakon: "89/2012 Sb.", par: "§ 2051"}}
+  - {bod: "U vzájemné dohody ověřit, že obě strany mají stejné povinnosti"}
+  - {bod: "Zpracovávají-li se pod dohodou osobní údaje, je potřeba navíc smlouva o zpracování podle GDPR — to tato dohoda neřeší"}
+
+upozorneni:
+  - text: >-
+      Obchodní tajemství chrání zákon jen tam, kde je vlastník skutečně utajuje. Označení
+      informace za důvěrnou ve smlouvě samo ochranu nezaloží, není-li utajení reálné.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 504"}
+  - text: >-
+      Nepřiměřeně vysokou smluvní pokutu může soud na návrh dlužníka snížit až do výše škody
+      vzniklé porušením povinnosti — přehnaná pokuta tedy nechrání, jen prodlužuje spor.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2051"}
+  - text: >-
+      Povinnost dbát o důvěrné údaje získané při jednání o smlouvě platí i bez NDA; dohoda ji
+      zpřesňuje a doplňuje o pokutu, nevytváří ji od nuly.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1730"}
