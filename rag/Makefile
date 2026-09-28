@@ -38,7 +38,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog bundles serve restart-chat install-unit mode deploy-spark
+        eval eval-catalog eval-law bundles serve restart-chat install-unit mode deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -72,6 +72,59 @@ ingest-perseus:
 sync-spark:
 	rsync -avz --progress $(JSONL) works.jsonl chapters.jsonl spark:$(SPARK_DIR)/rag/
 	rsync -a $(REGISTRY)/ spark:$(SPARK_DIR)/rag/$(REGISTRY)/
+
+# --- Právník (zákony ČR z e-Sbírky; Ol1nLLM/docs/plan-pravnik.md) ---
+# Tentýž řetěz jako knihy, jen jiný vstup, jiná PG databáze a jiná kolekce:
+#   ingest-law → sync-law → (SPARK) load-pg-law → pg-index-law → embed-law → law-chat
+# LAW_PG_DSN je v rag/.env (databáze `law` na tomtéž Postgresu :5433).
+LAW_DIR        ?= law
+LAW_COLLECTION ?= law_v1
+LAW_TIER       ?= 1
+LAW_TOP_K      ?= 8
+export LAW_PG_DSN
+
+ingest-law:
+	$(PY) ingest_law.py --tier $(LAW_TIER) --out-dir $(LAW_DIR)
+
+ingest-law-stats:
+	$(PY) ingest_law.py --tier $(LAW_TIER) --stats-only
+
+sync-law:
+	rsync -avz --progress $(LAW_DIR)/works.jsonl $(LAW_DIR)/chapters.jsonl $(LAW_DIR)/books.jsonl spark:$(SPARK_DIR)/rag/$(LAW_DIR)/
+	rsync -a registry/law/ spark:$(SPARK_DIR)/rag/registry/law/
+
+pg-migrate-law:
+	PG_DSN=$(LAW_PG_DSN) $(PY) pg_migrate.py
+
+load-pg-law:
+	$(PY) load_pg.py --dsn $(LAW_PG_DSN) --input $(LAW_DIR)/books.jsonl --works $(LAW_DIR)/works.jsonl \
+		--chapters $(LAW_DIR)/chapters.jsonl --registry registry/law --summaries /dev/null --replace-all
+
+pg-index-law:
+	PG_DSN=$(LAW_PG_DSN) $(PY) pg_migrate.py --only 0003 --force
+
+embed-law:
+	$(PY) embed_books.py --input $(LAW_DIR)/books.jsonl --works $(LAW_DIR)/works.jsonl \
+		--chroma-url $(CHROMA_URL) --collection $(LAW_COLLECTION) --mode passages $(EMBED_FLAGS)
+
+# Lokálně (M2, proti Chromě a PG v LAN): make serve-law LLM_URL=https://llm.ol1n.com/v1
+serve-law:
+	$(PY) server.py --port 8098 --prompt-file prompts/pravnik_cs.md \
+		--chroma-url $(CHROMA_URL) --collection $(LAW_COLLECTION) --gloss-collection law_gloss_none \
+		--channels vec --pg-dsn $(LAW_PG_DSN) --cite-registry registry/law/tier1.yaml \
+		--planner off --rewrite off --max-per-work 6 --no-translate-excerpts --summaries-file $(LAW_DIR)/summaries.json \
+		--llm-url $(LLM_URL) --llm-model $(LLM_MODEL) $(EMBED_FLAGS)
+
+restart-law-chat:
+	ssh spark "systemctl --user restart law-chat && sleep 20 && curl -s localhost:8098/status"
+
+# Eval Právníka proti běžící službě (produkční konfigurace, bez druhého embedderu
+# v paměti SPARKu — jde i z M2 přes LAN). Přímý režim s vlastním embedderem:
+#   make eval-law EVAL_LAW_ARGS="--mode vec"   (na SPARKu, když je volná paměť)
+LAW_URL       ?= http://192.168.88.66:8098
+EVAL_LAW_ARGS ?= --service $(LAW_URL)
+eval-law:
+	$(PY) eval/eval_law.py $(EVAL_LAW_ARGS) --top-k $(LAW_TOP_K)
 
 # --- JODA (Postgres + Chroma knihovny; deploy/joda) ---
 deploy-joda:

@@ -1,0 +1,1133 @@
+{
+ "summary": {
+  "label": "po opravě zkratky DPH (2026-09-28)",
+  "mode": "service",
+  "service": "http://192.168.88.66:8098",
+  "top_k": 8,
+  "max_per_work": 6,
+  "cite_hit_rate": 1.0,
+  "work_hit_rate": 1.0,
+  "ref_hit_rate": 0.86,
+  "ref_mrr": 0.618,
+  "questions": 65,
+  "by_area": {
+   "autorske": {
+    "n": 4,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.2,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "danove": {
+    "n": 4,
+    "work_hit": 1.0,
+    "ref_hit": 0.667,
+    "ref_mrr": 0.139,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "dedicke": {
+    "n": 1,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 1.0
+   },
+   "dilo": {
+    "n": 2,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.75
+   },
+   "insolvence": {
+    "n": 1,
+    "work_hit": 1.0,
+    "ref_hit": 0.0,
+    "ref_mrr": 0.0
+   },
+   "korporace": {
+    "n": 3,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.583
+   },
+   "kupni": {
+    "n": 4,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.611,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "najem": {
+    "n": 7,
+    "work_hit": 1.0,
+    "ref_hit": 0.714,
+    "ref_mrr": 0.321
+   },
+   "osobni_udaje": {
+    "n": 1,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.5
+   },
+   "pracovni": {
+    "n": 12,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.864,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "procesni": {
+    "n": 5,
+    "work_hit": 1.0,
+    "ref_hit": 0.25,
+    "ref_mrr": 0.25,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "spotrebitel": {
+    "n": 4,
+    "work_hit": 1.0,
+    "ref_hit": 0.75,
+    "ref_mrr": 0.531
+   },
+   "spravni": {
+    "n": 3,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.75
+   },
+   "trestni": {
+    "n": 5,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 1.0,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "ustavni": {
+    "n": 3,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 1.0,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   },
+   "zavazky": {
+    "n": 6,
+    "work_hit": 1.0,
+    "ref_hit": 1.0,
+    "ref_mrr": 0.9,
+    "cite_n": 1,
+    "cite_hit": 1.0
+   }
+  }
+ },
+ "rows": [
+  {
+   "q": "Co říká § 2079 občanského zákoníku?",
+   "kind": "cite",
+   "area": "kupni",
+   "parsed": "§ 2079",
+   "act_hint": "cz.sb.2012.89",
+   "hit": true,
+   "top": [
+    "89/2012 Sb. § 2079 odst. 1"
+   ]
+  },
+  {
+   "q": "§ 51 odst. 1 ZP",
+   "kind": "cite",
+   "area": "pracovni",
+   "parsed": "§ 51 odst. 1",
+   "act_hint": "cz.sb.2006.262",
+   "hit": true,
+   "top": [
+    "262/2006 Sb. § 51 odst. 1"
+   ]
+  },
+  {
+   "q": "čl. 10 Listiny",
+   "kind": "cite",
+   "area": "ustavni",
+   "parsed": "čl. 10",
+   "act_hint": "cz.sb.1993.2",
+   "hit": true,
+   "top": [
+    "2/1993 Sb. čl. 10 odst. 1"
+   ]
+  },
+  {
+   "q": "Co je v § 29 trestního zákoníku?",
+   "kind": "cite",
+   "area": "trestni",
+   "parsed": "§ 29",
+   "act_hint": "cz.sb.2009.40",
+   "hit": true,
+   "top": [
+    "40/2009 Sb. § 29 odst. 1"
+   ]
+  },
+  {
+   "q": "paragraf 204 OSŘ",
+   "kind": "cite",
+   "area": "procesni",
+   "parsed": "§ 204",
+   "act_hint": "cz.sb.1963.99",
+   "hit": true,
+   "top": [
+    "99/1963 Sb. § 204 odst. 1"
+   ]
+  },
+  {
+   "q": "§ 2048 OZ",
+   "kind": "cite",
+   "area": "zavazky",
+   "parsed": "§ 2048",
+   "act_hint": "cz.sb.2012.89",
+   "hit": true,
+   "top": [
+    "89/2012 Sb. § 2048 odst. 1"
+   ]
+  },
+  {
+   "q": "§ 58 autorského zákona",
+   "kind": "cite",
+   "area": "autorske",
+   "parsed": "§ 58",
+   "act_hint": "cz.sb.2000.121",
+   "hit": true,
+   "top": [
+    "121/2000 Sb. § 58 odst. 1",
+    "121/2000 Sb. § 58 odst. 5",
+    "121/2000 Sb. § 58 odst. 9"
+   ]
+  },
+  {
+   "q": "§ 29 odst. 1 zákona o DPH",
+   "kind": "cite",
+   "area": "danove",
+   "parsed": "§ 29 odst. 1",
+   "act_hint": "cz.sb.2004.235",
+   "hit": true,
+   "top": [
+    "235/2004 Sb. § 29 odst. 1",
+    "235/2004 Sb. § 29 odst. 3"
+   ]
+  },
+  {
+   "q": "Jaká je výpovědní doba u pracovního poměru?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 51 @0.672",
+    "262/2006 Sb. § 58 @0.677",
+    "262/2006 Sb. § 51a @0.682",
+    "262/2006 Sb. § 63 @0.688",
+    "262/2006 Sb. § 72 @0.692"
+   ]
+  },
+  {
+   "q": "Z jakých důvodů může zaměstnavatel dát zaměstnanci výpověď?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 50 @0.672",
+    "262/2006 Sb. § 52 @0.677",
+    "262/2006 Sb. § 57 @0.682",
+    "262/2006 Sb. § 52 @0.688",
+    "262/2006 Sb. § 58 @0.692"
+   ]
+  },
+  {
+   "q": "Kolik týdnů dovolené mám ze zákona?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 212 @0.672",
+    "262/2006 Sb. § 223 @0.677",
+    "262/2006 Sb. § 213 @0.682",
+    "262/2006 Sb. § 211 @0.688",
+    "262/2006 Sb. § 213 @0.692"
+   ]
+  },
+  {
+   "q": "Co je minimální mzda?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "586/1992 Sb. § 21g @0.672",
+    "262/2006 Sb. § 111 @0.677",
+    "262/2006 Sb. § 111 @0.682",
+    "262/2006 Sb. § 395 @0.688",
+    "262/2006 Sb. § 111 @0.692"
+   ]
+  },
+  {
+   "q": "Jak dlouhá může být zkušební doba?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 35 @0.672",
+    "141/1961 Sb. § 179i @0.677",
+    "40/2009 Sb. § 89 @0.682",
+    "218/2003 Sb. § 29 @0.688",
+    "89/2012 Sb. § 2150 @0.692"
+   ]
+  },
+  {
+   "q": "Co musí obsahovat pracovní smlouva?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 34 @0.672",
+    "435/2004 Sb. § 91 @0.677",
+    "262/2006 Sb. § 49 @0.682",
+    "262/2006 Sb. § 31 @0.688",
+    "262/2006 Sb. § 38 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy může zaměstnavatel okamžitě zrušit pracovní poměr?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 59 @0.672",
+    "262/2006 Sb. § 55 @0.677",
+    "262/2006 Sb. § 58 @0.682",
+    "262/2006 Sb. § 56 @0.688",
+    "262/2006 Sb. § 60 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy mi patří odstupné a v jaké výši?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 67 @0.672",
+    "262/2006 Sb. § 68 @0.677",
+    "262/2006 Sb. § 67 @0.682",
+    "99/1963 Sb. § 299 @0.688",
+    "89/2012 Sb. § 1992 @0.692"
+   ]
+  },
+  {
+   "q": "Kolik hodin ročně můžu odpracovat na dohodu o provedení práce?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 75 @0.672",
+    "262/2006 Sb. § 76 @0.677",
+    "262/2006 Sb. § 93 @0.682",
+    "435/2004 Sb. § 116 @0.688",
+    "262/2006 Sb. § 77 @0.692"
+   ]
+  },
+  {
+   "q": "Musí být práce z domova sjednaná písemně?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 317 @0.672",
+    "262/2006 Sb. § 21 @0.677",
+    "262/2006 Sb. § 335 @0.682",
+    "262/2006 Sb. § 77 @0.688",
+    "262/2006 Sb. § 335 @0.692"
+   ]
+  },
+  {
+   "q": "Jak dlouho mě může vázat konkurenční doložka po odchodu z práce?",
+   "kind": "content",
+   "area": "pracovni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 310 @0.672",
+    "262/2006 Sb. § 310 @0.677",
+    "89/2012 Sb. § 2518 @0.682",
+    "89/2012 Sb. § 2975 @0.688",
+    "262/2006 Sb. § 319a @0.692"
+   ]
+  },
+  {
+   "q": "Kdy jde o nutnou obranu?",
+   "kind": "content",
+   "area": "trestni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "40/2009 Sb. § 29 @0.672",
+    "250/2016 Sb. § 25 @0.677",
+    "89/2012 Sb. § 2905 @0.682",
+    "89/2012 Sb. § 2907 @0.688",
+    "110/1998 Sb. čl. 2 @0.692"
+   ]
+  },
+  {
+   "q": "Co je krajní nouze?",
+   "kind": "content",
+   "area": "trestni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "40/2009 Sb. § 28 @0.672",
+    "250/2016 Sb. § 24 @0.677",
+    "89/2012 Sb. § 2906 @0.682",
+    "89/2012 Sb. § 1037 @0.688",
+    "89/2012 Sb. § 2907 @0.692"
+   ]
+  },
+  {
+   "q": "Jaký trest hrozí za krádež?",
+   "kind": "content",
+   "area": "trestni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "40/2009 Sb. § 205 @0.672",
+    "40/2009 Sb. § 173 @0.677",
+    "40/2009 Sb. § 347 @0.682",
+    "40/2009 Sb. § 219 @0.688",
+    "40/2009 Sb. § 347a @0.692"
+   ]
+  },
+  {
+   "q": "Za jakých podmínek smí být obviněný vzat do vazby?",
+   "kind": "content",
+   "area": "trestni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "141/1961 Sb. § 67 @0.672",
+    "141/1961 Sb. § 314c @0.677",
+    "141/1961 Sb. § 75 @0.682",
+    "141/1961 Sb. § 73c @0.688",
+    "141/1961 Sb. § 68 @0.692"
+   ]
+  },
+  {
+   "q": "Jak dlouhá je obecná promlčecí lhůta?",
+   "kind": "content",
+   "area": "zavazky",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "250/2016 Sb. § 30 @0.672",
+    "89/2012 Sb. § 629 @0.677",
+    "99/1963 Sb. § 194 @0.682",
+    "89/2012 Sb. § 632 @0.688",
+    "89/2012 Sb. § 630 @0.692"
+   ]
+  },
+  {
+   "q": "Kdo nahradí škodu při porušení smluvní povinnosti?",
+   "kind": "content",
+   "area": "zavazky",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2913 @0.672",
+    "89/2012 Sb. § 2910 @0.677",
+    "89/2012 Sb. § 2543 @0.682",
+    "262/2006 Sb. § 250 @0.688",
+    "89/2012 Sb. § 2892 @0.692"
+   ]
+  },
+  {
+   "q": "Můžu si ve smlouvě sjednat smluvní pokutu?",
+   "kind": "content",
+   "area": "zavazky",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2048 @0.672",
+    "89/2012 Sb. § 2051 @0.677",
+    "89/2012 Sb. § 2050 @0.682",
+    "89/2012 Sb. § 2052 @0.688",
+    "89/2012 Sb. § 2049 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy je dlužník v prodlení?",
+   "kind": "content",
+   "area": "zavazky",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 1968 @0.672",
+    "89/2012 Sb. § 1969 @0.677",
+    "89/2012 Sb. § 1975 @0.682",
+    "89/2012 Sb. § 1974 @0.688",
+    "89/2012 Sb. § 1971 @0.692"
+   ]
+  },
+  {
+   "q": "Co se zavazuje pojistitel pojistnou smlouvou?",
+   "kind": "content",
+   "area": "zavazky",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2758 @0.672",
+    "89/2012 Sb. § 2779 @0.677",
+    "89/2012 Sb. § 2789 @0.682",
+    "89/2012 Sb. § 2859 @0.688",
+    "89/2012 Sb. § 2774 @0.692"
+   ]
+  },
+  {
+   "q": "K čemu se zavazuje prodávající kupní smlouvou?",
+   "kind": "content",
+   "area": "kupni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2079 @0.672",
+    "89/2012 Sb. § 2087 @0.677",
+    "89/2012 Sb. § 2095 @0.682",
+    "89/2012 Sb. § 2089 @0.688",
+    "89/2012 Sb. § 2093 @0.692"
+   ]
+  },
+  {
+   "q": "Do kdy můžu reklamovat vadu zboží?",
+   "kind": "content",
+   "area": "kupni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 637 @0.672",
+    "89/2012 Sb. § 2165 @0.677",
+    "89/2012 Sb. § 2389k @0.682",
+    "634/1992 Sb. § 19 @0.688",
+    "89/2012 Sb. § 2618 @0.692"
+   ]
+  },
+  {
+   "q": "Za jaké vady odpovídá prodávající při převzetí věci?",
+   "kind": "content",
+   "area": "kupni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 3,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2102 @0.672",
+    "89/2012 Sb. § 2170 @0.677",
+    "89/2012 Sb. § 2161 @0.682",
+    "89/2012 Sb. § 2103 @0.688",
+    "89/2012 Sb. § 2165 @0.692"
+   ]
+  },
+  {
+   "q": "Do kdy může spotřebitel odstoupit od smlouvy uzavřené na dálku?",
+   "kind": "content",
+   "area": "spotrebitel",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 8,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 1846 @0.672",
+    "89/2012 Sb. § 1850 @0.677",
+    "89/2012 Sb. § 1831 @0.682",
+    "89/2012 Sb. § 1862 @0.688",
+    "89/2012 Sb. § 1824 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy od smlouvy uzavřené přes internet odstoupit nemůžu?",
+   "kind": "content",
+   "area": "spotrebitel",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 1846 @0.672",
+    "89/2012 Sb. § 1831 @0.677",
+    "89/2012 Sb. § 1830 @0.682",
+    "89/2012 Sb. § 2389h @0.688",
+    "89/2012 Sb. § 2003 @0.692"
+   ]
+  },
+  {
+   "q": "Do kdy musí obchod vyřídit reklamaci?",
+   "kind": "content",
+   "area": "spotrebitel",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "634/1992 Sb. § 19 @0.672",
+    "634/1992 Sb. § 20p @0.677",
+    "634/1992 Sb. § 19 @0.682",
+    "634/1992 Sb. § 23f @0.688",
+    "634/1992 Sb. § 13 @0.692"
+   ]
+  },
+  {
+   "q": "Co je nekalá obchodní praktika?",
+   "kind": "content",
+   "area": "spotrebitel",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "634/1992 Sb. § 4 @0.672",
+    "634/1992 Sb. § 5 @0.677",
+    "634/1992 Sb. None @0.682",
+    "634/1992 Sb. None @0.688",
+    "634/1992 Sb. § 5b @0.692"
+   ]
+  },
+  {
+   "q": "Co je nájem bytu a k čemu se pronajímatel zavazuje?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2236 @0.672",
+    "89/2012 Sb. § 2257 @0.677",
+    "89/2012 Sb. § 2205 @0.682",
+    "89/2012 Sb. § 2201 @0.688",
+    "89/2012 Sb. § 2247 @0.692"
+   ]
+  },
+  {
+   "q": "Pronajímatel mě chce vystěhovat z bytu, kdy to může?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2320 @0.672",
+    "89/2012 Sb. § 2244 @0.677",
+    "89/2012 Sb. § 2261 @0.682",
+    "89/2012 Sb. § 2245 @0.688",
+    "89/2012 Sb. § 2285 @0.692"
+   ]
+  },
+  {
+   "q": "Můžu dát výpověď z nájmu sjednaného na dobu určitou?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2229 @0.672",
+    "89/2012 Sb. § 2231 @0.677",
+    "89/2012 Sb. § 2312 @0.682",
+    "89/2012 Sb. § 2287 @0.688",
+    "89/2012 Sb. § 2310 @0.692"
+   ]
+  },
+  {
+   "q": "Jak vysokou kauci po mně může pronajímatel chtít?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2295 @0.672",
+    "89/2012 Sb. § 2249 @0.677",
+    "89/2012 Sb. § 2291 @0.682",
+    "89/2012 Sb. § 2254 @0.688",
+    "89/2012 Sb. § 2260 @0.692"
+   ]
+  },
+  {
+   "q": "Může mi pronajímatel zvýšit nájemné?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2250 @0.672",
+    "89/2012 Sb. § 2249 @0.677",
+    "89/2012 Sb. § 2248 @0.682",
+    "89/2012 Sb. § 2272 @0.688",
+    "89/2012 Sb. § 3074 @0.692"
+   ]
+  },
+  {
+   "q": "Kdo platí drobné opravy v nájemním bytě?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2267 @0.672",
+    "89/2012 Sb. § 2264 @0.677",
+    "89/2012 Sb. § 2265 @0.682",
+    "89/2012 Sb. § 2257 @0.688",
+    "89/2012 Sb. § 2260 @0.692"
+   ]
+  },
+  {
+   "q": "Potřebuju souhlas pronajímatele k podnájmu?",
+   "kind": "content",
+   "area": "najem",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2275 @0.672",
+    "89/2012 Sb. § 2215 @0.677",
+    "89/2012 Sb. § 2274 @0.682",
+    "89/2012 Sb. § 2305 @0.688",
+    "89/2012 Sb. § 2220 @0.692"
+   ]
+  },
+  {
+   "q": "K čemu se zhotovitel zavazuje smlouvou o dílo?",
+   "kind": "content",
+   "area": "dilo",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2586 @0.672",
+    "89/2012 Sb. § 2598 @0.677",
+    "89/2012 Sb. § 2631 @0.682",
+    "89/2012 Sb. § 2593 @0.688",
+    "89/2012 Sb. § 2634 @0.692"
+   ]
+  },
+  {
+   "q": "Co když cena díla určená odhadem bude výrazně vyšší?",
+   "kind": "content",
+   "area": "dilo",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 2620 @0.672",
+    "89/2012 Sb. § 2612 @0.677",
+    "89/2012 Sb. § 2621 @0.682",
+    "89/2012 Sb. § 2614 @0.688",
+    "89/2012 Sb. § 2622 @0.692"
+   ]
+  },
+  {
+   "q": "Co tvoří pozůstalost?",
+   "kind": "content",
+   "area": "dedicke",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "89/2012 Sb. § 1475 @0.672",
+    "292/2013 Sb. § 177 @0.677",
+    "89/2012 Sb. § 1499 @0.682",
+    "89/2012 Sb. § 1687 @0.688",
+    "292/2013 Sb. § 186 @0.692"
+   ]
+  },
+  {
+   "q": "Jaký je minimální vklad do společnosti s ručením omezeným?",
+   "kind": "content",
+   "area": "korporace",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "90/2012 Sb. § 142 @0.672",
+    "90/2012 Sb. § 133 @0.677",
+    "90/2012 Sb. § 132 @0.682",
+    "90/2012 Sb. § 148 @0.688",
+    "90/2012 Sb. § 145 @0.692"
+   ]
+  },
+  {
+   "q": "Ručí jednatel za rozhodnutí, když jednal informovaně a v dobré víře?",
+   "kind": "content",
+   "area": "korporace",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "90/2012 Sb. § 195 @0.672",
+    "90/2012 Sb. § 196 @0.677",
+    "90/2012 Sb. § 198 @0.682",
+    "90/2012 Sb. § 51 @0.688",
+    "90/2012 Sb. § 177 @0.692"
+   ]
+  },
+  {
+   "q": "Můžu převést svůj podíl ve s.r.o. na někoho jiného?",
+   "kind": "content",
+   "area": "korporace",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "90/2012 Sb. § 208 @0.672",
+    "90/2012 Sb. § 207 @0.677",
+    "90/2012 Sb. § 600 @0.682",
+    "90/2012 Sb. § 42 @0.688",
+    "90/2012 Sb. § 599 @0.692"
+   ]
+  },
+  {
+   "q": "Komu patří program, který zaměstnanec napíše v práci?",
+   "kind": "content",
+   "area": "autorske",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 5,
+   "routed": [],
+   "top": [
+    "262/2006 Sb. § 335a @0.672",
+    "262/2006 Sb. § 312 @0.677",
+    "262/2006 Sb. § 316 @0.682",
+    "262/2006 Sb. § 337 @0.688",
+    "121/2000 Sb. § 58 @0.692"
+   ]
+  },
+  {
+   "q": "Můžu si udělat kopii filmu pro svoje osobní použití?",
+   "kind": "content",
+   "area": "autorske",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 5,
+   "routed": [],
+   "top": [
+    "121/2000 Sb. § 16 @0.672",
+    "89/2012 Sb. § 89 @0.677",
+    "121/2000 Sb. § 37 @0.682",
+    "121/2000 Sb. § 38 @0.688",
+    "121/2000 Sb. § 30 @0.692"
+   ]
+  },
+  {
+   "q": "Co autor poskytuje licenční smlouvou k autorskému dílu?",
+   "kind": "content",
+   "area": "autorske",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 5,
+   "routed": [],
+   "top": [
+    "106/1999 Sb. § 14b @0.672",
+    "121/2000 Sb. § 98 @0.677",
+    "89/2012 Sb. § 2384 @0.682",
+    "89/2012 Sb. § 2372 @0.688",
+    "89/2012 Sb. § 2371 @0.692"
+   ]
+  },
+  {
+   "q": "Do kdy se podává odvolání proti rozsudku v civilní věci?",
+   "kind": "content",
+   "area": "procesni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "99/1963 Sb. § 204 @0.672",
+    "99/1963 Sb. § 207 @0.677",
+    "99/1963 Sb. § 243f @0.682",
+    "99/1963 Sb. § 205b @0.688",
+    "141/1961 Sb. § 248 @0.692"
+   ]
+  },
+  {
+   "q": "Co musí obsahovat žaloba?",
+   "kind": "content",
+   "area": "procesni",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "99/1963 Sb. § 246 @0.672",
+    "150/2002 Sb. § 84 @0.677",
+    "99/1963 Sb. § 232 @0.682",
+    "99/1963 Sb. § 247 @0.688",
+    "99/1963 Sb. § 91a @0.692"
+   ]
+  },
+  {
+   "q": "Kdo platí náklady soudního řízení?",
+   "kind": "content",
+   "area": "procesni",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "292/2013 Sb. § 43 @0.672",
+    "292/2013 Sb. § 74 @0.677",
+    "150/2002 Sb. § 59 @0.682",
+    "150/2002 Sb. § 61 @0.688",
+    "292/2013 Sb. § 506 @0.692"
+   ]
+  },
+  {
+   "q": "Můžeme si ve smlouvě dohodnout, který soud bude spor rozhodovat?",
+   "kind": "content",
+   "area": "procesni",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "91/2012 Sb. § 119 @0.672",
+    "89/2012 Sb. § 634 @0.677",
+    "89/2012 Sb. § 1787 @0.682",
+    "89/2012 Sb. § 725 @0.688",
+    "89/2012 Sb. § 1749 @0.692"
+   ]
+  },
+  {
+   "q": "V jaké lhůtě musí správní orgán vydat rozhodnutí?",
+   "kind": "content",
+   "area": "spravni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "250/2016 Sb. § 94 @0.672",
+    "500/2004 Sb. § 146 @0.677",
+    "150/2002 Sb. § 81 @0.682",
+    "500/2004 Sb. § 71 @0.688",
+    "500/2004 Sb. § 119 @0.692"
+   ]
+  },
+  {
+   "q": "Jaké správní tresty lze uložit za přestupek?",
+   "kind": "content",
+   "area": "spravni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "250/2016 Sb. § 35 @0.672",
+    "250/2016 Sb. § 41 @0.677",
+    "251/2016 Sb. § 4 @0.682",
+    "250/2016 Sb. § 36 @0.688",
+    "250/2016 Sb. § 43 @0.692"
+   ]
+  },
+  {
+   "q": "Za jak dlouho se přestupek promlčí?",
+   "kind": "content",
+   "area": "spravni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "250/2016 Sb. § 30 @0.672",
+    "143/2001 Sb. § 23 @0.677",
+    "589/1992 Sb. § 25e @0.682",
+    "250/2016 Sb. § 32 @0.688",
+    "250/2016 Sb. § 31 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy může úřad zpracovávat osobní údaje bez souhlasu?",
+   "kind": "content",
+   "area": "osobni_udaje",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 2,
+   "routed": [],
+   "top": [
+    "110/2019 Sb. § 35 @0.672",
+    "110/2019 Sb. § 5 @0.677",
+    "110/2019 Sb. § 38 @0.682",
+    "110/2019 Sb. § 43 @0.688",
+    "89/2012 Sb. § 2650 @0.692"
+   ]
+  },
+  {
+   "q": "Jaké jsou sazby DPH?",
+   "kind": "content",
+   "area": "danove",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 4,
+   "routed": [],
+   "top": [
+    "586/1992 Sb. § 16 @0.672",
+    "586/1992 Sb. § 16a @0.677",
+    "235/2004 Sb. § 47a @0.682",
+    "235/2004 Sb. § 47 @0.688",
+    "353/2003 Sb. § 130c @0.692"
+   ]
+  },
+  {
+   "q": "Co musí obsahovat faktura jako daňový doklad?",
+   "kind": "content",
+   "area": "danove",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 6,
+   "routed": [],
+   "top": [
+    "235/2004 Sb. § 26 @0.672",
+    "235/2004 Sb. § 86b @0.677",
+    "235/2004 Sb. § 30a @0.682",
+    "235/2004 Sb. § 33 @0.688",
+    "353/2003 Sb. § 16 @0.692"
+   ]
+  },
+  {
+   "q": "Kdy vzniká povinnost odvést DPH při dodání zboží?",
+   "kind": "content",
+   "area": "danove",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "235/2004 Sb. § 20a @0.672",
+    "353/2003 Sb. § 9 @0.677",
+    "235/2004 Sb. § 22 @0.682",
+    "353/2003 Sb. § 9 @0.688",
+    "235/2004 Sb. § 25 @0.692"
+   ]
+  },
+  {
+   "q": "Kdo může navrhnout oddlužení?",
+   "kind": "content",
+   "area": "insolvence",
+   "work_hit": true,
+   "ref_hit": false,
+   "rank": null,
+   "routed": [],
+   "top": [
+    "182/2006 Sb. § 390 @0.672",
+    "182/2006 Sb. § 394a @0.677",
+    "182/2006 Sb. § 417 @0.682",
+    "182/2006 Sb. § 403 @0.688",
+    "182/2006 Sb. § 391 @0.692"
+   ]
+  },
+  {
+   "q": "Právo na zachování lidské důstojnosti a dobré pověsti",
+   "kind": "content",
+   "area": "ustavni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "2/1993 Sb. čl. 10 @0.672",
+    "89/2012 Sb. § 3037 @0.677",
+    "89/2012 Sb. § 612 @0.682",
+    "89/2012 Sb. § 2957 @0.688",
+    "89/2012 Sb. § 7 @0.692"
+   ]
+  },
+  {
+   "q": "Je Česká republika právní stát?",
+   "kind": "content",
+   "area": "ustavni",
+   "work_hit": true,
+   "ref_hit": true,
+   "rank": 1,
+   "routed": [],
+   "top": [
+    "1/1993 Sb. čl. 1 @0.672",
+    "1/1993 Sb. čl. 4 @0.677",
+    "91/2012 Sb. § 103 @0.682",
+    "1/1993 Sb. čl. 80 @0.688",
+    "418/2011 Sb. § 42 @0.692"
+   ]
+  }
+ ]
+}

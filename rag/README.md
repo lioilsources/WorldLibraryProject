@@ -69,6 +69,80 @@ Pozor: Chroma na SPARKu (`192.168.88.66:8007`) i Postgres na JODĚ
 běžel v domácí síti (M2 stačí; embedding jednoho dotazu zvládne i MPS/CPU).
 Přes internet by musely oba porty do tunelu.
 
+## Právník — druhá instance nad zákony ČR
+
+Persona ⚖️ Právník v Ol1nLLM (plán a ověření zdrojů:
+`Ol1nLLM/docs/plan-pravnik.md`). **Nestaví nový server**: tentýž `server.py`
+s jiným vstupem, jinou databází a jinou kolekcí, jako uživatelský unit
+`law-chat` na SPARKu (**port 8098** — 8091 drží gen-queue):
+
+```
+e-Sbírka (sbr-cache REST, stránky 0-based, pořadí = dokument)
+   │ ingest_law.py --tier 1            registry/law/tier1.yaml (53 zákonů, aliasy, zkratky)
+   ▼
+law/{works,chapters,books}.jsonl       tentýž kontrakt jako knihy; chunk = §, dělený po odstavcích
+   │ load_pg.py --dsn LAW_PG_DSN       JODA :5433, databáze `law` (schéma z rag/sql)
+   │ embed_books.py --collection law_v1   Chroma na SPARKu :8007
+   ▼
+server.py --port 8098 --prompt-file prompts/pravnik_cs.md --cite-registry … --channels vec --planner off
+```
+
+`make ingest-law` (M2) → `make sync-law` → na SPARKu `make load-pg-law pg-index-law
+embed-law` → `make install-unit` (kopíruje i `law-chat.service`) → `make
+restart-law-chat`. `LAW_PG_DSN` je v `rag/.env` (M2 i SPARK).
+
+Co je jinak než u knihovny a proč (změřeno 23. 9. 2026, `eval/eval_law.py`,
+28 otázek nad vrstvou 1, `eval/results/law_20260923-*.json`):
+
+- **Intent `cite`** (`cite.py`, `--cite-registry`): dotaz, který jmenuje
+  ustanovení („§ 51 odst. 1 ZP", „čl. 10 Listiny"), jde deterministicky do
+  Postgresu, ne do vektoru — **100 %** správný § i předpis. Zkratky (OZ, ZP,
+  TZ…) jsou celé tokeny, ne kmenové aliasy: kmen „zp" by od hranice slova
+  chytil „zpět".
+- **Jen vektor** (`--channels vec`): ref-hit@8 **91 %** (MRR 0,75) proti
+  hybridu s fulltextem 74 % a čistému fulltextu 35 %. Postgres `simple` bez
+  českého stemmingu tahá do RRF šum („výpovědní doba" → § 67 ZP); přesné
+  odkazy, kde by fulltext pomohl, řeší `cite`.
+- **Plánovač vypnutý** (`--planner off --rewrite off`): knihovní plánovač
+  překládá termíny do jazyků tradic (u zákonů vyšlo „Vertragsende,
+  Arbeitsverhältnis") a stojí ~10 s na první token. Katalogové otázky („které
+  zákony znáš") tím zatím padají do obyčejného hledání — právní plánovač je
+  follow-up.
+- `--max-per-work 6` (knihovna 2): otázka na nájem má pět § v jednom zákoně.
+- `--no-translate-excerpts`: korpus je česky; appka bez `excerpt_cs` ukáže originál.
+- Název zdroje v appce: `title` = „262/2006 Sb. (§ 51 odst. 1–3)" — pozici
+  z konce `title` čte appka beze změny (`retriever.py` ho skládá z
+  `ref_start/ref_end`, když vypadají jako § nebo čl.).
+
+Co se v ingestu zahazuje a proč: část `novela` předpisů (citace textu
+vkládaného do *jiných* zákonů — 1,1 % fragmentů, v konsolidovaném znění
+cílového zákona už jsou), poznámky pod čarou na konci dokumentu, prefix a
+podpisy. Přílohy a preambule zůstávají (Listina je celá v příloze usnesení).
+Pořadí fragmentů se nebere z `id` (vložené novelou mají vyšší), ale ze
+surového pořadí stránek 0..N, které je pořadím dokumentu.
+
+### Eval Právníka
+
+`make eval-law` → `eval/eval_law.py` proti `eval/golden_law.jsonl` (67 otázek:
+65 měřitelných se `area`, 2 katalogové; `cite` větev musí být 1,00, cokoli míň
+je bug). Dva režimy:
+
+- `--service URL` (default cíle) — content otázky přes `GET /search` běžícího
+  `law-chat`, tj. **přesně produkční konfigurace** a bez druhého embedderu
+  v paměti SPARKu (při obohacení knihovny tam bývá volné jen ~2 GB ze 121).
+  Jde to i z M2 přes LAN; `cite` větev potřebuje jen PG.
+- `--mode vec|fts|hybrid` — vlastní embedder + Chroma, na izolaci kanálů.
+
+`eval/check_golden_law.py` ověří, že každý očekávaný § v korpusu existuje —
+spustit po každém rozšíření zlatého standardu.
+
+Baseline 28. 9. 2026 (65 otázek, produkční konfig): cite 1,00 · work-hit@8 1,00
+· **ref-hit@8 0,860** (MRR 0,618) · **ref-hit@5 0,825** (MRR 0,613). Slabá
+místa podle `by_area`: procesní 0,25 (vektor nerozliší OSŘ / ZŘS / SŘS),
+insolvence 0,00, daňové 0,667, nájem 0,714. Tři z osmi minutých otázek mají
+v top-5 **sousední §** (§ 2236 vs. 2235, §§ 20a a 22 vs. 21, §§ 390 a 391 vs.
+389) — rozbor a další nálezy v `docs/lawyer/CURRENT_STATE.md`.
+
 ## Zprovoznění
 
 ### 0. Data (M2)
