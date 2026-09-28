@@ -38,7 +38,8 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog eval-law bundles serve restart-chat install-unit mode deploy-spark
+        eval eval-catalog eval-law validate-templates update-template-snapshots render-doc \
+        bundles serve restart-chat install-unit mode deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -51,6 +52,7 @@ test:
 	$(PY) hybrid.py
 	$(PY) law_terms.py
 	$(PY) cite.py
+	$(PY) -m docgen.templates
 	$(PY) -m pytest -q tests
 
 # eval plánovače a katalogu přes běžící server (PG režim)
@@ -129,6 +131,21 @@ LAW_URL       ?= http://192.168.88.66:8098
 EVAL_LAW_ARGS ?= --service $(LAW_URL)
 eval-law:
 	$(PY) eval/eval_law.py $(EVAL_LAW_ARGS) --top-k $(LAW_TOP_K)
+
+# --- Šablony smluv (docgen; data v ../data/templates) -----------------------------
+# Validace = schéma + proměnné + výrazy + existence § v právním indexu + snapshoty
+# renderů. Kontrola § potřebuje LAW_PG_DSN; bez něj se přeskočí a řekne to.
+validate-templates:
+	$(PY) -m docgen.validate
+
+update-template-snapshots:
+	$(PY) -m docgen.validate --update-snapshots
+
+# make render-doc TYP=najemni_smlouva_byt VSTUP=docgen/fixtures/najemni_smlouva_byt__neurcita_minimum.json
+TYP   ?= najemni_smlouva_byt
+VSTUP ?=
+render-doc:
+	$(PY) -m docgen.render $(TYP) $(if $(VSTUP),--vstup $(VSTUP),--otazky)
 
 # --- JODA (Postgres + Chroma knihovny; deploy/joda) ---
 deploy-joda:

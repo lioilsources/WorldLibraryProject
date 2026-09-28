@@ -1,0 +1,19 @@
+{
+  "_popis": "DPP na 200 hodin, zákonný způsob zrušení, výplata na účet.",
+  "_k_datu": "2026-09-28",
+  "zamestnavatel_jmeno": "Ol1n Studio s.r.o.",
+  "zamestnavatel_identifikace": "IČO 12345678",
+  "zamestnavatel_adresa": "Nádražní 5, 602 00 Brno",
+  "zamestnanec_jmeno": "Tomáš Beran",
+  "zamestnanec_identifikace": "nar. 9. 7. 2001",
+  "zamestnanec_adresa": "Sokolská 18, 120 00 Praha 2",
+  "sjednana_prace": "korektury a jazyková revize českých textů v redakčním systému, podle zadání vedoucího projektu",
+  "misto_vykonu": "sídlo zaměstnavatele a místo bydliště zaměstnance (práce na dálku)",
+  "doba_od": "2026-10-01",
+  "doba_do": "2026-12-31",
+  "rozsah_hodin": 200,
+  "odmena_za_hodinu": 320,
+  "splatnost_den": 15,
+  "bankovni_ucet": "1029384756/0300",
+  "zpusob_zruseni": "zakonny"
+}

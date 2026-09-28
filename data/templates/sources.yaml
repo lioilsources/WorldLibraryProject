@@ -1,0 +1,89 @@
+# Odkud šablony berou obsah a co s čím smíme dělat. Ověřeno 2026-09-28.
+#
+# Rozhodnutí: **klauzule se odvozují z textu zákona v právním indexu**, ne
+# z cizích vzorů. Právní důvod je v samotném autorském zákoně, který máme
+# zaindexovaný a ověřený:
+#   * § 2 odst. 6 zák. č. 121/2000 Sb. — „Dílem podle tohoto zákona není zejména
+#     námět díla sám o sobě, … myšlenka, postup, princip, metoda …“ → struktura
+#     a náležitosti smluvního typu chráněné nejsou, chráněné je konkrétní vyjádření.
+#   * § 3 písm. a) zák. č. 121/2000 Sb. — z ochrany je vyňato úřední dílo (právní
+#     předpis, rozhodnutí, veřejná listina…) → texty zákonů z e-Sbírky jsou volné.
+#     Poradenský „vzor smlouvy“ z webu ministerstva ale úředním dílem není.
+#
+# Proto v tomto repu **není** adresář raw/ s cizími vzory a není fetcher: nic, co
+# by se muselo licenčně hlídat, sem netečeme. Kdyby to bylo někdy potřeba, platí
+# pravidlo z plánu: zdroj bez licence = jen ke čtení, ne jako vstup do generování.
+
+pouzite:
+  - id: esbirka_law_v1
+    nazev: e-Sbírka — úplná znění předpisů ČR
+    url: https://www.e-sbirka.cz/
+    pristup: "přes rag/ingest_law.py do kolekce law_v1 (53 předpisů vrstvy 1, znění k 2026-09)"
+    licence: "úřední dílo, z ochrany vyňato (§ 3 písm. a) zák. č. 121/2000 Sb.)"
+    role: primarni
+    poznamka: >-
+      Jediný zdroj obsahu šablon. Každá klauzule nese § a docgen/validate.py ověřuje,
+      že ten § v účinném znění existuje.
+
+  - id: vlastni_znalost
+    nazev: Formulace klauzulí
+    licence: "vlastní text (Ol1nLLM), psaný podle zákona"
+    role: primarni
+    poznamka: >-
+      Text klauzulí je psaný vlastními slovy podle znění zákona; tam, kde zákon
+      formulaci diktuje (poučení o námitkách, výčet nezbytných služeb), se drží zákona.
+
+prozkoumane_nepouzite:
+  - id: frankbold
+    nazev: Frank Bold — právní vzory
+    url: https://frankbold.org/poradna/vzory
+    zjisteno_kdy: 2026-09-28
+    licence: "nezjištěna — stránka uvádí „přes 50 volně dostupných formulářů“, ale žádnou licenci"
+    verdikt: nepouzito
+    duvod: >-
+      „Volně dostupné“ není licence. Bez výslovného svolení platí plná ochrana
+      konkrétního vyjádření, takže vzory nejsou vstupem do generování.
+
+  - id: dtest
+    nazev: dTest — vzory dopisů a smluv
+    url: https://www.dtest.cz/clanek-3272/vzory-dopisu-a-smluv
+    zjisteno_kdy: 2026-09-28
+    licence: nezjištěna
+    verdikt: nepouzito
+    duvod: "Stránka je za anti-bot ochranou (Anubis, „Access Denied“) — automatizovaný přístup není vítaný."
+
+  - id: mpsv
+    nazev: MPSV — pracovněprávní vzory a informace
+    url: https://mpsv.gov.cz/
+    zjisteno_kdy: 2026-09-28
+    licence: >-
+      robots.txt automatizovaný přístup obecně dovoluje (Disallow jen */rest/*, /fas/*,
+      /cas/*, /uredni-deska*; úplná blokace pro JoobleBot a SemrushBot). Licenční
+      podmínky vzorů neuvedeny.
+    verdikt: nepouzito_zatim
+    duvod: >-
+      Robots by stahování dovolil, ale poradenský vzor ministerstva není úřední dílo
+      podle § 3 písm. a) AZ. Jako kontrola náležitostí by šel použít ke čtení, k tomu
+      ale stejně dobře slouží samotný zákoník práce.
+
+  - id: justice_formulare
+    nazev: Formuláře a veřejné dokumenty justice.cz / portal.gov.cz
+    url: https://justice.cz/
+    zjisteno_kdy: 2026-09-28
+    licence: "úřední formuláře a veřejné listiny — kandidát na výjimku podle § 3 písm. a) AZ"
+    verdikt: pro_pozdeji
+    duvod: >-
+      Užitečné až u šablon, které se podávají soudu (návrh na vklad, žaloba, návrh na
+      oddlužení). Pro smluvní typy z první sady nejsou potřeba.
+
+  - id: zakonyprolidi
+    nazev: zakonyprolidi.cz
+    verdikt: zakazano
+    duvod: >-
+      Podmínky zakazují masivní a dávkové stahování, robots.txt blokuje /api/ (ověřeno
+      2026-09-23, Ol1nLLM/docs/plan-pravnik.md §2.2). Texty předpisů bereme z e-Sbírky.
+
+  - id: czcdc
+    nazev: CzCDC 1.0 (LINDAT) — judikatura
+    verdikt: zakazano
+    duvod: "CC BY-NC — nekomerční licence, do produktu nepatří."

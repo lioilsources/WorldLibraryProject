@@ -50,4 +50,8 @@ dosažitelná jako `joda`).
   (`rag/eval/eval_law.py` + `golden_law.jsonl`, `check_golden_law.py`); sekce
   „Právník" a „Eval Právníka" v `rag/README.md`, stav a nálezy
   `docs/lawyer/CURRENT_STATE.md`, plán `Ol1nLLM/docs/plan-pravnik.md`
+- **Šablony smluv** (Právník generuje dokumenty): `data/templates/*.yaml` (data,
+  ne prompt) + `rag/docgen/` (schéma, render, validace). Každá klauzule nese §
+  a `make validate-templates` ověří, že ten § v účinném znění existuje. Jak se
+  šablona píše: `docs/lawyer/TEMPLATES.md`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)
