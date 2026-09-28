@@ -1,0 +1,26 @@
+# Témata pro Právníka = právní odvětví. Čte je load_pg.py (--registry registry/law)
+# do tabulky topics; id odpovídají works.group v tier1.yaml.
+- id: ustavni
+  name_cs: Ústavní právo
+  description_cs: Ústava, Listina, Ústavní soud, volby, bezpečnost státu. Použij, když se ptá na základní práva, státní moc nebo ústavní pořádek.
+- id: obcanske
+  name_cs: Občanské právo
+  description_cs: Občanský zákoník, procesní předpisy civilního soudnictví, exekuce, insolvence, spotřebitel, katastr, duševní vlastnictví. Použij u smluv, vlastnictví, rodiny, dědění, náhrady újmy.
+- id: obchodni
+  name_cs: Obchodní a hospodářské právo
+  description_cs: Obchodní korporace, živnosti, veřejné rejstříky, účetnictví, hospodářská soutěž, banky. Použij u podnikání a firem.
+- id: trestni
+  name_cs: Trestní právo
+  description_cs: Trestní zákoník a řád, trestní odpovědnost právnických osob, mládež, oběti. Použij u trestných činů, trestů a trestního řízení.
+- id: pracovni_socialni
+  name_cs: Pracovní právo a sociální zabezpečení
+  description_cs: Zákoník práce, zaměstnanost, nemocenské a důchodové pojištění, pojistné, zdravotní pojištění, inspekce práce. Použij u pracovního poměru, mzdy, dovolené, výpovědi, dávek.
+- id: spravni
+  name_cs: Správní právo
+  description_cs: Správní řád, správní soudnictví, přestupky, informace, osobní údaje, obce, silniční provoz, stavební právo, cizinci, veřejné zakázky. Použij u úřadů, řízení před úřady a přestupků.
+- id: danove
+  name_cs: Daňové právo
+  description_cs: Daňový řád, daně z příjmů, DPH, daň z nemovitých věcí, spotřební daně. Použij u daní a jednání s finanční správou.
+- id: justice
+  name_cs: Justice a právnické profese
+  description_cs: Soudy a soudci, advokacie, notářství, státní zastupitelství. Použij u organizace justice a profesních pravidel.

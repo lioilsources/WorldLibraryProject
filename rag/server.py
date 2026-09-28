@@ -131,6 +131,12 @@ class RAGServer:
             args.llm_model, args.planner_model, args.excerpt_model, "swarm-director",
         ])
         self.system_prompt = Path(args.prompt_file).read_text(encoding="utf-8")
+        # Právník: „co říká § 2079 OZ" je deterministický lookup, ne hledání —
+        # registr zkratek a aliasů je tentýž, ze kterého jde ingest_law.py.
+        self.cite_registry = None
+        if getattr(args, "cite_registry", ""):
+            from cite import LawRegistry
+            self.cite_registry = LawRegistry(Path(args.cite_registry))
 
         url = urlparse(args.chroma_url)
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
@@ -557,6 +563,54 @@ class RAGServer:
         messages.append({"role": "user", "content": "\n\n".join(parts)})
         return messages
 
+    # --- Právník: intent cite ---------------------------------------------------------
+
+    def _cite(self, req: ChatRequest, out: dict) -> bool:
+        """Dotaz jmenuje ustanovení („§ 51 odst. 1 ZP", „čl. 10 Listiny") → celý
+        § z Postgresu jako hity, bez vektoru. Bez jmenovaného předpisu se
+        hledá ve všech s prioritou 1; víc zásahů = protiotázka s kandidáty,
+        ne tipování. Vrací False, když dotaz citaci neobsahuje — pak jede
+        běžná cesta."""
+        from cite import lookup, narrow_to_unit, parse_citation, ref_span
+
+        cit = parse_citation(req.message, self.cite_registry)
+        if cit is None:
+            return False
+        with self.pool.connection() as conn:
+            rows = lookup(conn, cit)
+        rows = narrow_to_unit(rows, cit)
+        acts = []
+        for r in rows:
+            if r["work_id"] not in acts:
+                acts.append(r["work_id"])
+        hits = []
+        for r in rows:
+            hits.append({"text": r["text"], "distance": 0.0, "meta": {
+                "chunk_id": r["chunk_id"], "work": r["work"], "work_id": r["work_id"], "name_cs": r["name_cs"],
+                "title": f"{r['work']} ({ref_span(r['ref_start'], r['ref_end'])})", "group": r["group"], "lang": "cs",
+                "lang_original": "cs", "lang_corpus": "cs", "edition": r["edition"], "path": r["source_path"],
+                "chapter_id": r["chapter_id"], "chapter_path": r["chapter_path"],
+                "ref_start": r["ref_start"], "ref_end": r["ref_end"], "seq": r["seq"], "score": None,
+                "channels": ["cite"]}})
+        label = cit.label
+        if not hits:
+            out["instruction"] = (f"Uživatel se ptá na {label}"
+                                  + (f" předpisu {self.cite_registry.short.get(cit.act_hint, cit.act_hint)}" if cit.act_hint else "")
+                                  + ", ale v knihovně takové ustanovení není (předpis chybí, nebo § neexistuje). "
+                                  "Řekni to na rovinu; nevymýšlej jeho obsah.")
+        elif len(acts) > 1:
+            names = ", ".join(self.cite_registry.short.get(a, a) for a in acts)
+            out["instruction"] = (f"Dotaz jmenuje {label}, ale ne předpis, a takové ustanovení má víc předpisů "
+                                  f"({names}). Úryvky jsou z každého z nich: krátce řekni, o čem {label} v každém je, "
+                                  "a zeptej se, který předpis uživatel myslí.")
+        else:
+            out["instruction"] = (f"Uživatel se ptá na {label}. Úryvky jsou celé znění toho ustanovení: cituj ho "
+                                  "přesně (odstavce, písmena), pak vysvětli, co znamená, a uveď datum účinnosti znění.")
+        out["hits"] = hits[: max(req.top_k, 8)]
+        out["routed"] = {"works": acts, "groups": [], "intent": "cite", "ref": label,
+                         "unit": cit.unit_ref, "act_hint": cit.act_hint}
+        return True
+
     # --- plán → kontext ------------------------------------------------------------
 
     def _prepare(self, req: ChatRequest, session_id: str, history,
@@ -570,6 +624,10 @@ class RAGServer:
                "instruction": None, "payload": {}, "plan": None}
         if self.retriever is None:
             out["hits"], out["routed"] = self.retrieve(req.message, req.top_k)
+            return out
+        # Citace paragrafu má přednost před vším: je přesná a stojí nula
+        # latence; plánovač ani vektor by k ní nic nepřidaly.
+        if self.cite_registry is not None and self._cite(req, out):
             return out
         plan = QueryPlan()
         # Aliasy jsou tabulkové vyhledání, plánovač je LLM roundtrip za 25-40 s
@@ -1168,6 +1226,8 @@ def main():
                         "http://localhost:8005/v1); prázdné = lokální model")
     p.add_argument("--device", default="auto", help="auto|cuda|mps|cpu")
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
+    p.add_argument("--cite-registry", default="",
+                   help="Právník: registry/law/tier1.yaml zapne intent cite — dotaz na § jde rovnou do PG, ne do vektoru")
     p.add_argument("--summaries-file", default=str(Path(__file__).parent / "summaries.json"),
                    help="anotace děl z gen_summaries.py (chybějící soubor = bez anotací)")
     p.add_argument("--pg-dsn", default=os.getenv("PG_DSN", ""),

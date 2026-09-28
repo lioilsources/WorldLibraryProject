@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from cite import ref_span
 from embeddings import format_query
 from hybrid import dedup_passages, rrf
 from pg_search import fts_cs, fts_orig, hydrate, known_groups, neighbors, query_terms
@@ -128,7 +129,11 @@ class Retriever:
                 meta = {
                     "chunk_id": cid,
                     "work": row["title"], "work_id": row["work_id"], "name_cs": row["name_cs"],
-                    "title": f"{row['title']} (část {row['seq'] + 1}/?)",
+                    # Zákon: pozice je paragraf, ne pořadí chunku — appka čte
+                    # z konce title „§ 51 odst. 1–3" stejně jako „část 30/488".
+                    "title": (f"{row['title']} ({ref_span(row['ref_start'], row['ref_end'])})"
+                              if (row.get("ref_start") or "").startswith(("§", "čl."))
+                              else f"{row['title']} (část {row['seq'] + 1}/?)"),
                     "group": row["group"], "subgroup": row["subgroup"], "lang": row["lang"],
                     "lang_original": row["lang_original"], "lang_corpus": row["lang_corpus"],
                     "author": row["author"], "author_cs": row["author_cs"], "edition": row["edition"],
@@ -163,6 +168,10 @@ def context_block(hits: list[dict]) -> str:
         translated = ""
         if m.get("lang_original") and m.get("lang_corpus") and m["lang_original"] != m["lang_corpus"]:
             translated = f" [v knihovně: překlad, {m.get('edition') or m['lang_corpus']}]"
+        # Zákon: datum znění musí být v kontextu, jinak si ho model vymyslí
+        # (pozorováno: „účinné od 1. 1. 2026" u znění ZP z 29. 8. 2026).
+        elif (m.get("ref_start") or "").startswith(("§", "čl.")) and m.get("edition"):
+            translated = f" [{m['edition']}]"
         head = f"[{i}] {label}" + (f" › {where}" if where else "") + ref + translated
         lines.append(f"{head}:\n{h['text']}")
     return "\n\n".join(lines) if lines else "(nic nenalezeno)"

@@ -1,0 +1,30 @@
+[Unit]
+# Právník — druhá instance rag/server.py nad zákony ČR (kolekce law_v1, databáze
+# law na JODA, prompt pravnik_cs.md, intent cite). Plán: Ol1nLLM/docs/plan-pravnik.md.
+# Instalace: make install-unit (kopíruje deploy/spark/*.service a enabluje).
+# LAW_PG_DSN čte z rag/.env (mimo git) — stejný soubor jako knihovní instance.
+Description=Právník — RAG chatbot nad zákony ČR (WorldLibraryProject, port 8098)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/deploy/WorldLibraryProject/rag
+EnvironmentFile=%h/deploy/WorldLibraryProject/rag/.env
+ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 server.py \
+  --port 8098 \
+  --prompt-file prompts/pravnik_cs.md \
+  --collection law_v1 --gloss-collection law_gloss_none \
+  --channels vec \
+  --pg-dsn ${LAW_PG_DSN} \
+  --cite-registry registry/law/tier1.yaml \
+  --planner off --rewrite off \
+  --max-per-work 6 --no-translate-excerpts \
+  --summaries-file law/summaries.json \
+  --llm-url http://localhost:8080/v1
+Restart=always
+RestartSec=5
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target
