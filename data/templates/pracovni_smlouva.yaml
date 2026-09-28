@@ -1,0 +1,246 @@
+# Pracovní smlouva. Povinné minimum je krátké a kogentní: druh práce, místo výkonu
+# práce a den nástupu (§ 34 odst. 1), písemně (§ 34 odst. 2). Všechno ostatní je
+# ujednání — ale zaměstnavatel musí o zbytku obsahu písemně informovat (§ 37),
+# takže co není ve smlouvě, musí být v informaci.
+# Zkušební doba: účinné znění § 35 odst. 2 dovoluje 4 měsíce (8 u vedoucího
+# zaměstnance), ne 3 a 6, jak stálo ve znění do roku 2023.
+typ: pracovni_smlouva
+nazev: Pracovní smlouva
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Vznik pracovního poměru. Na dobu určitou i neurčitou; zkušební doba nepovinná,
+  ale musí být sjednána písemně nejpozději v den vzniku pracovního poměru.
+forma:
+  pisemna: true
+  zaklad: {zakon: "262/2006 Sb.", par: "§ 34", poznamka: "odst. 2"}
+
+pravni_zaklad:
+  - {zakon: "262/2006 Sb.", paragrafy: "§ 33 a násl.", poznamka: "pracovní poměr"}
+
+strany:
+  - {role: zamestnavatel, nazev: Zaměstnavatel, typ: [fyzicka, pravnicka]}
+  - {role: zamestnanec, nazev: Zaměstnanec, typ: [fyzicka]}
+
+promenne:
+  - {id: zamestnavatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma zaměstnavatele?"}
+  - {id: zamestnavatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození zaměstnavatele?"}
+  - {id: zamestnavatel_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa zaměstnavatele?"}
+  - {id: zamestnanec_jmeno, typ: string, povinna: true, otazka: "Jméno zaměstnance?"}
+  - {id: zamestnanec_identifikace, typ: string, povinna: true, otazka: "Datum narození zaměstnance?"}
+  - {id: zamestnanec_adresa, typ: string, povinna: true, otazka: "Adresa zaměstnance?"}
+
+  - id: druh_prace
+    typ: string
+    povinna: true
+    otazka: "Jaký je druh práce (pracovní pozice)?"
+    napoveda: "Povinná součást smlouvy. Vymezuje, jakou práci lze zaměstnanci přidělovat."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 34"}
+  - id: misto_vykonu
+    typ: string
+    povinna: true
+    otazka: "Jaké je místo nebo místa výkonu práce?"
+    napoveda: "Je-li sjednáno šířeji než jedna obec, řeší § 34a, co je pravidelné pracoviště pro cestovní náhrady."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 34a"}
+  - id: den_nastupu
+    typ: date
+    povinna: true
+    otazka: "Jaký je den nástupu do práce?"
+    napoveda: "Tímto dnem vzniká pracovní poměr. Povinná součást smlouvy."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 34"}
+  - id: doba_pomeru
+    typ: enum
+    hodnoty: [neurcita, urcita]
+    povinna: true
+    otazka: "Pracovní poměr na dobu neurčitou, nebo určitou?"
+  - {id: doba_do, typ: date, povinna: false, otazka: "Do kdy pracovní poměr trvá (u doby určité)?"}
+  - id: je_vedouci
+    typ: enum
+    hodnoty: [ne, ano]
+    povinna: true
+    otazka: "Jde o vedoucí pracovní místo?"
+    napoveda: "U vedoucího zaměstnance smí být zkušební doba až 8 měsíců, jinak 4."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}
+  - id: zkusebni_doba_mesice
+    typ: int
+    povinna: false
+    otazka: "Zkušební doba v měsících, pokud ji sjednáváte?"
+    napoveda: "Nejvýše 4 měsíce (8 u vedoucího) a nejvýše polovina sjednané doby u poměru na dobu určitou."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}
+  - id: tydenni_doba
+    typ: int
+    povinna: true
+    otazka: "Jaká je týdenní pracovní doba v hodinách?"
+    napoveda: "Stanovená týdenní pracovní doba je 40 hodin; kratší lze sjednat."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 79"}
+  - id: mzda_forma
+    typ: enum
+    hodnoty: [mesicni, hodinova]
+    povinna: true
+    otazka: "Je mzda měsíční, nebo hodinová?"
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 113"}
+  - {id: mzda, typ: money, povinna: true, otazka: "Jaká je mzda (měsíčně, nebo za hodinu)?"}
+  - {id: dovolena_tydny, typ: int, povinna: true, otazka: "Jaká je výměra dovolené v týdnech?"}
+  - {id: bankovni_ucet, typ: string, povinna: true, otazka: "Na jaký účet se mzda vyplácí?"}
+
+kontroly:
+  - vyraz: "mzda > 0"
+    zprava: "Mzda musí být větší než nula."
+  - vyraz: "tydenni_doba > 0 and tydenni_doba <= 40"
+    zprava: "Týdenní pracovní doba nemůže přesáhnout stanovenou týdenní pracovní dobu 40 hodin."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 79"}
+  - vyraz: "je_vedouci == 'ano' or zkusebni_doba_mesice <= 4"
+    zprava: "Zkušební doba nesmí být delší než 4 měsíce po sobě jdoucí ode dne vzniku pracovního poměru."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}
+  - vyraz: "zkusebni_doba_mesice <= 8"
+    zprava: "Zkušební doba nesmí být delší než 8 měsíců ani u vedoucího zaměstnance."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}
+  - vyraz: "dovolena_tydny >= 4"
+    zprava: "Výměra dovolené v pracovním poměru je nejméně 4 týdny."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 212"}
+  - vyraz: "doba_pomeru == 'neurcita' or doba_do != null"
+    zprava: "U pracovního poměru na dobu určitou chybí datum, do kterého trvá."
+
+klauzule:
+  - id: vznik
+    nazev: Druh práce, místo výkonu a den nástupu
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 34"}
+      - {zakon: "262/2006 Sb.", par: "§ 34a"}
+    text: |
+      Zaměstnavatel přijímá zaměstnance na druh práce: {{ druh_prace }}.
+
+      Místem výkonu práce je {{ misto_vykonu }}. Není-li sjednáno pravidelné pracoviště pro
+      účely cestovních náhrad, je jím místo výkonu práce podle této smlouvy.
+
+      Dnem nástupu do práce je {{ den_nastupu|datum }}; tímto dnem vzniká pracovní poměr.
+
+  - id: doba
+    nazev: Doba trvání pracovního poměru
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 34"}
+    varianty:
+      podle: doba_pomeru
+      hodnoty:
+        neurcita: |
+          Pracovní poměr se sjednává na dobu neurčitou.
+        urcita: |
+          Pracovní poměr se sjednává na dobu určitou do {{ doba_do|datum }}.
+
+  - id: zkusebni_doba
+    nazev: Zkušební doba
+    povinna: false
+    podminka: "zkusebni_doba_mesice != null"
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 35"}
+    text: |
+      Strany sjednávají zkušební dobu v délce {{ zkusebni_doba_mesice|cislo }} měsíců ode dne
+      vzniku pracovního poměru.
+
+      Zkušební doba se prodlužuje o pracovní dny, v nichž zaměstnanec neodpracoval celou směnu
+      z důvodu překážky v práci, čerpání dovolené nebo neomluveného zameškání práce.
+
+  - id: pracovni_doba
+    nazev: Pracovní doba
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 79"}
+    text: |
+      Sjednaná týdenní pracovní doba činí {{ tydenni_doba|cislo }} hodin. Rozvržení pracovní
+      doby určuje zaměstnavatel.
+
+  - id: mzda
+    nazev: Mzda
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 109"}
+      - {zakon: "262/2006 Sb.", par: "§ 113"}
+      - {zakon: "262/2006 Sb.", par: "§ 141"}
+    varianty:
+      podle: mzda_forma
+      hodnoty:
+        mesicni: |
+          Za vykonanou práci přísluší zaměstnanci mzda ve výši {{ mzda|kc }} měsíčně.
+
+          Mzda je splatná po vykonání práce, nejpozději v kalendářním měsíci následujícím po
+          měsíci, ve kterém na ni zaměstnanci vzniklo právo, a vyplácí se na účet zaměstnance
+          č. {{ bankovni_ucet }}.
+        hodinova: |
+          Za vykonanou práci přísluší zaměstnanci mzda ve výši {{ mzda|kc }} za hodinu práce.
+
+          Mzda je splatná po vykonání práce, nejpozději v kalendářním měsíci následujícím po
+          měsíci, ve kterém na ni zaměstnanci vzniklo právo, a vyplácí se na účet zaměstnance
+          č. {{ bankovni_ucet }}.
+
+  - id: dovolena
+    nazev: Dovolená
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 212"}
+      - {zakon: "262/2006 Sb.", par: "§ 213"}
+    text: |
+      Výměra dovolené činí {{ dovolena_tydny|cislo }} týdny v kalendářním roce. Délka dovolené
+      se určí jako sjednaná týdenní pracovní doba vynásobená výměrou dovolené; při kratší
+      pracovní době nebo kratším trvání poměru přísluší dovolená poměrně.
+
+  - id: povinnosti
+    nazev: Práva a povinnosti stran
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 38"}
+    text: |
+      Od vzniku pracovního poměru je zaměstnavatel povinen přidělovat zaměstnanci práci podle
+      pracovní smlouvy, platit mu za vykonanou práci mzdu, vytvářet podmínky pro plnění jeho
+      pracovních úkolů a dodržovat ostatní pracovní podmínky.
+
+      Zaměstnanec je povinen podle pokynů zaměstnavatele konat osobně práce podle pracovní
+      smlouvy v rozvržené pracovní době a dodržovat povinnosti, které mu vyplývají
+      z pracovního poměru.
+
+  - id: informovani
+    nazev: Informování o obsahu pracovního poměru
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 37"}
+    text: |
+      Údaje, které tato smlouva neobsahuje a o nichž zákon ukládá zaměstnance písemně
+      informovat, zaměstnavatel zaměstnanci písemně poskytne ve lhůtě stanovené zákonem.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 34"}
+    text: |
+      Smlouva je uzavřena písemně ve dvou vyhotoveních; jedno obdrží zaměstnanec. Změny
+      vyžadují písemnou formu.
+
+      Není-li v této smlouvě něco sjednáno, platí zákoník práce.
+
+checklist:
+  - {bod: "Smlouva obsahuje druh práce, místo výkonu práce a den nástupu", zaklad: {zakon: "262/2006 Sb.", par: "§ 34"}}
+  - {bod: "Smlouva je písemná a jedno vyhotovení dostal zaměstnanec", zaklad: {zakon: "262/2006 Sb.", par: "§ 34"}}
+  - {bod: "Zkušební doba je sjednána písemně nejpozději v den vzniku pracovního poměru", zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}}
+  - {bod: "U poměru na dobu určitou není zkušební doba delší než polovina sjednané doby", zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}}
+  - {bod: "Mzda není nižší než minimální mzda a zaručená mzda pro danou skupinu prací — částky stanoví nařízení vlády mimo právní index, ověřit ručně", zaklad: {zakon: "262/2006 Sb.", par: "§ 111"}}
+  - {bod: "Zaměstnanec byl písemně informován o údajích, které smlouva neobsahuje", zaklad: {zakon: "262/2006 Sb.", par: "§ 37"}}
+  - {bod: "U doby určité ověřit pravidlo o opakování a řetězení pracovních poměrů — tato šablona je neřeší"}
+  - {bod: "Vstupní lékařská prohlídka, mzdové zařazení a přihlášky na ČSSZ a zdravotní pojišťovnu — mimo tuto šablonu"}
+
+upozorneni:
+  - text: >-
+      Zkušební doba smí být nejvýše 4 měsíce po sobě jdoucí ode dne vzniku pracovního poměru,
+      u vedoucího zaměstnance 8 měsíců. Znění do roku 2023 mělo 3 a 6 měsíců — starší vzory
+      jsou v tomhle bodě zastaralé.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 35"}
+  - text: >-
+      Nenastoupí-li zaměstnanec v den nástupu do práce a nebyla-li mu v tom překážka nebo
+      neuvědomí-li o ní zaměstnavatele, může zaměstnavatel od smlouvy odstoupit.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 34"}
+  - text: >-
+      Zaměstnanec v dalším základním pracovněprávním vztahu u téhož zaměstnavatele nesmí konat
+      práce, které jsou stejně druhově vymezené.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 34b"}

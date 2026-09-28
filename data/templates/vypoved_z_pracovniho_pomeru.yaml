@@ -1,0 +1,170 @@
+# Výpověď z pracovního poměru — jednostranný dokument, ve dvou režimech, které
+# se právně liší podstatně:
+#  * zaměstnanec může dát výpověď z jakéhokoli důvodu nebo bez uvedení důvodu
+#    (§ 50 odst. 3);
+#  * zaměstnavatel jen z důvodu výslovně stanoveného v § 52 a musí ho **skutkově
+#    vymezit** tak, aby nebyl zaměnitelný s jiným (§ 50 odst. 2 a 4); důvod nesmí
+#    být dodatečně měněn.
+# Výpovědní doba je nejméně 2 měsíce a začíná dnem doručení (§ 51) — pozor, u nájmu
+# bytu běží od prvního dne následujícího měsíce, tady ne.
+# Odstupné u důvodů § 52 písm. a) až c) je 1–3násobek průměrného výdělku podle
+# délky trvání poměru (§ 67).
+typ: vypoved_z_pracovniho_pomeru
+nazev: Výpověď z pracovního poměru
+verze: 1
+jazyk: cs
+druh: jednostranny_dokument
+popis: >-
+  Výpověď daná zaměstnancem (bez důvodu) nebo zaměstnavatelem (jen z důvodu podle
+  § 52, skutkově vymezeného). Nejde o okamžité zrušení pracovního poměru ani
+  o dohodu o rozvázání.
+forma:
+  pisemna: true
+  zaklad: {zakon: "262/2006 Sb.", par: "§ 50", poznamka: "odst. 1 — písemně, jinak se k výpovědi nepřihlíží"}
+
+pravni_zaklad:
+  - {zakon: "262/2006 Sb.", paragrafy: "§ 50 a násl.", poznamka: "rozvázání pracovního poměru výpovědí"}
+
+strany:
+  - {role: odesilatel, nazev: Odesílatel, typ: [fyzicka, pravnicka]}
+  - {role: adresat, nazev: Adresát, typ: [fyzicka, pravnicka]}
+
+promenne:
+  - {id: odesilatel_jmeno, typ: string, povinna: true, otazka: "Kdo výpověď dává (jméno nebo firma)?"}
+  - {id: odesilatel_identifikace, typ: string, povinna: false, otazka: "IČO nebo datum narození odesílatele?"}
+  - {id: odesilatel_adresa, typ: string, povinna: true, otazka: "Adresa odesílatele?"}
+  - {id: adresat_jmeno, typ: string, povinna: true, otazka: "Komu je výpověď určena (jméno nebo firma)?"}
+  - {id: adresat_identifikace, typ: string, povinna: false, otazka: "IČO nebo datum narození adresáta?"}
+  - {id: adresat_adresa, typ: string, povinna: true, otazka: "Adresa adresáta?"}
+
+  - id: kdo
+    typ: enum
+    hodnoty: [zamestnanec, zamestnavatel]
+    povinna: true
+    otazka: "Dává výpověď zaměstnanec, nebo zaměstnavatel?"
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}
+  - {id: druh_prace, typ: string, povinna: true, otazka: "Jaký druh práce (pozice) byl sjednán?"}
+  - {id: den_nastupu, typ: date, povinna: true, otazka: "Kdy pracovní poměr vznikl (den nástupu)?"}
+  - {id: datum_doruceni, typ: date, povinna: true, otazka: "Kterým dnem výpověď doručujete?"}
+  - id: duvod_pismeno
+    typ: enum
+    hodnoty: [a, b, c, d, e, f, g, h]
+    povinna: false
+    otazka: "U výpovědi od zaměstnavatele: který důvod podle § 52 to je (písmeno a–h)?"
+    napoveda: >-
+      a) ruší se zaměstnavatel nebo jeho část; b) přemísťuje se; c) nadbytečnost při
+      organizačních změnách; d) dlouhodobá zdravotní nezpůsobilost podle posudku;
+      e) dosažení nejvyšší přípustné expozice; f) nesplňování předpokladů nebo požadavků
+      (u neuspokojivých výsledků po písemné výzvě v posledních 12 měsících);
+      g) důvody pro okamžité zrušení nebo závažné porušení povinností (u soustavného méně
+      závažného po písemném upozornění v posledních 6 měsících); h) zvlášť hrubé porušení
+      povinnosti podle § 301a.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 52"}
+  - id: duvod_skutkove
+    typ: text
+    povinna: false
+    otazka: "U výpovědi od zaměstnavatele: popiš důvod skutkově — co se stalo, kdy, čím je nezaměnitelný."
+    napoveda: "Bez skutkového vymezení je výpověď neplatná a důvod nelze dodatečně měnit."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 50", poznamka: "odst. 4"}
+
+kontroly:
+  - vyraz: "kdo == 'zamestnanec' or duvod_pismeno != null"
+    zprava: "Výpověď od zaměstnavatele musí uvádět důvod podle § 52."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}
+  - vyraz: "kdo == 'zamestnanec' or duvod_skutkove != null"
+    zprava: "Výpověď od zaměstnavatele musí důvod skutkově vymezit tak, aby nebyl zaměnitelný s jiným."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}
+
+klauzule:
+  - id: vypoved
+    nazev: Výpověď z pracovního poměru
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 50"}
+      - {zakon: "262/2006 Sb.", par: "§ 51"}
+      - {zakon: "262/2006 Sb.", par: "§ 52"}
+    varianty:
+      podle: kdo
+      hodnoty:
+        zamestnanec: |
+          Dávám tímto výpověď z pracovního poměru, který vznikl dnem {{ den_nastupu|datum }}
+          a byl sjednán na druh práce {{ druh_prace }}.
+
+          Výpověď dávám bez uvedení důvodu; zaměstnanec tak může učinit z jakéhokoli důvodu
+          nebo bez uvedení důvodu.
+
+          Pracovní poměr skončí uplynutím výpovědní doby, která činí nejméně 2 měsíce a začíná
+          dnem, v němž byla tato výpověď doručena druhé smluvní straně.
+        zamestnavatel: |
+          Dávám tímto zaměstnanci výpověď z pracovního poměru, který vznikl dnem
+          {{ den_nastupu|datum }} a byl sjednán na druh práce {{ druh_prace }}.
+
+          Důvodem výpovědi je důvod podle § 52 písm. {{ duvod_pismeno }} zákoníku práce.
+          Skutkově jej vymezuji takto: {{ duvod_skutkove }}
+
+          Pracovní poměr skončí uplynutím výpovědní doby, která činí nejméně 2 měsíce a začíná
+          dnem, v němž byla tato výpověď doručena zaměstnanci.
+
+  - id: odstupne
+    nazev: Odstupné
+    povinna: false
+    podminka: "kdo == 'zamestnavatel' and (duvod_pismeno == 'a' or duvod_pismeno == 'b' or duvod_pismeno == 'c')"
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 67"}
+    text: |
+      Vzhledem k tomu, že pracovní poměr je rozvazován z důvodu podle § 52 písm.
+      {{ duvod_pismeno }} zákoníku práce, přísluší zaměstnanci při skončení pracovního poměru
+      odstupné ve výši nejméně jednonásobku jeho průměrného výdělku, trval-li pracovní poměr
+      méně než 1 rok, dvojnásobku při trvání alespoň 1 rok a méně než 2 roky a trojnásobku při
+      trvání alespoň 2 roky. Odstupné bude vyplaceno v nejbližším výplatním termínu po skončení
+      pracovního poměru.
+
+  - id: potvrzeni
+    nazev: Potvrzení o zaměstnání a vypořádání
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 313"}
+    text: |
+      Při skončení pracovního poměru vydá zaměstnavatel zaměstnanci potvrzení o zaměstnání
+      se zákonem stanovenými údaji.
+
+      Strany si ke dni skončení pracovního poměru vzájemně vypořádají nevyčerpanou dovolenou,
+      svěřené věci a další závazky z pracovního poměru.
+
+  - id: zaver
+    nazev: Doručení
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 50"}
+      - {zakon: "262/2006 Sb.", par: "§ 51"}
+    text: |
+      Tato výpověď se doručuje dne {{ datum_doruceni|datum }}. Výpověď je písemná; žádám
+      o písemné potvrzení jejího převzetí.
+
+checklist:
+  - {bod: "Výpověď je písemná — jinak se k ní nepřihlíží", zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}}
+  - {bod: "Výpověď byla druhé straně prokazatelně doručena; výpovědní doba začíná dnem doručení", zaklad: {zakon: "262/2006 Sb.", par: "§ 51"}}
+  - {bod: "U výpovědi od zaměstnavatele je důvod uveden a skutkově vymezen a nebude dodatečně měněn", zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}}
+  - {bod: "Zkontrolováno, že zaměstnanec není v ochranné době (nemoc, těhotenství, rodičovská, výkon veřejné funkce a další)", zaklad: {zakon: "262/2006 Sb.", par: "§ 53"}}
+  - {bod: "U důvodu f) proběhla písemná výzva k odstranění neuspokojivých výsledků v posledních 12 měsících", zaklad: {zakon: "262/2006 Sb.", par: "§ 52"}}
+  - {bod: "U soustavného méně závažného porušování podle g) proběhlo písemné upozornění na možnost výpovědi v posledních 6 měsících", zaklad: {zakon: "262/2006 Sb.", par: "§ 52"}}
+  - {bod: "U důvodů a) až c) je spočítáno a připraveno odstupné", zaklad: {zakon: "262/2006 Sb.", par: "§ 67"}}
+  - {bod: "Působí-li u zaměstnavatele odborová organizace, byla výpověď s ní projednána — tato šablona to neřeší"}
+
+upozorneni:
+  - text: >-
+      Výpovědní doba u pracovního poměru začíná dnem doručení výpovědi, ne prvním dnem
+      následujícího měsíce jako u nájmu bytu. Nejméně činí 2 měsíce.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 51"}
+  - text: >-
+      Zaměstnavatel může dát výpověď jen z důvodu výslovně stanoveného v § 52 a musí ho
+      skutkově vymezit tak, aby nebyl zaměnitelný s jiným; dodatečně jej měnit nelze.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 50"}
+  - text: >-
+      V ochranné době je výpověď od zaměstnavatele zakázána — zejména při dočasné pracovní
+      neschopnosti, v těhotenství, na mateřské a rodičovské dovolené a při výkonu veřejné funkce.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 53"}
+  - text: >-
+      Tento dokument není okamžité zrušení pracovního poměru. To má vlastní důvody a i u něj
+      platí povinnost skutkově vymezit důvod a písemná forma.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 60"}
