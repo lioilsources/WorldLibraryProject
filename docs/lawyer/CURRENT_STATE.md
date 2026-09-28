@@ -240,6 +240,24 @@ restart-law-chat` (restart maže konverzace v RAM).
 předpisy znáš" jde do vektoru. V evalu jsou dvě katalogové otázky, ale
 `eval_law.py` je přeskakuje — katalog se dnes neměří vůbec.
 
+**N9 — retrieval jede, generování odpovědi je na hranici použitelnosti.** Model
+group `translate`, se kterým je `law-chat` nakonfigurovaný, mezi kontejnery
+**vůbec neběží**; odpovídá se jen díky fallbacku LiteLLM na `swarm-director`,
+který v tu dobu obsluhuje obohacení knihovny (vLLM: 16 běžících, 4 čekající;
+SPARK 118/121 GB obsazeno). Výsledek 28. 9.: `/ask` 136 s, `POST /chat` **256 s**
+(HTTP 200, `model: swarm-director`, přilehlé § ve zdrojích) — a mezi tím jedno
+**500 z LiteLLM**, když fallback nestihl („Model Group=translate → connection
+error, fallback swarm-director → connection error"). Není to nestabilita
+Právníka, ale parku: buď nahodit `translate`, nebo počítat s minutami na
+odpověď, dokud obohacení jede. Pozor na paměť — 36GiB model se do 3 GB volných
+nevejde.
+
+Retrieval se tím netrápí: `GET /search` odpovídá do stovek ms a celý eval (65 +
+18 otázek) proti běžící službě prošel. Dopad dnešní změny na latenci je měřený
+a malý: prompt narostl o **24–48 %** (10 593 → 15 674 znaků u „zkušební doba",
+6 730 → 8 618 u výpovědi z nájmu), tj. ~1 200 tokenů prefillu navíc — proti
+minutám ve frontě je to šum.
+
 **N8 — mapa pojmů se na nových formulacích nepotvrdila, expanze na přilehlé § ano.**
 Dvě změny nasazené 28. 9. měřené zvlášť na hlavní sadě (65 otázek) a na holdout
 sadě `golden_law_v2.jsonl` (18 otázek, psaná až po mapě, jinými slovy):
