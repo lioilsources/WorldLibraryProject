@@ -299,3 +299,26 @@ def test_skriptovany_klient_vraci_tool_calls():
     o = k.chat([{"role": "user", "content": "x"}], tools=[])
     assert isinstance(o, OdpovedModelu) and o.chce_nastroj
     assert json.loads(o.tool_calls[0]["arguments"]) == {"query": "jistota"}
+
+
+class _BezNastroju:
+    """Nástroje bez PG: prázdný registr — stačí na tvar zpráv pro model."""
+
+    def registr(self):
+        return {}
+
+    def definice(self):
+        return []
+
+
+def test_system_zprava_jen_jedna_a_na_zacatku():
+    """Qwen3.6 (openclaw-default) odmítne systémovou zprávu jinde než na začátku
+    (400 „System message must be at the beginning"), benchmark 2026-09-29."""
+    zacykleny = [{"tool": "neexistuje", "args": {}} for _ in range(3)]
+    llm = SkriptovanyKlient(zacykleny + ["konec"])
+    agent = Pravnik(_BezNastroju(), llm=llm, router="heuristika", max_volani=3)
+    agent.krok("Potřebuji nájemní smlouvu.", historie=[{"role": "user", "content": "ahoj"}, {"role": "assistant", "content": "dobrý den"}])
+    assert llm.volani, "model nebyl zavolán"
+    for v in llm.volani:
+        role = [z["role"] for z in v["zpravy"]]
+        assert role[0] == "system" and role.count("system") == 1, role
