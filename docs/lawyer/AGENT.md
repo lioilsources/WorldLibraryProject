@@ -118,12 +118,14 @@ success s reálným modelem, počet volání modelu a latence — to je na model
 
 ## Co chybí a proč
 
-* **Model.** Dokud v parku neběží chat model s tool callingem, `/agent/chat` je
-  503. Tohle je první věc na řadě a je to rozhodnutí o paměti SPARKu, ne o kódu.
-  Až model poběží, změř: (a) vrací vLLM `tool_calls` pro director (Nemotron-3-Super
-  jede s `--tool-call-parser qwen3_coder`, což je nesourodá kombinace a může být
-  rozbitá), (b) totéž pro `openclaw-default` (Qwen3.6-35B, v LiteLLM označený jako
-  model pro tool calling), (c) kolik volání a sekund stojí jeden draft.
+* **Model.** Rozhodnuto benchmarkem 2026-10-01 (AiStack `PLAN-model-bench.md` §6a):
+  agent = **Gemma-4-31B** přes alias LiteLLM **`pravnik-agent`** (draft 92 %, revize
+  100 %, odolnost vůči injection 100 %, ~7 tok/s, ~4–5 min na návrh). Gemma běží jen
+  v profilu SPARKu **gemma** na vyžádání (AiStack `PLAN-spark-scheduler.md`), mimo něj
+  alias padá na `openclaw-default` (qwen36: 50/50 %, injection 60 %) a `fallback`.
+  Zbývá: přepnout `/agent/chat` z `translate` na `pravnik-agent` a změřit draft
+  v okně gemma. Director (Nemotron, `qwen3_coder` parser) a translate (bez tool
+  parseru) pro agenta nepoužívat.
 * **Flutter UI** (plán §4): karty pro `ask_user`, progress bar podle povinných
   proměnných, průběžný náhled, seznam uložených sessionů. Server pro to má
   všechno (`otazky` v odpovědi `/agent/chat`, `GET /agent/intake/{id}`,

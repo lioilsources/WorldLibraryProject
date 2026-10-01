@@ -252,6 +252,15 @@ Právníka, ale parku: buď nahodit `translate`, nebo počítat s minutami na
 odpověď, dokud obohacení jede. Pozor na paměť — 36GiB model se do 3 GB volných
 nevejde.
 
+> **Aktualizace 2026-10-01 (rozvrh SPARKu, AiStack `PLAN-spark-scheduler.md`):**
+> `translate` je z rozvrhu vyřazený. Alias `translate` v LiteLLM teď padá řetězem
+> `translate → openclaw-default (qwen36) → swarm-director → fallback`, takže chat
+> odpoví modelem okna, které zrovna běží: v okně **llm** qwen36 (~80 tok/s, bez
+> soupeření s obohacením), v okně **director** director jako dřív, v okně **comfy**
+> jen `fallback`. Agent má vlastní alias **`pravnik-agent`** → Gemma-4-31B
+> (benchmark §6a: draft 92 %, revize 100 %, injection 100 %), která běží jen
+> v profilu **gemma** na vyžádání místo llm. Chat pro N9 tedy patří do okna llm.
+
 Retrieval se tím netrápí: `GET /search` odpovídá do stovek ms a celý eval (65 +
 18 otázek) proti běžící službě prošel. Dopad dnešní změny na latenci je měřený
 a malý: prompt narostl o **24–48 %** (10 593 → 15 674 znaků u „zkušební doba",
