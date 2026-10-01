@@ -1,6 +1,12 @@
 # PLAN — nasazení knihovního RAG chatbota na SPARK
 
 Plán pro Claude Code běžící na DGX Spark (`/home/ol1n/deploy/AiStack/`).
+
+> **Stav 2026-10-01:** `translate` (Qwen3-32B) je z rozvrhu SPARKu vyřazený
+> (AiStack `PLAN-spark-scheduler.md`). Chatbot dál volá alias `translate` a LiteLLM
+> ho přes řetěz `translate → openclaw-default (qwen36) → swarm-director → fallback`
+> obslouží modelem toho okna, které zrovna běží. **`make up-translate` nespouštět** —
+> vedle ComfyUI nebo directora se nevejde. Krok 3b níž je historický.
 Cíl: zprovoznit chatbot nad korpusem WorldLibraryProject, dostupný na
 https://chat.ol1n.com, s LLM z AiStack parku a vektory na JODA.
 
@@ -66,7 +72,7 @@ curl -sf http://192.168.88.88:8006/api/v2/heartbeat
 # provést PLAN-joda-chroma.md (v kořeni tohoto repa) a pak pokračovat zde.
 
 # 3b. translate běží? (LiteLLM přes gateway)
-curl -sf http://localhost:8080/v1/models | grep -q translate || make up-translate
+curl -sf http://localhost:8080/v1/models | grep -q translate   # alias stačí, model nestartovat (viz Stav 2026-10-01)
 # paměťová kontrola PŘED startem: free -g, nvidia-smi (translate ~20 GB)
 
 # 3c. WorldLibraryProject na SPARK

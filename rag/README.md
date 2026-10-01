@@ -188,8 +188,8 @@ jen 3,8 GB RAM a index se jí stránkoval ze swapu.
   jazykem originálu, „v korpusu: originál / překlad", tématy a anotací v délce podle počtu; antika
   po autorech; fragmenty se jen sečtou), přehled díla, seznam kapitol, obsah kapitoly, čtení dál.
   Do systémového promptu už nejde celý katalog, jen index tradic (7 551 → 1 805 znaků).
-- **Obohacení** (`enrich_chunks.py` translate přímo na :8004; `enrich_chapters.py`,
-  `enrich_works.py` director): gloss_cs, klíčová slova cs/en/orig, otázky, entity, témata, kvalita;
+- **Obohacení** (`enrich_chunks.py`, `enrich_chapters.py`, `enrich_works.py` přímo na
+  swarm-director :8012, jen v okně director — rozvrh v AiStack `PLAN-spark-scheduler.md`): gloss_cs, klíčová slova cs/en/orig, otázky, entity, témata, kvalita;
   summary kapitol a děl ve 3 délkách. Resume přes `input_sha`, fallback model se zahazuje.
 - **Endpointy navíc**: `GET /works` (filtry group/topic/author/lang/q, `detail`),
   `GET /works/{id}/chapters`, `GET /works/{id}/chunks` (čtení dál), `GET /search` (bez LLM),
