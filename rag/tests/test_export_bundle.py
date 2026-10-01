@@ -12,7 +12,7 @@ import pytest
 
 from export_bundle import (
     asset_name, build_bundle, build_tree, chapter_label, chunk_terms,
-    node_id, score_terms, slugify, validate_bundle, walk_nodes,
+    node_id, norm_term, score_terms, split_gloss, slugify, validate_bundle, walk_nodes,
 )
 
 WORK = {
@@ -103,6 +103,30 @@ def test_chunk_terms_rozlisi_druh_a_zahodi_balast():
         ("tao", "word"), ("道", "orig"), ("Lao-c'", "entity")}
     assert chunk_terms(chunk(cs=["patička"], quality=0)) == set()
     assert chunk_terms(chunk(cs=["", "  ", "42", "x" * 41])) == set()
+
+
+def test_zavorka_se_neurizne_a_vysvetlivka_odpadne():
+    # Živý Postgres 2026-10-01: „Tao (Cesta)" vyšlo z norm_term jako „Tao (Cesta".
+    assert norm_term("Tao (Cesta)") == "Tao (Cesta)"
+    assert norm_term("(wu wei)") == "wu wei"
+    assert split_gloss("Tao (Cesta)") == ("Tao", None)
+    assert split_gloss("Wu wei (無為)") == ("Wu wei", "無為")
+    assert split_gloss("Nibbāna (nirvána)") == ("Nibbāna", None)
+    assert split_gloss("Lao-c'") == ("Lao-c'", None)
+    assert chunk_terms(chunk(entities=["Svatý člověk (聖人)"], cs=["Cesta (Tao)"])) == {
+        ("Svatý člověk", "entity"), ("聖人", "orig"), ("Cesta", "word")}
+
+
+def test_jeden_pojem_je_jedna_bublina():
+    # uvnitř chunku: entita vyhraje nad slovem, velikost písmen nerozhoduje
+    assert chunk_terms(chunk(cs=["Dao", "brāhmaṇa"], entities=["dao", "Brāhmaṇa"])) == {
+        ("dao", "entity"), ("Brāhmaṇa", "entity")}
+    # napříč chunky: v kořeni zůstane jedna podoba, počty se sečtou
+    rows = {1: [chunk(cs=["Tao"]), chunk(cs=["Tao"])], 2: [chunk(entities=["tao"])]}
+    work = {**WORK, "summary_long": None}
+    chapters = [{**ch, "parent_id": None} for ch in CHAPTERS[:2]]
+    root = build_bundle(work, chapters, rows)["words"]["nodes"]["root"]["terms"]
+    assert [(t["term"], t["kind"], t["count"]) for t in root] == [("Tao", "word", 3)]
 
 
 def test_vzacny_term_prebije_vsudypritomny():
