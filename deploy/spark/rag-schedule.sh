@@ -5,17 +5,23 @@
 # kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
 # qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   comfy    (07:00)  ComfyUI + audio (~52+25 GiB); žádný velký LLM. Obrázky
-#                     StoryTelleru a labu, Kirian video, tributy PromoClowna (16:30).
-#   llm      (17:00)  qwen36-agent (36,5) + swarm-nano (Nano-30B, 27) + swarm-embed
-#                     (~6): chat Právníka a Knihovníka, ToyShaders, AiSwarmBattle,
-#                     PromoClown (heartbeat 17:05–00:55). Nahradil okno promo
-#                     (2026-10-01, uživatel): qwen36 tu běží celý večer.
+#   comfy    (07–13)  ComfyUI + audio (~52+25 GiB) + flux-schnell NIM (17); žádný
+#                     velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
+#                     StoryTeller, Kirian, Stickers, tributy PromoClowna (12:30).
+#   rag      (13–19)  denní směna directora — stejné dávky jako v noci.
+#   llm      (19–01)  qwen36-agent (36,5) + flux-schnell NIM (17): chat Právníka
+#                     a Knihovníka, ToyShaders, tier 0 obrázky, PromoClown
+#                     (heartbeat 19:05–00:55). qwen36 tu běží celý večer.
 #   gemma    (ručně / fronta)  jako llm, ale místo qwen36 Gemma-4 (util 0,40):
 #                     agent Právníka na vyžádání. Zpět `rag-schedule.sh llm`.
-#   rag      (01:00)  swarm-director 0.75 (91 GiB) sám; obohacení Knihovníka,
-#                     souhrny kapitol pro Kindlify a noční dávka StoryTelleru
+#   rag      (01–07)  swarm-director 0.75 (91 GiB) sám; obohacení Knihovníka,
+#                     souhrny kapitol pro Kindlify a dávka StoryTelleru
 #                     (DIRECTOR_JOBS), sloty 6 + 4 + 2, chat 4.
+#
+# Okna 2026-10-01 odpoledne (uživatel): ComfyUI nikdo nepotřebuje denně, director
+# má frontu na desítky hodin → comfy jen 07–13, director i přes den 13–19.
+# AiSwarmBattle a Aukrofy jsou cold (PLAN §6) — Nano, embed a swarm-litellm
+# proto v profilu llm nejsou, rozvrh je jen zastavuje.
 #
 # translate (Qwen3-32B TRT-LLM) vypadl z rozvrhu (2026-10-01, uživatel): bench
 # AiStack/PLAN-model-bench.md §6a ho ve všem předčí qwen36 (6× rychlejší, 64k
@@ -27,7 +33,7 @@
 # kvalita (A/B na 30 chuncích: translate napsal o Beowulfovi „staroslovanský
 # epos", director „anglosaský").
 #
-# Volá se z rag-schedule.service (timer 01, 07, 17 h + po bootu). Ručně:
+# Volá se z rag-schedule.service (timer 01, 07, 13, 19 h + po bootu). Ručně:
 #   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh comfy|llm|gemma|rag|auto
 #   (synonyma: day = comfy, night = director = rag, promo = llm)
 # Vypnout rozvrh:  systemctl --user stop rag-schedule.timer
@@ -40,9 +46,8 @@
 set -euo pipefail
 
 AISTACK="${AISTACK:-$HOME/deploy/AiStack}"
-DAY_START="${DAY_START:-7}"       # comfy: ComfyUI + audio
-LLM_START="${LLM_START:-17}"      # llm: qwen36 + Nano + embed (nahradil promo)
-NIGHT_START="${NIGHT_START:-1}"   # rag: swarm-director + noční dávky
+# Rozvrh „hodina:režim“ — okno trvá do začátku dalšího (přes půlnoc taky).
+SCHEDULE="${SCHEDULE:-1:rag 7:comfy 13:rag 19:llm}"
 # Kontejnery AiStacku mimo tenhle rozvrh, které se v noci musí uhnout:
 # audio-music + audio-sfx (nasazené 7. 9. 2026) drží ~25 GiB a director
 # (0.75 × 121,7 = 91,3 GiB) se vedle nich nevejde — 8. 9. 00:13 padal
@@ -58,10 +63,11 @@ AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
 # vedle něj (89 GiB < potřebných 92) dvě noci nevešel. Startuje ho něco
 # mimo tenhle skript (spolu s comfyui službou), tady se jen ruší před rag.
 FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
-# Profil llm: Nano-30B a embed ze swarm compose (Nano util 0.22 — s 0.15 od
-# vLLM 0.21 nemá KV cache, 30. 9. 2026). Gemma (profil gemma) je jednorázový
-# kontejner z AiStack bench/serve.sh.
-LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed}"
+# Kontejnery cold projektů (AiSwarmBattle): v žádném profilu, rozvrh je jen
+# zastavuje. Až se AiSwarmBattle odblokuje, vrátit do llm přes swarm compose
+# s --no-deps (Nano util 0.22 — s 0.15 od vLLM 0.21 nemá KV cache).
+# Gemma (profil gemma) je jednorázový kontejner z AiStack bench/serve.sh.
+LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed swarm-litellm}"
 GEMMA_CONTAINERS="${GEMMA_CONTAINERS:-bench-gemma}"
 # Noční dávky na directoru — každá je systemd --user služba, která se sama
 # dokončí / resumuje; workery v součtu 12, aby chatu zbyly 4 sloty z 16.
@@ -136,18 +142,28 @@ probe_test() {
   if out=$( cd "$RAG" && .venv/bin/python3 probe_llm.py --limit 4 --workers 6 2>&1 ); then
     log "sonda ok: $(printf '%s\n' "$out" | tail -1)"; return 0
   fi
+  # Jedna varianta useknutá na délce (fin=length) není rozbitý model: 1. 10. 2026
+  # konkordance Pyramidových textů (tabulka čísel) nevešla do 1300 tokenů a sonda
+  # tím shodila celou denní směnu, i když 11/12 bylo čistých. Rozbitá instance
+  # kazí většinu variant, takže tolerance jedné délkové chyby ji pořád chytí.
+  local ok total bad
+  ok=$(printf '%s\n' "$out" | sed -n 's/^HOTOVO: \([0-9]*\)\/\([0-9]*\).*/\1/p')
+  total=$(printf '%s\n' "$out" | sed -n 's/^HOTOVO: \([0-9]*\)\/\([0-9]*\).*/\2/p')
+  bad=$(printf '%s\n' "$out" | grep 'parse=BAD' | grep -vc 'fin=length' || true)
+  if [ -n "$ok" ] && [ "$ok" -ge $(( total - 1 )) ] && [ "$bad" = 0 ]; then
+    log "sonda ok s výhradou: $ok/$total čistých, zbytek jen useknutý na délce"; return 0
+  fi
   log "sonda SELHALA: $(printf '%s\n' "$out" | grep -E 'fin=|EXC|HOTOVO|Traceback' | grep -v 'parse=OK' | head -3 | tr '\n' ' ' | cut -c1-300)"
   return 1
 }
 
-# Hodina → okno. Začátky se seřadí a hodina spadne do posledního okna, které
-# ještě začalo; když je před prvním začátkem dne, patří do okna, které přešlo
-# půlnoc (to poslední). Díky tomu je jedno, jestli okno přes půlnoc přechází.
-mode_for_hour() {  # hodina comfy_start llm_start rag_start
-  local h="$1" best="" best_start=-1 last="" last_start=-1
-  local name start
-  for pair in "comfy:$2" "llm:$3" "rag:$4"; do
-    name="${pair%%:*}"; start="${pair##*:}"
+# Hodina → okno. Hodina patří do okna s nejpozdějším začátkem ≤ hodina; před
+# prvním začátkem dne do posledního okna (to přešlo půlnoc). Proto je jedno,
+# jestli a které okno přes půlnoc přechází.
+mode_for_hour() {  # hodina "h:režim h:režim …"
+  local h="$1" best="" best_start=-1 last="" last_start=-1 pair name start
+  for pair in $2; do
+    start="${pair%%:*}"; name="${pair##*:}"
     if [ "$start" -gt "$last_start" ]; then last="$name"; last_start="$start"; fi
     if [ "$h" -ge "$start" ] && [ "$start" -gt "$best_start" ]; then best="$name"; best_start="$start"; fi
   done
@@ -156,16 +172,18 @@ mode_for_hour() {  # hodina comfy_start llm_start rag_start
 
 if [ "${1:-}" = selftest ]; then
   fail=0
-  check() { # hodina comfy llm rag očekávané
-    got=$(mode_for_hour "$1" "$2" "$3" "$4")
-    [ "$got" = "$5" ] || { echo "CHYBA: h=$1 okna $2/$3/$4 → $got, čekáno $5"; fail=1; }
+  check() { # hodina rozvrh očekávané
+    got=$(mode_for_hour "$1" "$2")
+    [ "$got" = "$3" ] || { echo "CHYBA: h=$1 rozvrh '$2' → $got, čekáno $3"; fail=1; }
   }
-  # ostrý rozvrh: comfy 07–17, llm 17–01 (přes půlnoc), rag 01–07
-  for h in 7 8 12 16; do check $h 7 17 1 comfy; done
-  for h in 17 20 23 0; do check $h 7 17 1 llm; done
-  for h in 1 3 6; do check $h 7 17 1 rag; done
-  # okno přes půlnoc smí být kterékoli: rag 23–07
-  check 0 7 17 23 rag; check 23 7 17 23 rag; check 22 7 17 23 llm
+  S="1:rag 7:comfy 13:rag 19:llm"   # ostrý rozvrh
+  for h in 7 8 12; do check $h "$S" comfy; done
+  for h in 13 16 18; do check $h "$S" rag; done
+  for h in 19 22 23 0; do check $h "$S" llm; done
+  for h in 1 3 6; do check $h "$S" rag; done
+  # pořadí v řetězci nehraje roli; okno přes půlnoc smí být kterékoli
+  check 0 "19:llm 7:comfy 1:rag 13:rag" llm
+  check 0 "7:comfy 17:llm 23:rag" rag; check 23 "7:comfy 17:llm 23:rag" rag; check 22 "7:comfy 17:llm 23:rag" llm
   [ $fail = 0 ] && echo "rag-schedule.sh: selftest ok"
   exit $fail
 fi
@@ -173,8 +191,8 @@ fi
 mode="${1:-auto}"
 if [ "$mode" = auto ]; then
   h=$(date +%-H)
-  mode=$(mode_for_hour "$h" "$DAY_START" "$LLM_START" "$NIGHT_START")
-  log "auto → $mode (je ${h}:xx; comfy ${DAY_START}, llm ${LLM_START}, rag ${NIGHT_START})"
+  mode=$(mode_for_hour "$h" "$SCHEDULE")
+  log "auto → $mode (je ${h}:xx; rozvrh $SCHEDULE)"
 fi
 
 # Čeká, až model zase odpovídá — bez toho by chat i obohacení chvíli mlely
@@ -221,33 +239,41 @@ qwen36_up() {
   docker start $AGENT_CONTAINERS >/dev/null 2>&1 || ( cd "$AISTACK" && make up-agent >/dev/null )
   wait_endpoint 8040 qwen36-agent || fail "qwen36-agent nenaběhl — večerní okno bez modelu"
 }
-nano_up() {
-  admit swarm-nano 0.22; admit swarm-embed 0.05
-  swarm_up swarm-nano swarm-embed
-  wait_endpoint 8010 swarm-nano || notify "⚠️ <b>rag-schedule</b> ($mode): swarm-nano do 10 min nenaběhl (ToyShaders/AiSwarmBattle bez Nano)"
+flux_up() {  # tier 0 obrázky (gen-queue /nim/flux-schnell); TensorRT si paměť bere celou
+  # při startu a nepadá na CPU, proto smí vedle qwen36 — vedle directora ne (25. 9. pád stroje)
+  local avail; avail=$(awk '/MemAvailable/ {printf "%d", $2/1048576}' /proc/meminfo)
+  if [ "$avail" -lt 22 ]; then
+    notify "⚠️ <b>rag-schedule</b> ($mode): flux-schnell se nevejde (volno ${avail} GiB) — tier 0 obrázky nepoběží"; return 0
+  fi
+  docker start $FLUX_CONTAINERS >/dev/null 2>&1 || ( cd "$AISTACK" && make up-image-schnell >/dev/null 2>&1 ) \
+    || notify "⚠️ <b>rag-schedule</b> ($mode): flux-schnell nenaběhl"
 }
 
 case "$mode" in
   comfy|day)
-    log "režim comfy: LLM i director dole, ComfyUI a audio nahoru"
+    log "režim comfy: LLM i director dole, ComfyUI, audio a flux-schnell nahoru"
     stop_director; stop_llm; stop_translate
     systemctl --user start comfyui
     docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
+    flux_up
     ;;
   llm|promo)
-    log "režim llm: ComfyUI, audio a director dole, qwen36 + Nano + embed nahoru"
-    stop_comfy; stop_director; stop_translate
+    log "režim llm: ComfyUI, audio a director dole, qwen36 + flux-schnell nahoru"
+    systemctl --user stop comfyui || true
+    docker stop $AUDIO_CONTAINERS $LLM_CONTAINERS >/dev/null 2>&1 || true
+    stop_director; stop_translate
     docker rm -f $GEMMA_CONTAINERS >/dev/null 2>&1 || true
     sleep 5
     qwen36_up
-    nano_up
+    flux_up
     ;;
   gemma)
     # Agent Právníka na vyžádání (uživatel 2026-10-01): místo qwen36 Gemma-4,
     # util 0.40 — při 0.30 měla jen 9k tokenů KV cache a 12k dotaz nepřijala.
-    log "režim gemma: qwen36 dole, Gemma-4 + Nano nahoru (agent Právníka)"
-    stop_comfy; stop_director; stop_translate
-    docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
+    log "režim gemma: qwen36 dole, Gemma-4 + flux-schnell nahoru (agent Právníka)"
+    systemctl --user stop comfyui || true
+    docker stop $AUDIO_CONTAINERS $LLM_CONTAINERS $AGENT_CONTAINERS >/dev/null 2>&1 || true
+    stop_director; stop_translate
     sleep 5
     ( cd "$AISTACK" && GEMMA_UTIL=0.40 bench/serve.sh gemma >/dev/null ) || fail "Gemma se nevešla nebo nenaběhla"
     for _ in $(seq 1 60); do
@@ -255,10 +281,10 @@ case "$mode" in
       sleep 15
     done
     docker logs bench-gemma 2>&1 | grep -q "Application startup complete" || fail "Gemma do 15 min nenaběhla"
-    nano_up
+    flux_up
     ;;
   rag|night|director)
-    log "režim rag: ComfyUI, LLM profil a audio dole, director nahoru, noční dávky jedou"
+    log "režim rag: ComfyUI, LLM profil, audio a flux-schnell dole, director nahoru, dávky jedou"
     stop_comfy; stop_llm; stop_translate
     sleep 5
     memory_check
