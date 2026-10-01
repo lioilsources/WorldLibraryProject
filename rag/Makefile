@@ -38,7 +38,7 @@ EMBED_FLAGS = $(if $(EMBED_URL),--embed-url $(EMBED_URL),)
         pg-up pg-down pg-logs pg-status pg-migrate pg-index deploy-joda \
         load-pg embed embed-gloss chroma-drop \
         enrich-benchmark enrich-chunks enrich-chapters enrich-works \
-        eval eval-catalog bundles serve restart-chat install-unit mode deploy-spark
+        eval eval-catalog bundles kindlify-sync serve restart-chat install-unit mode deploy-spark
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -141,6 +141,13 @@ enrich-works:
 # Rovnou do assetů appky: make bundles BUNDLE_OUT=../../Kindlify/assets/bundles
 bundles:
 	$(PY) export_bundle.py $(BUNDLE_ARGS) --out $(BUNDLE_OUT)
+
+# Průběžné plnění Kindlify: hotová díla (obohacené chunky + souhrny kapitol)
+# → assets/bundles + index.json, přepíše jen změněné. Nanečisto bez SYNC_ARGS.
+#   make kindlify-sync SYNC_ARGS="--write --commit"
+KINDLIFY_BUNDLES ?= ../../Kindlify/assets/bundles
+kindlify-sync:
+	$(PY) kindlify_sync.py --out $(KINDLIFY_BUNDLES) --priority $(PRIORITY) $(SYNC_ARGS)
 
 eval:
 	$(PY) eval/eval_retrieval.py --retrieve-mode $(MODE) --collection $(COLLECTION) --compare eval/results/baseline.json
