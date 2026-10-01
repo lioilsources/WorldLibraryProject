@@ -32,8 +32,15 @@ vůbec. Jediné, co něco přepisuje, je zápis JSON souborů do `--out`.
   Opraveny dvě vady exportéru: `norm_term` uřezával `)` („Tao (Cesta"),
   a stejný pojem jako slovo i entita / v jiné velikosti písmen dával dvě
   bubliny. Zbývá vada obohacení: „Dao" vs. „Tao", „Svätý člověk".
-- **Fáze 3** čeká na `enrich_chapters --work zh.daodejing` (a `zh.lunyu`)
-  na SPARKu (swarm-director, noční okno).
+- **Fáze 3** ✔ pro `zh.daodejing` (jednorázový `kindlify-zh` na SPARKu,
+  81/81 souhrnů): `zh_daodejing.json` v Kindlify, `verify_flow_test` ho
+  importuje za ~1 s. `zh.lunyu` 16/20 — 4 kapitoly useknuté na
+  `max_tokens=900`; `enrich_chapters --max-tokens` (výchozí 1600) to řeší
+  po nasazení na SPARK.
+- **Fáze 4** nahrazena průběžným syncem: `make kindlify-sync` (`rag/kindlify_sync.py`)
+  exportuje hotová díla (≥95 % chunků i kapitol), přepisuje jen změněné a
+  obnovuje `index.json`, ze kterého Kindlify staví seznam knih. Souhrny
+  kapitol dělá noční `library-chapters.service` (Director, PR #8).
 
 ---
 
