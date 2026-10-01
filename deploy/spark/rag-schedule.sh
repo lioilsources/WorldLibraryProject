@@ -1,45 +1,48 @@
 #!/usr/bin/env bash
-# Rozvrh SPARKu — tři okna, v každém jeden velký model. 121,7 GiB unified
-# nestačí na dva: director (0.75 = 91 GiB) ani ComfyUI (52) se vedle
-# qwen36-agenta (0.30 = 36,5) nevejdou, a vLLM při startu odmítne cokoli pod
-# util × total.
+# Rozvrh SPARKu — profily, v každém okně jen to, co se do 121,7 GiB unified
+# vejde se zachováním pravidel z incidentů (AiStack/PLAN-spark-scheduler.md):
+# ComfyUI render nikdy vedle LLM ≥ 30 GiB (29. 9. 2026 CPU render + přehřátí),
+# kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
+# qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   den (06:00)  ComfyUI + translate úsporný (~36 GiB) + audio (~25 GiB),
-#                obohacení stojí → Image Studio i chat mají GPU pro sebe
-#   promo (00:00)  ComfyUI a audio dole, nahoru qwen36-agent (ClownPROMO)
-#   rag   (01:00)  qwen36 i translate dole, nahoru swarm-director, obohacení jede
-#   comfy (07:00)  director i qwen36 dole, translate úsporný, ComfyUI a audio nahoru
-#                (~93 GiB), obohacení korpusu jede na něm
+#   comfy    (07:00)  ComfyUI + audio (~52+25 GiB); žádný velký LLM. Obrázky
+#                     StoryTelleru a labu, Kirian video, tributy PromoClowna (16:30).
+#   llm      (17:00)  qwen36-agent (36,5) + swarm-nano (Nano-30B, 27) + swarm-embed
+#                     (~6): chat Právníka a Knihovníka, ToyShaders, AiSwarmBattle,
+#                     PromoClown (heartbeat 17:05–00:55). Nahradil okno promo
+#                     (2026-10-01, uživatel): qwen36 tu běží celý večer.
+#   gemma    (ručně / fronta)  jako llm, ale místo qwen36 Gemma-4 (util 0,40):
+#                     agent Právníka na vyžádání. Zpět `rag-schedule.sh llm`.
+#   rag      (01:00)  swarm-director 0.75 (91 GiB) sám; obohacení Knihovníka,
+#                     souhrny kapitol pro Kindlify a noční dávka StoryTelleru
+#                     (DIRECTOR_JOBS), sloty 6 + 4 + 2, chat 4.
 #
-# Proč v noci director a ne translate, když je 2,8× pomalejší (6,7 vs 18,9
-# chunku/min): obohacení se zapéká do databáze NATRVALO, takže rozhoduje
-# kvalita, ne rychlost — a noční okno je stejně prázdné. A/B na 30 chuncích
-# v deseti jazycích originálu: translate napsal o Beowulfovi „staroslovanský
-# epos" (director „anglosaský") a u Hérodota „kvůli královny dcera Io".
+# translate (Qwen3-32B TRT-LLM) vypadl z rozvrhu (2026-10-01, uživatel): bench
+# AiStack/PLAN-model-bench.md §6a ho ve všem předčí qwen36 (6× rychlejší, 64k
+# kontext, nástroje, JSON). Chat knihovny jde v LiteLLM řetězem
+# translate → openclaw-default (qwen36) → swarm-director → fallback, takže
+# odpovídá v každém okně.
 #
-# Chat knihovny (library-chat) běží v obou režimech. V noci translate neběží,
-# ale LiteLLM má řetěz translate → swarm-director → fallback, takže chat sáhne
-# na directora — tedy na LEPŠÍ model, ne na 4B nouzovku.
+# Proč v noci director: obohacení se zapéká do databáze NATRVALO, rozhoduje
+# kvalita (A/B na 30 chuncích: translate napsal o Beowulfovi „staroslovanský
+# epos", director „anglosaský").
 #
-# Volá se z rag-schedule.service (timer 08:00 a 22:00 + po bootu). Ručně:
-#   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh comfy|rag|promo|auto
-#   (day = comfy a night = rag zůstávají jako synonyma, ať staré ruční volání
-#   a `make mode MODE=day` v rag/ nepřestanou fungovat)
+# Volá se z rag-schedule.service (timer 01, 07, 17 h + po bootu). Ručně:
+#   ~/deploy/WorldLibraryProject/deploy/spark/rag-schedule.sh comfy|llm|gemma|rag|auto
+#   (synonyma: day = comfy, night = director = rag, promo = llm)
 # Vypnout rozvrh:  systemctl --user stop rag-schedule.timer
 #
 # `auto` odvodí režim z hodin, takže timer smí mít Persistent=true —
 # po restartu stroje ve 3 ráno se srovná do nočního režimu, ne do denního.
-# Okna se čtou z proměnných níž a nesmí se překrývat; mode_for_hour je řadí
-# podle hodiny a zvládne i okno přes půlnoc (comfy 07–00).
 #
 # Kontrola logiky bez zásahu do stroje:  rag-schedule.sh selftest
 
 set -euo pipefail
 
 AISTACK="${AISTACK:-$HOME/deploy/AiStack}"
-DAY_START="${DAY_START:-7}"       # comfy: ComfyUI + translate + audio
-NIGHT_START="${NIGHT_START:-1}"   # rag: swarm-director + obohacení
-PROMO_START="${PROMO_START:-0}"   # promo: qwen36-agent pro ClownPROMO
+DAY_START="${DAY_START:-7}"       # comfy: ComfyUI + audio
+LLM_START="${LLM_START:-17}"      # llm: qwen36 + Nano + embed (nahradil promo)
+NIGHT_START="${NIGHT_START:-1}"   # rag: swarm-director + noční dávky
 # Kontejnery AiStacku mimo tenhle rozvrh, které se v noci musí uhnout:
 # audio-music + audio-sfx (nasazené 7. 9. 2026) drží ~25 GiB a director
 # (0.75 × 121,7 = 91,3 GiB) se vedle nich nevejde — 8. 9. 00:13 padal
@@ -55,6 +58,14 @@ AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
 # vedle něj (89 GiB < potřebných 92) dvě noci nevešel. Startuje ho něco
 # mimo tenhle skript (spolu s comfyui službou), tady se jen ruší před rag.
 FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
+# Profil llm: Nano-30B a embed ze swarm compose (Nano util 0.22 — s 0.15 od
+# vLLM 0.21 nemá KV cache, 30. 9. 2026). Gemma (profil gemma) je jednorázový
+# kontejner z AiStack bench/serve.sh.
+LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed}"
+GEMMA_CONTAINERS="${GEMMA_CONTAINERS:-bench-gemma}"
+# Noční dávky na directoru — každá je systemd --user služba, která se sama
+# dokončí / resumuje; workery v součtu 12, aby chatu zbyly 4 sloty z 16.
+DIRECTOR_JOBS="${DIRECTOR_JOBS:-library-enrich library-chapters storyteller-night}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -84,7 +95,7 @@ memory_check() {
   # službu (vrací 3) jsou tu OČEKÁVANÝ výsledek, ne chyba — pod set -e bez
   # toho umřou potichu úplně stejně jako řádek s read výš, jen o pár řádků
   # dál a bez jediného CHYBA hlášení. Přesně to se stalo 18. 9. 2026 01:05.
-  holders="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'translate|director|qwen|agent|audio|comfy' | sort | paste -sd ', ' -)" || true
+  holders="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'translate|director|qwen|agent|audio|comfy|nano|embed|gemma|flux' | sort | paste -sd ', ' -)" || true
   comfy="$(systemctl --user is-active comfyui 2>/dev/null)" || true
   fail "director se nevejde: k dispozici ${avail} GiB, potřebuje ${need} GiB (util ${util} × ${total}). Drží: kontejnery ${holders:-žádné}; comfyui ${comfy}"
 }
@@ -132,10 +143,10 @@ probe_test() {
 # Hodina → okno. Začátky se seřadí a hodina spadne do posledního okna, které
 # ještě začalo; když je před prvním začátkem dne, patří do okna, které přešlo
 # půlnoc (to poslední). Díky tomu je jedno, jestli okno přes půlnoc přechází.
-mode_for_hour() {
-  local h="$1" promo="$2" rag="$3" comfy="$4" best="" best_start=-1 last="" last_start=-1
+mode_for_hour() {  # hodina comfy_start llm_start rag_start
+  local h="$1" best="" best_start=-1 last="" last_start=-1
   local name start
-  for pair in "promo:$promo" "rag:$rag" "comfy:$comfy"; do
+  for pair in "comfy:$2" "llm:$3" "rag:$4"; do
     name="${pair%%:*}"; start="${pair##*:}"
     if [ "$start" -gt "$last_start" ]; then last="$name"; last_start="$start"; fi
     if [ "$h" -ge "$start" ] && [ "$start" -gt "$best_start" ]; then best="$name"; best_start="$start"; fi
@@ -145,16 +156,16 @@ mode_for_hour() {
 
 if [ "${1:-}" = selftest ]; then
   fail=0
-  check() { # hodina promo rag comfy očekávané
+  check() { # hodina comfy llm rag očekávané
     got=$(mode_for_hour "$1" "$2" "$3" "$4")
     [ "$got" = "$5" ] || { echo "CHYBA: h=$1 okna $2/$3/$4 → $got, čekáno $5"; fail=1; }
   }
-  # ostrý rozvrh: promo 00–01, rag 01–07, comfy 07–00 (přes půlnoc)
-  check 0 0 1 7 promo
-  for h in 1 2 6; do check $h 0 1 7 rag; done
-  for h in 7 8 13 23; do check $h 0 1 7 comfy; done
-  # okno, které přechází půlnoc, smí být kterékoli: promo 23–01 → 0:xx je promo
-  check 0 23 1 7 promo; check 23 23 1 7 promo; check 22 23 1 7 comfy
+  # ostrý rozvrh: comfy 07–17, llm 17–01 (přes půlnoc), rag 01–07
+  for h in 7 8 12 16; do check $h 7 17 1 comfy; done
+  for h in 17 20 23 0; do check $h 7 17 1 llm; done
+  for h in 1 3 6; do check $h 7 17 1 rag; done
+  # okno přes půlnoc smí být kterékoli: rag 23–07
+  check 0 7 17 23 rag; check 23 7 17 23 rag; check 22 7 17 23 llm
   [ $fail = 0 ] && echo "rag-schedule.sh: selftest ok"
   exit $fail
 fi
@@ -162,8 +173,8 @@ fi
 mode="${1:-auto}"
 if [ "$mode" = auto ]; then
   h=$(date +%-H)
-  mode=$(mode_for_hour "$h" "$PROMO_START" "$NIGHT_START" "$DAY_START")
-  log "auto → $mode (je ${h}:xx; promo ${PROMO_START}, rag ${NIGHT_START}, comfy ${DAY_START})"
+  mode=$(mode_for_hour "$h" "$DAY_START" "$LLM_START" "$NIGHT_START")
+  log "auto → $mode (je ${h}:xx; comfy ${DAY_START}, llm ${LLM_START}, rag ${NIGHT_START})"
 fi
 
 # Čeká, až model zase odpovídá — bez toho by chat i obohacení chvíli mlely
@@ -179,39 +190,76 @@ wait_endpoint() {
   log "POZOR: $name do 10 min nenaběhl"; return 1
 }
 
+# --- skupiny služeb ------------------------------------------------------------
+# Vše jen `docker stop` / `systemctl stop`: kontejnery AiStacku musí zůstat
+# existovat, protože se tady jen startují (`docker start`). Výjimkou jsou
+# director a translate, které se staví přes make (compose up s profilem).
+stop_director() {
+  local j; for j in $DIRECTOR_JOBS; do systemctl --user stop "$j" 2>/dev/null || true; done
+  ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
+}
+stop_llm() {
+  docker stop $AGENT_CONTAINERS $LLM_CONTAINERS >/dev/null 2>&1 || true
+  docker rm -f $GEMMA_CONTAINERS >/dev/null 2>&1 || true   # jednorázový docker run, ne compose
+}
+stop_comfy() {
+  systemctl --user stop comfyui || true
+  docker stop $AUDIO_CONTAINERS $FLUX_CONTAINERS >/dev/null 2>&1 || true
+}
+stop_translate() { ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true; }
+
+admit() {  # kontejner util — AiStack mem-admit (rezerva 2 GiB), jinak fail s důvodem
+  ( cd "$AISTACK" && scripts/mem-admit.sh "$1" "$2" ) || fail "$1 se nevejde do paměti (util $2)"
+}
+swarm_up() {  # služby swarm compose bez závislostí; embed je v profilu embed
+  ( cd "$AISTACK" && docker compose -f deploy/docker-compose.swarm.yaml --env-file .env --profile embed \
+      up -d --no-deps "$@" >/dev/null 2>&1 )
+}
+qwen36_up() {
+  admit qwen36-agent 0.30
+  # kontejner smí chybět (30. 9. ho `make down-agent` smazal) — pak ho postaví compose
+  docker start $AGENT_CONTAINERS >/dev/null 2>&1 || ( cd "$AISTACK" && make up-agent >/dev/null )
+  wait_endpoint 8040 qwen36-agent || fail "qwen36-agent nenaběhl — večerní okno bez modelu"
+}
+nano_up() {
+  admit swarm-nano 0.22; admit swarm-embed 0.05
+  swarm_up swarm-nano swarm-embed
+  wait_endpoint 8010 swarm-nano || notify "⚠️ <b>rag-schedule</b> ($mode): swarm-nano do 10 min nenaběhl (ToyShaders/AiSwarmBattle bez Nano)"
+}
+
 case "$mode" in
   comfy|day)
-    log "režim comfy: obohacení stop, director i promo dole, translate úsporný, ComfyUI a audio nahoru"
-    systemctl --user stop library-enrich || true
-    ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
-    docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
-    ( cd "$AISTACK" && make up-translate-lean >/dev/null )
-    wait_endpoint 8004 translate || true
+    log "režim comfy: LLM i director dole, ComfyUI a audio nahoru"
+    stop_director; stop_llm; stop_translate
     systemctl --user start comfyui
     docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     ;;
-  promo)
-    # Translate zůstává: Knihovník má přes promo okno odpovídat pořád, a
-    # 36,5 (agent) + 36 (translate lean) + ~15 (chat, fallback, chroma)
-    # se do 121,7 vejde. ComfyUI a audio ne — ty jsou 52 + 25.
-    log "režim promo: ComfyUI a audio dole, qwen36-agent nahoru, translate úsporný zůstává"
-    systemctl --user stop comfyui || true
-    docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
-    systemctl --user stop library-enrich || true
-    ( cd "$AISTACK" && make down-swarm-director >/dev/null 2>&1 ) || true
-    ( cd "$AISTACK" && make up-translate-lean >/dev/null )
-    docker start $AGENT_CONTAINERS >/dev/null 2>&1 || true
-    wait_endpoint 8040 qwen36-agent || fail "qwen36-agent nenaběhl — promo okno bez modelu"
+  llm|promo)
+    log "režim llm: ComfyUI, audio a director dole, qwen36 + Nano + embed nahoru"
+    stop_comfy; stop_director; stop_translate
+    docker rm -f $GEMMA_CONTAINERS >/dev/null 2>&1 || true
+    sleep 5
+    qwen36_up
+    nano_up
     ;;
-  rag|night)
-    log "režim rag: ComfyUI, promo, translate i audio dole, director nahoru, obohacení jede"
-    systemctl --user stop comfyui || true
-    docker stop $AUDIO_CONTAINERS >/dev/null 2>&1 || true
+  gemma)
+    # Agent Právníka na vyžádání (uživatel 2026-10-01): místo qwen36 Gemma-4,
+    # util 0.40 — při 0.30 měla jen 9k tokenů KV cache a 12k dotaz nepřijala.
+    log "režim gemma: qwen36 dole, Gemma-4 + Nano nahoru (agent Právníka)"
+    stop_comfy; stop_director; stop_translate
     docker stop $AGENT_CONTAINERS >/dev/null 2>&1 || true
-    docker stop $FLUX_CONTAINERS >/dev/null 2>&1 || true
-    # translate musí pryč DŘÍV, než se pustí director: vLLM odmítne start,
-    # když je volné paměti míň než util × total (0.75 = 91 GiB)
-    ( cd "$AISTACK" && make down-translate >/dev/null 2>&1 ) || true
+    sleep 5
+    ( cd "$AISTACK" && GEMMA_UTIL=0.40 bench/serve.sh gemma >/dev/null ) || fail "Gemma se nevešla nebo nenaběhla"
+    for _ in $(seq 1 60); do
+      docker logs bench-gemma 2>&1 | grep -q "Application startup complete" && { log "Gemma odpovídá"; break; }
+      sleep 15
+    done
+    docker logs bench-gemma 2>&1 | grep -q "Application startup complete" || fail "Gemma do 15 min nenaběhla"
+    nano_up
+    ;;
+  rag|night|director)
+    log "režim rag: ComfyUI, LLM profil a audio dole, director nahoru, noční dávky jedou"
+    stop_comfy; stop_llm; stop_translate
     sleep 5
     memory_check
     ( cd "$AISTACK" && make up-director-night >/dev/null )
@@ -222,16 +270,22 @@ case "$mode" in
       ( cd "$AISTACK" && make up-director-night >/dev/null )
       wait_endpoint 8012 swarm-director || true
       if ! smoke_test 8012 swarm-director; then
-        fail "director je rozbitý i po restartu — obohacení NESPOUŠTÍM"
+        fail "director je rozbitý i po restartu — noční dávky NESPOUŠTÍM"
       fi
     fi
     if ! probe_test; then
-      fail "director generuje poškozené odpovědi — obohacení NESPOUŠTÍM"
+      fail "director generuje poškozené odpovědi — noční dávky NESPOUŠTÍM"
     fi
-    systemctl --user start library-enrich
+    for j in $DIRECTOR_JOBS; do
+      if systemctl --user cat "$j" >/dev/null 2>&1; then
+        systemctl --user start "$j" && log "dávka $j běží"
+      else
+        log "dávka $j není nainstalovaná, přeskakuji"
+      fi
+    done
     ;;
   *)
-    echo "použití: $0 comfy|rag|promo|auto (day/night = comfy/rag)" >&2; exit 2
+    echo "použití: $0 comfy|llm|gemma|rag|auto (day = comfy, promo = llm, night = director = rag)" >&2; exit 2
     ;;
 esac
 log "hotovo ($mode)"
