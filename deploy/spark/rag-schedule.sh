@@ -142,6 +142,17 @@ probe_test() {
   if out=$( cd "$RAG" && .venv/bin/python3 probe_llm.py --limit 4 --workers 6 2>&1 ); then
     log "sonda ok: $(printf '%s\n' "$out" | tail -1)"; return 0
   fi
+  # Jedna varianta useknutá na délce (fin=length) není rozbitý model: 1. 10. 2026
+  # konkordance Pyramidových textů (tabulka čísel) nevešla do 1300 tokenů a sonda
+  # tím shodila celou denní směnu, i když 11/12 bylo čistých. Rozbitá instance
+  # kazí většinu variant, takže tolerance jedné délkové chyby ji pořád chytí.
+  local ok total bad
+  ok=$(printf '%s\n' "$out" | sed -n 's/^HOTOVO: \([0-9]*\)\/\([0-9]*\).*/\1/p')
+  total=$(printf '%s\n' "$out" | sed -n 's/^HOTOVO: \([0-9]*\)\/\([0-9]*\).*/\2/p')
+  bad=$(printf '%s\n' "$out" | grep 'parse=BAD' | grep -vc 'fin=length' || true)
+  if [ -n "$ok" ] && [ "$ok" -ge $(( total - 1 )) ] && [ "$bad" = 0 ]; then
+    log "sonda ok s výhradou: $ok/$total čistých, zbytek jen useknutý na délce"; return 0
+  fi
   log "sonda SELHALA: $(printf '%s\n' "$out" | grep -E 'fin=|EXC|HOTOVO|Traceback' | grep -v 'parse=OK' | head -3 | tr '\n' ' ' | cut -c1-300)"
   return 1
 }
