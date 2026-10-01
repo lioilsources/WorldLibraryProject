@@ -7,3 +7,4 @@ logs/
 works.jsonl
 chapters.jsonl
 tests/fixtures/*.tmp
+build/

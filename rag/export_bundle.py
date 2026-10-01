@@ -116,11 +116,37 @@ def node_kind(level: int) -> str:
 
 def norm_term(term: str) -> str | None:
     """NFC, oříznuté, bez balastu. None = term do cloudu nepatří.
-    Apostrof se neodřezává — je součástí české transkripce (Lao-c', Čuang-c')."""
-    t = unicodedata.normalize("NFC", (term or "").strip().strip(",.;:!?\"“”„()[]"))
+    Apostrof se neodřezává — je součástí české transkripce (Lao-c', Čuang-c').
+    Závorky se tu neodřezávají: „Tao (Cesta)" by skončilo jako „Tao (Cesta" —
+    vysvětlivky v závorce rozebírá `split_gloss()`."""
+    t = unicodedata.normalize("NFC", (term or "").strip().strip(",.;:!?\"“”„[]"))
+    if t.startswith("(") and t.endswith(")"):
+        t = t[1:-1].strip()
     if not t or len(t) > MAX_TERM_LEN or t.isdigit():
         return None
     return t
+
+
+def is_latin(text: str) -> bool:
+    """Obsahuje latinková písmena (i s diakritikou: nibbāna, ťing)?"""
+    return any(c.isalpha() and "LATIN" in unicodedata.name(c, "") for c in text)
+
+
+def split_gloss(term: str) -> tuple[str, str | None]:
+    """„Wu wei (無為)" → („Wu wei", „無為"), „Tao (Cesta)" → („Tao", None).
+    LLM obohacení k pojmu rádo připíše vysvětlivku. V cloudu jako filtru by
+    „Tao", „Tao (Cesta)" a „Cesta (Tao)" byly tři bubliny pro jeden pojem,
+    proto zůstává hlava. Když je v závorce původní písmo, vrátí se zvlášť
+    jako `orig` — to je přesně ten term, který má čtečka ukazovat."""
+    head, sep, rest = term.partition("(")
+    head = head.strip()
+    if not sep or not head:
+        return term, None
+    inner = rest.split(")")[0].strip()
+    return head, (inner if inner and not is_latin(inner) else None)
+
+
+KIND_RANK = {"orig": 0, "entity": 1, "word": 2}   # který druh vyhraje u shody termů
 
 
 def build_tree(work: dict, chapters: list[dict]) -> dict:
@@ -166,28 +192,57 @@ def chunk_terms(row: dict) -> set[tuple[str, str]]:
     """Termy jednoho chunku jako množina (term, kind) — opakování uvnitř
     chunku se nepočítá, `count` v bundlu je počet chunků, ne výskytů.
     `quality == 0` je podle schématu balast (patička, rejstřík) a vyhazuje
-    ho i retrieval, takže do cloudu nepatří."""
+    ho i retrieval, takže do cloudu nepatří.
+
+    Jeden pojem = jeden term: „Dao" jako klíčové slovo i jako entita, nebo
+    „Brāhmaṇa" vedle „brāhmaṇa", se sloučí (bez ohledu na velikost písmen)
+    a druh vybere `KIND_RANK`."""
     if row.get("quality") == 0:
         return set()
-    out: set[tuple[str, str]] = set()
+    raw: list[tuple[str, str]] = []
     for term in row.get("keywords_cs") or []:
-        if (t := norm_term(term)):
-            out.add((t, "word"))
+        raw.append((term, "word"))
     for term in row.get("keywords_orig") or []:
-        if (t := norm_term(term)):
-            out.add((t, "orig"))
+        raw.append((term, "orig"))
     for ent in row.get("entities") or []:
-        name = ent.get("name") if isinstance(ent, dict) else ent
-        if (t := norm_term(name or "")):
-            out.add((t, "entity"))
-    return out
+        raw.append((ent.get("name") if isinstance(ent, dict) else ent, "entity"))
+
+    best: dict[str, tuple[str, str]] = {}
+    def add(term: str | None, kind: str) -> None:
+        if not (t := norm_term(term or "")):
+            return
+        key = t.casefold()
+        if key not in best or KIND_RANK[kind] < KIND_RANK[best[key][1]]:
+            best[key] = (t, kind)
+
+    for term, kind in raw:
+        head, orig = split_gloss(norm_term(term or "") or "")
+        add(head, kind)
+        add(orig, "orig")
+    return set(best.values())
 
 
-def own_counts(chunk_rows: list[dict]) -> Counter:
+def canonical_terms(chunk_rows: dict) -> dict[str, tuple[str, str]]:
+    """casefold → (term, kind) s nejčastější podobou v celém díle. Bez toho
+    by „Tao" (entita v jedné kapitole) a „tao" (slovo v jiné) byly v kořeni
+    dvě bubliny — slučování uvnitř chunku nestačí."""
+    variants: dict[str, Counter] = {}
+    for rows in chunk_rows.values():
+        for row in rows:
+            for term, kind in chunk_terms(row):
+                variants.setdefault(term.casefold(), Counter())[(term, kind)] += 1
+    return {key: min(c, key=lambda v: (-c[v], KIND_RANK[v[1]], v[0]))
+            for key, c in variants.items()}
+
+
+def own_counts(chunk_rows: list[dict], canon: dict[str, tuple[str, str]] | None = None) -> Counter:
     """Chunky jednoho uzlu → Counter[(term, kind)] = v kolika chuncích je."""
     counts: Counter = Counter()
     for row in chunk_rows:
-        counts.update(chunk_terms(row))
+        terms = chunk_terms(row)
+        if canon:
+            terms = {canon.get(t.casefold(), (t, k)) for t, k in terms}
+        counts.update(terms)
     return counts
 
 
@@ -229,17 +284,17 @@ def score_terms(counts: Counter, idf: dict[str, float], *, top: int = TOP_TERMS,
     nejsilnějšímu termu uzlu (ne absolutní TF-IDF) — Kindlify z něj dělá
     velikost bubliny, takže musí být srovnatelné napříč uzly.
     `boost` jsou kurátorská klíčová slova díla/kapitoly: jdou navrch."""
-    boosted = {t for t in (norm_term(b) for b in (boost or [])) if t}
+    boosted = {t.casefold(): t for t in (norm_term(b) for b in (boost or [])) if t}
     ranked = []
     for (term, kind), count in counts.items():
         weight = count * idf.get(term, 1.0)
-        ranked.append((0 if term in boosted else 1, -weight, term, kind, count))
+        ranked.append((0 if term.casefold() in boosted else 1, -weight, term, kind, count))
     ranked.sort()
 
     # Termy z boostu, které v chuncích vůbec nejsou (např. dílo bez obohacení).
-    seen = {term for _, _, term, _, _ in ranked}
-    for term in boosted - seen:
-        ranked.insert(0, (0, 0.0, term, "word", 1))
+    seen = {term.casefold() for _, _, term, _, _ in ranked}
+    for key in sorted(boosted.keys() - seen, reverse=True):
+        ranked.insert(0, (0, 0.0, boosted[key], "word", 1))
 
     ranked = ranked[:top]
     if not ranked:
@@ -302,10 +357,11 @@ def build_bundle(work: dict, chapters: list[dict], chunk_rows: dict[int, list[di
     """Řádky z Postgresu → hotový bundle. `chunk_rows` a `chapter_keywords`
     jsou klíčované ordinálem kapitoly (None = chunk mimo kapitoly)."""
     tree = build_tree(work, chapters)
-    per_node = {node_id(o): own_counts(rows) for o, rows in chunk_rows.items() if o is not None}
+    canon = canonical_terms(chunk_rows)
+    per_node = {node_id(o): own_counts(rows, canon) for o, rows in chunk_rows.items() if o is not None}
     orphan = chunk_rows.get(None)
     if orphan:                       # chunky bez kapitoly patří dílu jako celku
-        per_node["root"] = own_counts(orphan)
+        per_node["root"] = own_counts(orphan, canon)
     words = build_words(
         tree, per_node,
         work_keywords=work_keywords or [],

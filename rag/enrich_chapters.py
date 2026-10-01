@@ -109,6 +109,10 @@ def main() -> int:
     p.add_argument("--model", default="swarm-director")
     p.add_argument("--accept-model", action="append")
     p.add_argument("--workers", type=int, default=6)
+    # 900 nestačilo: 2026-10-01 se useklo 4 z 20 kapitol Hovorů (finish_reason=length),
+    # vždy ty s víc chunky — director píše dlouhé summary_long. Stejná zkušenost
+    # jako u enrich_chunks (900 → 1300).
+    p.add_argument("--max-tokens", type=int, default=1600)
     p.add_argument("--priority", type=int, default=1)
     p.add_argument("--work")
     p.add_argument("--limit", type=int, default=0)
@@ -120,7 +124,7 @@ def main() -> int:
     topics = yaml.safe_load((Path(args.registry) / "topics.yaml").read_text(encoding="utf-8")) or []
     slugs = {t["id"] for t in topics}
     hint = ", ".join(f"{t['id']} ({t['name_cs']})" for t in topics)
-    llm = LLMBatch(args.llm_url, args.model, workers=args.workers, max_tokens=900, temperature=0.3,
+    llm = LLMBatch(args.llm_url, args.model, workers=args.workers, max_tokens=args.max_tokens, temperature=0.3,
                    accept_models=set(args.accept_model or [args.model]))
     mapper = LLMBatch(args.llm_url, args.model, workers=1, max_tokens=400, temperature=0.2,
                       accept_models=set(args.accept_model or [args.model]))
