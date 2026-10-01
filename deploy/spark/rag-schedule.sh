@@ -60,8 +60,10 @@ AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
 FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 # Profil llm: Nano-30B a embed ze swarm compose (Nano util 0.22 — s 0.15 od
 # vLLM 0.21 nemá KV cache, 30. 9. 2026). Gemma (profil gemma) je jednorázový
-# kontejner z AiStack bench/serve.sh.
-LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed}"
+# kontejner z AiStack bench/serve.sh. swarm-litellm (:4001, bez GPU) potřebuje
+# AiSwarmBattle — pipeline volá Nano jen přes něj; v compose závisí na
+# swarm-coder, proto swarm_up s --no-deps.
+LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed swarm-litellm}"
 GEMMA_CONTAINERS="${GEMMA_CONTAINERS:-bench-gemma}"
 # Noční dávky na directoru — každá je systemd --user služba, která se sama
 # dokončí / resumuje; workery v součtu 12, aby chatu zbyly 4 sloty z 16.
@@ -223,7 +225,7 @@ qwen36_up() {
 }
 nano_up() {
   admit swarm-nano 0.22; admit swarm-embed 0.05
-  swarm_up swarm-nano swarm-embed
+  swarm_up swarm-nano swarm-embed swarm-litellm
   wait_endpoint 8010 swarm-nano || notify "⚠️ <b>rag-schedule</b> ($mode): swarm-nano do 10 min nenaběhl (ToyShaders/AiSwarmBattle bez Nano)"
 }
 
