@@ -1,0 +1,19 @@
+# Noční dávka StoryTelleru na swarm-directorovi: nápovědy (rag.hints) pro světový
+# výřez motivů (~/deploy/storyteller/rag/data/tales.world-hints.jsonl, round-robin
+# po zemích, resumovatelné). Patří repu storyteller, ale plánuje ji rag-schedule.sh
+# (DIRECTOR_JOBS) — proto leží tady. 2 souběžné požadavky z 12 noci.
+# Až výřez doběhne, nahradit další dávkou StoryTelleru (verbalize, scene_prompts).
+[Unit]
+OnFailure=notify-failure@%n.service
+Description=StoryTeller noční dávka (hints světa, swarm-director)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/deploy/storyteller
+Environment=LITELLM_BASE_URL=http://localhost:8080/v1 LITELLM_MODEL=swarm-director LITELLM_CONCURRENCY=2 LITELLM_TIMEOUT=900 PYTHONUNBUFFERED=1
+ExecStart=%h/deploy/storyteller/rag/.venv/bin/python -m rag.hints --lang cs --no-generic --tales rag/data/tales.world-hints.jsonl
+Restart=no
+
+[Install]
+WantedBy=default.target
