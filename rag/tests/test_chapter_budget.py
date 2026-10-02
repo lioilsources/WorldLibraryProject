@@ -12,9 +12,19 @@ from llm_batch import LLMBatch, is_context_error
 
 def test_odhad_je_pro_puvodni_pismo_pesimisticky():
     assert est_tokens("a" * 3500) < 1100            # latinka ~3,5 znaku/token
-    assert est_tokens("道" * 1000) >= 1500           # han: víc tokenů než znaků
-    # dřívější strop 60 000 znaků by u čínštiny dal ~90k tokenů, ne „~20k"
+    assert est_tokens("道" * 1000) >= 1000           # han: aspoň token na znak
+    # dřívější strop 60 000 znaků by u čínštiny dal ~70k tokenů, ne „~20k"
     assert est_tokens("道" * 60_000) > 32_768
+
+
+def test_odhad_nepodstreli_rejstrik_ani_pali():
+    # Skutečnost podle tokenizéru directora (vLLM /tokenize, 2026-10-02):
+    # rejstřík Avesty 51 684 znaků = 32 070 tokenů, první odhad dal 16 273.
+    rejstrik = "p. 362 p. 363\nAhura Mazda, i. 4, 12; ii. 7, 33-35; xix. 1.\n" * 800
+    assert est_tokens(rejstrik) >= len(rejstrik) / 1.7
+    # páli s diakritikou: ~2 znaky na token, první odhad dal ~2,7
+    pali = "Kusalā dhammā, akusalā dhammā, abyākatā dhammā. " * 1000
+    assert est_tokens(pali) >= len(pali) / 2.2
 
 
 def test_fit_a_fit_list_drzi_rozpocet():

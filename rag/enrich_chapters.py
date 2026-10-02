@@ -37,15 +37,49 @@ CONTEXT_MARGIN = 1024        # rezerva na chat šablonu a nepřesnost odhadu
 MAP_MAX_TOKENS = 400
 
 
+# Tokenů na znak podle třídy — fit proti tokenizéru directora (vLLM /tokenize)
+# na 109 kapitolách všech jazyků korpusu (2026-10-02), krát 1,2 rezerva: na
+# vzorku pak odhad nikde není pod skutečností. První verze (ASCII 0,3, latinka
+# s diakritikou 1,0, ostatní 1,5) podstřelila rejstřík Avesty (čísla stránek,
+# interpunkce) o polovinu a pálijské texty o čtvrtinu.
+TOKENS_PER_CHAR = {
+    "ascii": 0.30,     # písmena; slova se slučují
+    "latx": 2.10,      # ā ṃ ṇ ī … — BPE trhá slovo u každé diakritiky
+    "greek": 0.95,
+    "han": 1.25,
+    "upunct": 5.80,    # „ " — … typografická interpunkce (vzácná, odhad z mála dat)
+    "other": 5.40,     # ostatní písma (dévanágarí, hebrejština); v korpusu skoro nejsou
+    "digit": 0.80,
+    "punct": 2.30,
+    "nl": 0.70,
+}
+
+
+def char_class(c: str) -> str | None:
+    o = ord(c)
+    if c == "\n":
+        return "nl"
+    if c.isspace():
+        return None
+    if o < 128:
+        return "ascii" if c.isalpha() else "digit" if c.isdigit() else "punct"
+    if o < 0x250 or 0x1E00 <= o < 0x1F00:
+        return "latx"
+    if 0x370 <= o < 0x400 or 0x1F00 <= o < 0x2000:
+        return "greek"
+    if 0x2E80 <= o < 0xA000 or 0xF900 <= o < 0xFB00 or 0xFF00 <= o < 0xFFF0 or o >= 0x20000:
+        return "han"
+    if 0x2000 <= o < 0x2070:
+        return "upunct"
+    return "other"
+
+
 def est_tokens(text: str) -> int:
-    """Horní odhad počtu tokenů bez tokenizéru modelu: ASCII ~3,5 znaku na
-    token, latinka s diakritikou ~1 token na znak, ostatní písma (han,
-    dévanágarí, řečtina, hebrejština) 1,5 — bajtové BPE je rozkládá na víc
-    tokenů než znaků."""
+    """Horní odhad počtu tokenů bez tokenizéru modelu (viz TOKENS_PER_CHAR)."""
     n = 0.0
     for c in text:
-        o = ord(c)
-        n += 0.3 if o < 128 else 1.0 if o < 0x250 or 0x1E00 <= o < 0x1F00 else 1.5
+        if (k := char_class(c)):
+            n += TOKENS_PER_CHAR[k]
     return int(n) + 1
 
 
