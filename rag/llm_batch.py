@@ -53,6 +53,7 @@ class BatchStats:
     failed: int = 0
     rejected_fallback: int = 0
     truncated: int = 0
+    too_long: int = 0
     tokens_in: int = 0
     tokens_out: int = 0
     started: float = field(default_factory=time.time)
@@ -61,6 +62,7 @@ class BatchStats:
     def rate(self) -> str:
         dt = max(1e-6, time.time() - self.started)
         trunc = f", {self.truncated} useknuto" if self.truncated else ""
+        trunc += f", {self.too_long} přes kontext" if self.too_long else ""
         return (f"{self.done} hotovo, {self.failed} chyb{trunc}, {self.rejected_fallback} fallback | "
                 f"{self.done / dt * 60:.1f}/min, in {self.tokens_in / dt:.0f} tok/s, out {self.tokens_out / dt:.0f} tok/s")
 
@@ -71,6 +73,21 @@ class BatchStats:
 BARE_VALUE_RE = re.compile(
     r'^(\s*"[^"]+"\s*:\s*)(?![\s"\[{]|-?\d|true\b|false\b|null\b)(.+?)(,?)\s*$', re.MULTILINE)
 MISSING_COMMA_RE = re.compile(r'([^\s,\[{])[ \t]*\n([ \t]*")')
+
+
+# vLLM: "This model's maximum context length is 32768 tokens. However, you
+# requested …"; TRT-LLM/LiteLLM píšou podobně. Je to vada vstupu, ne modelu.
+CONTEXT_ERROR_RE = re.compile(
+    r"maximum context length|context length exceeded|context_length_exceeded|max_model_len|"
+    r"prompt is too long|input is too long", re.IGNORECASE)
+
+
+def is_context_error(exc: Exception) -> bool:
+    """400 kvůli délce vstupu. Opakovat ho nemá smysl — stejný vstup dopadne
+    stejně —, takže se nesmí plést s výpadkem modelu (2026-10-02 tím noční
+    souhrny kapitol 100 minut spaly po 120 s nad jednou kapitolou)."""
+    status = getattr(exc, "status_code", None)
+    return (status in (400, 413, None)) and bool(CONTEXT_ERROR_RE.search(str(exc)))
 
 
 def _repair(blob: str) -> str:
@@ -159,6 +176,11 @@ class LLMBatch:
                     self.thinking = True     # backend to neumí — nech model uvažovat
                     print("  backend nezná chat_template_kwargs — uvažování zůstává zapnuté", flush=True)
                     continue
+                if is_context_error(exc):   # vada vstupu: položka padá, běh jede dál
+                    with self.stats.lock:
+                        self.stats.too_long += 1
+                    print(f"  vstup přes kontext modelu, přeskakuji ({msg[:160]})", flush=True)
+                    return None, ""
                 with self.stats.lock:
                     self._consecutive_bad += 1
                     bad = self._consecutive_bad
