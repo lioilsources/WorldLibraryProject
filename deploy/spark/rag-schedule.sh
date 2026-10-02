@@ -253,6 +253,8 @@ case "$mode" in
   comfy|day)
     log "režim comfy: LLM i director dole, ComfyUI, audio a flux-schnell nahoru"
     stop_director; stop_llm; stop_translate
+    # page cache po vahách directora/qwen36 by ComfyUI ukrojila MemFree → CPU render (2. 10.)
+    python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
     docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
     flux_up

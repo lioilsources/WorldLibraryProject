@@ -11,12 +11,23 @@
 # kontejnery). „loaded partially; 7456 MB usable“ je jen lowvram režim —
 # pomalejší, ale na GPU — ten se nehlásí.
 #
+# Od 2. 10. 2026 to i opravuje: při každém takovém řádku (nejvýš jednou za
+# minutu) vyhodí page cache modelů (evict-model-cache.py, bez roota) a požádá
+# ComfyUI o /free, takže další prompt nahraje model celý na GPU. Příčinou bývá
+# page cache, ne skutečný nedostatek paměti (viz evict-model-cache.py).
+#
 #   systemctl --user enable --now comfyui-cpu-watch
 set -u
 COOLDOWN="${COOLDOWN:-3600}"
 SIGNATURE='loaded partially; 0.00 MB usable'
 here="$(cd "$(dirname "$0")" && pwd)"
-last=0 count=0
+last=0 count=0 last_fix=0
+
+fix() {
+  python3 "$here/evict-model-cache.py" 2>&1
+  curl -s -m 10 -X POST http://127.0.0.1:8188/free -H 'Content-Type: application/json' \
+    -d '{"unload_models":true,"free_memory":true}' -o /dev/null || true
+}
 
 report() {
   local mem comfy queue containers
@@ -40,6 +51,10 @@ journalctl --user -u comfyui -f -n 0 -o cat 2>/dev/null | while IFS= read -r lin
   esac
   count=$((count + 1))
   now=$(date +%s)
+  if [ $((now - last_fix)) -ge 60 ]; then
+    fix
+    last_fix=$now
+  fi
   if [ $((now - last)) -ge "$COOLDOWN" ]; then
     report
     last=$now
