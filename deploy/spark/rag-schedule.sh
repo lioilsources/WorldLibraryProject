@@ -69,6 +69,11 @@ FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 # Gemma (profil gemma) je jednorázový kontejner z AiStack bench/serve.sh.
 LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed swarm-litellm}"
 GEMMA_CONTAINERS="${GEMMA_CONTAINERS:-bench-gemma}"
+# TTS (AiStack services/audio, 2. 10. 2026): audio-tts (Kokoro + Piper, CPU ~1 GiB)
+# běží v comfy i llm; GPU enginy XTTS (~2,5 GiB) a Chatterbox (~4 GiB) jen v llm.
+# V okně director nic z toho — director nechává MemAvailable jen 3–8 GiB.
+TTS_CPU_CONTAINERS="${TTS_CPU_CONTAINERS:-audio-tts}"
+TTS_GPU_CONTAINERS="${TTS_GPU_CONTAINERS:-audio-tts-xtts audio-tts-chatterbox}"
 # Noční dávky na directoru — každá je systemd --user služba, která se sama
 # dokončí / resumuje; workery v součtu 12, aby chatu zbyly 4 sloty z 16.
 DIRECTOR_JOBS="${DIRECTOR_JOBS:-library-enrich library-chapters storyteller-night}"
@@ -256,7 +261,8 @@ case "$mode" in
     # page cache po vahách directora/qwen36 by ComfyUI ukrojila MemFree → CPU render (2. 10.)
     python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
-    docker start $AUDIO_CONTAINERS >/dev/null 2>&1 || true
+    docker stop $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
+    docker start $AUDIO_CONTAINERS $TTS_CPU_CONTAINERS >/dev/null 2>&1 || true
     flux_up
     ;;
   llm|promo)
@@ -268,6 +274,7 @@ case "$mode" in
     sleep 5
     qwen36_up
     flux_up
+    docker start $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
     ;;
   gemma)
     # Agent Právníka na vyžádání (uživatel 2026-10-01): místo qwen36 Gemma-4,
@@ -288,6 +295,7 @@ case "$mode" in
   rag|night|director)
     log "režim rag: ComfyUI, LLM profil, audio a flux-schnell dole, director nahoru, dávky jedou"
     stop_comfy; stop_llm; stop_translate
+    docker stop $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
     sleep 5
     memory_check
     ( cd "$AISTACK" && make up-director-night >/dev/null )
