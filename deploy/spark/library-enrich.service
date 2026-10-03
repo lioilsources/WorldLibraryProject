@@ -4,7 +4,7 @@
 # Jede na swarm-directorovi, ne na translate: obohacení se zapéká do databáze
 # natrvalo, takže rozhoduje kvalita, ne rychlost (director je 2,8× pomalejší,
 # ale v A/B na 30 chuncích psal věcně i gramaticky správněji). Noční okno je
-# stejně prázdné. --max-tokens 1300, protože director píše delší glosy
+# stejně prázdné. --max-tokens 1800, protože director píše delší glosy
 # (⌀ 254 znaků proti 137) a do 900 se mu občas nevešly.
 #
 # --order breadth: n-tý chunk každého díla, teprve pak (n+1)-ní. Po každé
@@ -42,9 +42,11 @@ WorkingDirectory=%h/deploy/WorldLibraryProject/rag
 # čtyři sloty chatu (AiStack/PLAN-spark-scheduler.md §3). Dřív 12;
 # obohacení je o čtvrtinu pomalejší, ale běží celou noc, kdežto na chat se
 # čeká živý člověk.
+# max-tokens 1800 (dřív 1300): model občas vypíše do keywords_orig celý úryvek
+# v originále a 1300 souvislou odpověď usekl (4. 10. 2026, probe_llm).
 ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 enrich_chunks.py \
     --llm-url http://localhost:8012/v1 --model swarm-director \
-    --workers 6 --max-tokens 1300 --order breadth --priority 1
+    --workers 6 --max-tokens 1800 --order breadth --priority 1
 Restart=on-failure
 RestartSec=60
 # Ať se log dá číst po chuncích, ne až na konci
