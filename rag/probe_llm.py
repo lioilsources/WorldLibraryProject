@@ -66,7 +66,7 @@ def main() -> int:
     p.add_argument("--model", default="swarm-director")
     p.add_argument("--limit", type=int, default=6, help="kolik chunků z hlavy fronty")
     p.add_argument("--priority", type=int, default=1)
-    p.add_argument("--max-tokens", type=int, default=1300, help="stejně jako library-enrich.service")
+    p.add_argument("--max-tokens", type=int, default=1800, help="stejně jako library-enrich.service")
     p.add_argument("--workers", type=int, default=6, help="musí být pod --max-num-seqs modelu")
     p.add_argument("--variants", default="json,nojson,short")
     p.add_argument("--timeout", type=float, default=420.0)
