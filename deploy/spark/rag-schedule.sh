@@ -309,8 +309,14 @@ case "$mode" in
         fail "director je rozbitý i po restartu — noční dávky NESPOUŠTÍM"
       fi
     fi
+    # Sonda je náhodná (temperature 0.2): 5. 10. 2026 v 01:08 jednou neplatný JSON
+    # a jedna useknutá odpověď, hned nato 12/12 čistých — noc pak 20 min stála.
+    # Rozbitý model selže i podruhé, takže jedno opakování nic neschová.
     if ! probe_test; then
-      fail "director generuje poškozené odpovědi — noční dávky NESPOUŠTÍM"
+      log "sonda selhala — opakuji jednou"
+      if ! probe_test; then
+        fail "director generuje poškozené odpovědi i na druhý pokus — noční dávky NESPOUŠTÍM"
+      fi
     fi
     for j in $DIRECTOR_JOBS; do
       if systemctl --user cat "$j" >/dev/null 2>&1; then
