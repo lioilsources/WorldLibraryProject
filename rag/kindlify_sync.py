@@ -19,6 +19,13 @@ a aspoň `--min-chapters` kapitol (s textem) se souhrnem. Výchozí 0,95, ne
 navždy. Dílo pak může přijít o pár souhrnů dřív, než Knihovník doběhne —
 další běh ho přeexportuje a appka ho podle `pipelineVersion` reimportuje.
 
+Co se vynechává (rozhodnutí 2026-10-04):
+  * díla, která jsou v korpusu překladem (`works.is_translation` — Eddy,
+    Beowulf, Avesta, Texty pyramid, Mahábhárata v angličtině): čtečka je
+    o originálech jako celá knihovna; `--include-translations` to vypne,
+  * díla s méně než `--min-chapters-count` (2) kapitolami: bez stromu jsou
+    ve čtečce plochá; přibudou, až pro ně bude detektor kapitol.
+
 Bundle se přepisuje jen při změně obsahu (`pipelineVersion` je otisk), ne
 při každém běhu — `generatedAt` by jinak dělal z každé noci commit všech děl.
 """
@@ -39,7 +46,8 @@ from export_bundle import asset_name, export_work, report, walk_nodes  # noqa: E
 INDEX = "index.json"
 
 
-def ready_works(conn, *, priority: int, min_chunks: float, min_chapters: float) -> list[str]:
+def ready_works(conn, *, priority: int, min_chunks: float, min_chapters: float,
+                min_chapter_count: int = 2, include_translations: bool = False) -> list[str]:
     """ID děl s dost obohacenými chunky i dost souhrny kapitol."""
     with conn.cursor() as cur:
         cur.execute(
@@ -59,9 +67,11 @@ def ready_works(conn, *, priority: int, min_chunks: float, min_chapters: float) 
             WHERE w.priority <= %s AND w.chunk_count > 0
               AND ch.done >= ch.total * %s
               AND en.done >= w.chunk_count * %s
+              AND ch.total >= %s
+              AND (%s OR NOT coalesce(w.is_translation, false))
             ORDER BY w.priority, w.id
             """,
-            (priority, min_chapters, min_chunks),
+            (priority, min_chapters, min_chunks, min_chapter_count, include_translations),
         )
         return [r[0] for r in cur.fetchall()]
 
@@ -113,6 +123,10 @@ def main() -> int:
     p.add_argument("--priority", type=int, default=1, help="díla s prioritou ≤ N")
     p.add_argument("--min-chunks", type=float, default=0.95, help="podíl obohacených chunků")
     p.add_argument("--min-chapters", type=float, default=0.95, help="podíl kapitol se souhrnem")
+    p.add_argument("--min-chapters-count", type=int, default=2,
+                   help="vynechat díla s méně kapitolami (plochá, bez stromu)")
+    p.add_argument("--include-translations", action="store_true",
+                   help="i díla, která jsou v korpusu překladem (is_translation)")
     p.add_argument("--top-terms", type=int, default=50)
     p.add_argument("--write", action="store_true", help="zapsat (bez něj jen výpis hotových děl)")
     p.add_argument("--commit", action="store_true", help="s --write: commitnout změny v repu Kindlify")
@@ -133,7 +147,9 @@ def main() -> int:
     changed: list[str] = []
     with psycopg.connect(args.dsn) as conn:
         ids = ready_works(conn, priority=args.priority,
-                          min_chunks=args.min_chunks, min_chapters=args.min_chapters)
+                          min_chunks=args.min_chunks, min_chapters=args.min_chapters,
+                          min_chapter_count=args.min_chapters_count,
+                          include_translations=args.include_translations)
         print(f"hotových děl: {len(ids)}", file=sys.stderr)
         for work in query_works(conn, work_ids=ids, hide_priority=None) if ids else []:
             bundle = export_work(conn, work, top=args.top_terms, chapter_detail="medium")
