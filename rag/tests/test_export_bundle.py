@@ -11,7 +11,8 @@ import json
 import pytest
 
 from export_bundle import (
-    asset_name, build_bundle, build_tree, chapter_label, chunk_terms,
+    EXPORT_VERSION, asset_name, build_bundle, build_tree, chapter_label, chunk_terms,
+    leaf_label, strip_overlap,
     node_id, norm_term, score_terms, split_gloss, slugify, validate_bundle, walk_nodes,
 )
 
@@ -176,7 +177,7 @@ def test_manifest():
     m = bundle()["manifest"]
     assert m["slug"] == "zh-daodejing" and m["title"] == "Tao te ťing"
     assert m["sourceLanguage"] == "lzh" and m["script"] == "han"
-    assert m["pipelineVersion"].startswith("pg-1+")
+    assert m["pipelineVersion"].startswith(EXPORT_VERSION + "+")
     assert m["generatedAt"] == "2026-01-01T00:00:00Z"
 
 
@@ -249,9 +250,10 @@ class FakeCursor:
         elif "FROM chapters" in sql:
             self.rows = [(2, ["tao"]), (3, None)]
         elif "chunk_enrichment" in sql:
-            self.rows = [(2, ["tao"], ["道"], [{"name": "Lao-c'", "type": "person"}], 2),
-                         (2, ["tao"], None, None, None),
-                         (None, ["mimo kapitolu"], None, None, 1)]
+            self.rows = [(2, ["tao"], ["道"], [{"name": "Lao-c'", "type": "person"}], 2,
+                          1, 1, "1.1", "1.2", "Glosa prvního úseku.", "道可道，非常道。"),
+                         (2, ["tao"], None, None, None, 2, 2, None, None, None, "名可名，非常名。"),
+                         (None, ["mimo kapitolu"], None, None, 1, 3, None, None, None, None, "x")]
         else:
             raise AssertionError(f"neočekávaný dotaz: {sql}")
 
@@ -276,7 +278,9 @@ def test_fetch_keywords_a_chunk_rows_rozbali_radky():
     rows = fetch_chunk_rows(FakeConn(), "zh.daodejing")
     assert set(rows) == {2, None}                      # chunk bez kapitoly zůstane pod None
     assert len(rows[2]) == 2
-    assert rows[2][1] == {"keywords_cs": ["tao"], "keywords_orig": [], "entities": [], "quality": None}
+    assert rows[2][1] == {"keywords_cs": ["tao"], "keywords_orig": [], "entities": [], "quality": None,
+                          "seq": 2, "seq_in_chapter": 2, "ref_start": None, "ref_end": None,
+                          "gloss_cs": None, "text": "名可名，非常名。"}
 
 
 def test_export_work_slozi_a_zvaliduje_bundle():
@@ -287,3 +291,49 @@ def test_export_work_slozi_a_zvaliduje_bundle():
     root = {t["term"] for t in b["words"]["nodes"]["root"]["terms"]}
     assert "mimo kapitolu" in root                     # chunky bez kapitoly patří dílu
     assert {"tao", "te"} <= root
+
+
+# --- listy z úseků a text originálu (NZ: verše z verse_refs.py) -----------------
+
+def leaf_row(seq, ref_start=None, ref_end=None, gloss=None, text="", cs=()):
+    return {**chunk(cs=cs), "seq": seq, "seq_in_chapter": seq, "ref_start": ref_start,
+            "ref_end": ref_end, "gloss_cs": gloss, "text": text}
+
+
+def test_popisek_listu_podle_versu():
+    assert leaf_label(leaf_row(1, "1.1", "1.12")) == "1,1–12"
+    assert leaf_label(leaf_row(1, "1.44", "2.3")) == "1,44–2,3"
+    assert leaf_label(leaf_row(1, "4.3", "4.3")) == "4,3"
+    assert leaf_label(leaf_row(7)) == "Úsek 7"
+
+
+def test_prekryv_chunku_se_v_textu_neopakuje():
+    shared = "Καθὼς γέγραπται ἐν τῷ Ἠσαΐᾳ τῷ προφήτῃ"            # ~10 % překryv chunků
+    prev = "Ἀρχὴ τοῦ εὐαγγελίου Ἰησοῦ Χριστοῦ υἱοῦ θεοῦ. " * 4 + shared
+    cur = shared + " Ἰδοὺ ἀποστέλλω τὸν ἄγγελόν μου πρὸ προσώπου σου. " * 4
+    assert strip_overlap(prev, cur) == cur[len(shared):].lstrip()
+    assert strip_overlap("úplně jiný text", "bez překryvu") == "bez překryvu"
+
+
+def test_listy_nesou_glosu_termy_a_text():
+    rows = {
+        2: [leaf_row(1, "1.1", "1.12", "Jan Křtitel a křest.", "AAAA BBBB " * 10, cs=["křest"]),
+            leaf_row(2, "1.11", "1.23", "Pokušení na poušti.", "CCCC DDDD " * 10, cs=["poušť"])],
+        3: [leaf_row(3, None, None, "Jediný úsek.", "jen jeden chunk")],
+    }
+    b = build_bundle(WORK, CHAPTERS, rows, leaves=True, with_text=True, generated_at="x")
+    validate_bundle(b)
+    kap2 = next(n for n in walk_nodes(b["manifest"]["tree"]) if n["id"] == node_id(2))
+    assert [c["label"] for c in kap2["children"]] == ["1,1–12", "1,11–23"]
+    assert all(c["kind"] == "paragraph" for c in kap2["children"])
+    assert b["summaries"]["k00001"] == {"cs": "Jan Křtitel a křest."}
+    assert {t["term"] for t in b["words"]["nodes"][node_id(2)]["terms"]} >= {"křest", "poušť"}  # zdola
+    assert b["texts"]["k00001"].startswith("AAAA")
+    # kapitola s jediným chunkem list nedostane a text nese sama
+    kap3 = next(n for n in walk_nodes(b["manifest"]["tree"]) if n["id"] == node_id(3))
+    assert kap3["children"] == [] and b["texts"][node_id(3)] == "jen jeden chunk"
+
+
+def test_bez_textu_klic_texts_chybi_a_otisk_se_nemeni():
+    b = build_bundle(WORK, CHAPTERS, CHUNK_ROWS, generated_at="x")
+    assert "texts" not in b

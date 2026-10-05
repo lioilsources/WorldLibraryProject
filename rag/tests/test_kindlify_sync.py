@@ -27,4 +27,4 @@ def test_index_drzi_rucni_label_dema_a_bere_exportovana_dila(tmp_path):
     assert entries[0]["nodes"] == 2
     assert entries[1]["label"] == "Tao te ťing"
     assert entries[1]["slug"] == "zh-daodejing"
-    assert entries[1]["pipelineVersion"].startswith("pg-1+")
+    assert entries[1]["pipelineVersion"].startswith("pg-2+")
