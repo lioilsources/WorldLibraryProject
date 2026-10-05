@@ -1,4 +1,11 @@
-# Právník jako agent — stav k 2026-09-28
+# Právník jako agent — stav k 2026-10-05
+
+**Zapojeno do appky** (Ol1nLLM, persona „Právník – smlouvy 📝", `backend:
+"law-agent"`). `/agent/chat` jede na aliasu LiteLLM **`pravnik-agent`**
+(`--agent-model`), který dnes reálně odpovídá **qwen36** (`openclaw-default`,
+okno 19–01); Gemma pod týmž aliasem přijde, až poběží profil gemma. Ověřeno
+2026-10-05 s qwen36: nájemní smlouva na byt od první zprávy po dokument
+v sedmi krocích, 3–20 s na krok. Kontrakt níž v „Kontrakt pro appku".
 
 Plán: `LAWYER_AGENT_PLAN.md` (mimo repo). Předchůdci: `CURRENT_STATE.md` (právní
 index), `TEMPLATES.md` (14 šablon). Tady je, co je hotové, kde to bydlí a co
@@ -29,11 +36,12 @@ ostatní je deterministické a otestované.
 | Nástroje (8) | `rag/agent/tools.py` |
 | Smyčka, režimy, routing | `rag/agent/loop.py` |
 | Přístup k modelu + skriptovaný model pro testy | `rag/agent/llm.py` |
+| Krok pro appku: historie, stav intake, odpovědi z karet, 503 | `rag/agent/klient.py` |
 | Stav rozpracovaného dokumentu | `rag/agent/session.py`, tabulky v `rag/sql/0005_lawyer_sessions.sql` |
 | Deterministická revize cizí smlouvy | `rag/agent/review.py` |
 | Nástroje jako HTTP služba | endpointy v `rag/server.py` (zapnou se s `--cite-registry` + PG) |
 | Eval | `rag/eval/lawyer_agent/` — `make eval-agent` |
-| Testy | `rag/tests/test_agent.py` (v `make test`) |
+| Testy | `rag/tests/test_agent.py`, `rag/tests/test_agent_klient.py` (v `make test`) |
 
 ## Nástroje
 
@@ -76,7 +84,8 @@ GET  /agent/intake/{session_id}       → další otázky bez modelu
 POST /agent/render {session_id}       POST /agent/review {text, typ?}
 GET  /agent/sessions                  DELETE /agent/sessions/{session_id}
 GET  /agent/log/{session_id}
-POST /agent/chat {message, session_id?, mode?, zdroj?}   ← potřebuje model
+POST /agent/chat {message, session_id?, mode?, zdroj?, odpovedi?}   ← potřebuje model
+POST /reset {session_id}              → smaže i rozhovor agenta (dokument v PG zůstává)
 ```
 
 `/law/paragraph` má zákon v query parametru, ne v cestě — číslo předpisu obsahuje
@@ -85,6 +94,61 @@ lomítko. Tím je zároveň doplněné to, co chtěl plán RAG (`GET /law/paragr
 Ověřeno proti běžící službě na SPARKu (2026-09-28): `/templates` vrací 14 šablon,
 `/law/paragraph` § 75 ZP, intake → odmítnutý render → doplnění → render 1 266 znaků
 plné moci, log čtyř volání s časy.
+
+## Kontrakt pro appku (`POST /agent/chat`)
+
+Jeden JSON na krok, **ne stream**. Krok je smyčka model ↔ nástroje (až
+`--agent-max-volani` volání), trvá 3–20 s s qwen36 a výsledkem jsou data
+(karty, dokument), ne text, který by stálo za to sypat po tokenech.
+
+```
+→ {"message": "Chci nájemní smlouvu", "session_id": "…", "mode": "draft",
+   "odpovedi": [{"id": "najemne", "otazka": "Kolik?", "hodnota": "16 500 Kč"}]}
+← {"odpoved": "text agenta", "mode": "draft", "session_id": "…",
+   "otazky": [{"id", "otazka", "typ", "hodnoty"?, "napoveda"?, "hodnota"?}],
+   "dokument": "markdown" | null, "checklist": [str], "upozorneni": [str],
+   "stav": {"typ", "nazev", "stav", "vyplneno", "povinnych", "povinnych_vyplneno",
+            "chybi_celkem", "dalsi_otazky", "porusene_limity": [{"zprava", "zaklad"}],
+            "pripraveno_k_renderu"} | null,
+   "ulozene_odpovedi": {"ulozeno": [id], "odmitnuto": [{"id", "duvod"}]} | null,
+   "volani": [...], "ms_modelu": int, "model": "pravnik-agent"}
+503 {"detail": "Právník teď smlouvy nesepisuje: … jen večer od 19:00 do 01:00 …"}
+```
+
+Co krok dělá navíc proti `loop.Pravnik.krok` (`agent/klient.py`) — každé
+z toho je reakce na to, co qwen36 2026-10-05 skutečně dělal:
+
+* **Historie v RAM per `session_id`** (24 zpráv, smaže `/reset`). Bez ní model
+  ve druhém kroku zapomněl, že jde o nájem, a ptal se na `name_najemce`.
+  Do historie jde jen text odpovědi — značky karet v ní model začal opisovat.
+* **Stav intake do systémové zprávy** (šablona, co je vyplněné, co chybí,
+  porušené limity) z Postgresu — model navazuje i po restartu serveru.
+* **`get_template` v režimu draft přiřadí šablonu** session, když ji ještě
+  nemá (`loop._prirad_sablonu`). qwen36 po `get_template` rovnou volá
+  `ask_user` a `save_intake(typ=…)` vynechá — odpovědi by se pak neměly kam
+  uložit. Session, která šablonu má, se nemění (změna typu maže odpovědi).
+* **`odpovedi` z karet ukládá server**, ne model: neznámé id a nepřevoditelná
+  hodnota jdou do `odmitnuto` s větou pro člověka, ostatní do `save_intake`
+  s převodem podle typu proměnné (`money`/`int` „16 500 Kč" → 16500, `date`
+  „1. 10. 2026" → ISO, `bool` ano/ne, `enum` podle hodnot šablony). Model
+  dostane v textu, co je uložené.
+* **Karty jsou ze šablony.** Otázky z `ask_user`, jejichž id šablona nezná, se
+  nahradí dalšími chybějícími povinnými údaji; když povinné nechybí a render
+  přesto neprojde, karta se ptá na proměnné porušené kontroly (podmíněně
+  povinné `doba_do` u nájmu na dobu určitou — model ho přejmenovával na
+  `doba_ukonceni`).
+* **`session_id` v `save_intake`/`render_document` přepíše server** — model si
+  ho občas vymyslí.
+* **`checklist` a `upozorneni`** z `render_document` jdou v odpovědi; prompt
+  modelu říká, ať dokument do textu neopisuje (jinak ho qwen36 vypsal celý
+  a krok trval 44 s místo 9).
+* **503 pro člověka** (`hlaska_modelu`): mimo okno 19–01 věta o okně, v okně
+  „model neodpovídá, zkus za pár minut" s technickou příčinou. Technický
+  detail jde do logu služby.
+
+`mode: "draft"` posílá appka vždy (persona je na sepisování), takže se
+nevolá router. Dotazy na právo zůstávají v běžném chatu Právníka
+(`/chat/stream`, `--llm-model`), ten se nemění.
 
 ## Eval — 22 scénářů, všechny bez LLM
 
@@ -111,8 +175,8 @@ success s reálným modelem, počet volání modelu a latence — to je na model
 
 | Fáze | Stav |
 |---|---|
-| 1. Tool-calling skeleton + QA s citacemi | **kód hotový**, nasazený; nezměřeno, protože neběží model |
-| 2. Draft pro 3 šablony + intake UI | **backend hotový pro všech 14 šablon** (intake, limity, render, sessiony); UI ve Flutteru ne — viz níž |
+| 1. Tool-calling skeleton + QA s citacemi | **kód hotový**, nasazený; draft s qwen36 ověřený end-to-end (2026-10-05), QA a review s modelem nezměřené |
+| 2. Draft pro 3 šablony + intake UI | **hotové**: backend pro všech 14 šablon, UI v Ol1nLLM (karty, progress, dokument s kopírováním a sdílením) |
 | 3. Review | **deterministická část hotová** (audit citací, limity, checklist); segmentace a posouzení klauzulí modelem ne; docx/pdf na vstupu ne |
 | 4. Zbytek šablon, sessiony, judikatura | šablony hotové (14), sessiony hotové, judikatura ne |
 
@@ -123,18 +187,53 @@ success s reálným modelem, počet volání modelu a latence — to je na model
   100 %, odolnost vůči injection 100 %, ~7 tok/s, ~4–5 min na návrh). Gemma běží jen
   v profilu SPARKu **gemma** na vyžádání (AiStack `PLAN-spark-scheduler.md`), mimo něj
   alias padá na `openclaw-default` (qwen36: 50/50 %, injection 60 %) a `fallback`.
-  Zbývá: přepnout `/agent/chat` z `translate` na `pravnik-agent` a změřit draft
-  v okně gemma. Director (Nemotron, `qwen3_coder` parser) a translate (bez tool
-  parseru) pro agenta nepoužívat.
-* **Flutter UI** (plán §4): karty pro `ask_user`, progress bar podle povinných
-  proměnných, průběžný náhled, seznam uložených sessionů. Server pro to má
-  všechno (`otazky` v odpovědi `/agent/chat`, `GET /agent/intake/{id}`,
-  `GET /agent/sessions`), ale klient to zatím nevykresluje — appka dnes mluví jen
-  SSE dialektem `/chat/stream`.
+  `/agent/chat` už jede na `pravnik-agent` (`--agent-model`, 2026-10-05), takže dnes
+  odpovídá qwen36 (tool parser `qwen3_xml`) v okně 19–01 — draft s ním projde díky
+  deterministickým pojistkám v `agent/klient.py`. Zbývá změřit draft v okně gemma.
+  Director (Nemotron, `qwen3_coder` parser) a translate (bez tool parseru) pro
+  agenta nepoužívat.
+* **Flutter UI — hotové jádro** (Ol1nLLM, persona „Právník – smlouvy 📝"): karty
+  pro `ask_user`, progress podle povinných proměnných, porušené limity, dokument
+  s checklistem a upozorněními, kopírování a sdílení. Chybí: průběžný náhled
+  rozpracovaného dokumentu, seznam uložených sessionů (`GET /agent/sessions`)
+  a „vrať se a dokonči" mimo původní konverzaci.
 * **Vstup docx/pdf do revize.** `review_document` bere text. Konverze chybí
   (`pandoc` na M2 není, rozhodnutí o knihovně je stejné jako u exportu šablon).
 * **Export docx/pdf** z renderu (`format` zatím jen `md`).
 * **Judikatura** jako druhá kolekce (plán fáze 4, zdroj prověřený v `CURRENT_STATE.md`).
+
+## Nasazení na SPARK (ruční, `~/deploy/WorldLibraryProject`)
+
+Na SPARKu je checkout na `main` s ručně přepsanými soubory z větve `pravnik`.
+Změna z větve `pravnik-agent-app` sahá jen na tyto soubory v `rag/`:
+
+```
+rag/agent/klient.py        (nový)
+rag/agent/loop.py
+rag/agent/llm.py
+rag/server.py
+rag/tests/test_agent.py
+rag/tests/test_agent_klient.py   (nový)
+```
+
+```bash
+# z Macu, z worktree větve pravnik-agent-app
+cd rag
+scp agent/klient.py agent/loop.py agent/llm.py spark:~/deploy/WorldLibraryProject/rag/agent/
+scp server.py spark:~/deploy/WorldLibraryProject/rag/
+scp tests/test_agent.py tests/test_agent_klient.py spark:~/deploy/WorldLibraryProject/rag/tests/
+# na SPARKu
+ssh spark 'cd ~/deploy/WorldLibraryProject/rag && .venv/bin/python -m pytest -q tests/test_agent.py tests/test_agent_klient.py \
+  && systemctl --user restart law-chat && sleep 20 && curl -s localhost:8098/health'
+```
+
+Unit se nemění: `--agent-model` má výchozí `pravnik-agent`, takže
+`deploy/spark/law-chat.service` nepotřebuje nový přepínač. Ověření (v okně
+19–01): `curl -s -X POST localhost:8098/agent/chat -H 'content-type:
+application/json' -d '{"message":"Chci nájemní smlouvu na byt","mode":"draft"}'`
+→ `stav.typ == "najemni_smlouva_byt"` a tři karty `pronajimatel_*`. Mimo okno
+→ 503 s větou o 19:00–01:00. Restart smaže rozhovory agentů v RAM, rozepsané
+dokumenty v PG zůstanou.
 
 ## Otevřené otázky z plánu — a co k nim vyšlo
 

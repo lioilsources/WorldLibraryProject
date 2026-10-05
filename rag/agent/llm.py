@@ -65,7 +65,10 @@ class OpenAIKlient:
             # některé backendy json_schema neumí — zkus volnější json_object
             if json_schema is not None and "response_format" in str(e).lower():
                 kwargs["response_format"] = {"type": "json_object"}
-                r = self.client.chat.completions.create(**kwargs)
+                try:
+                    r = self.client.chat.completions.create(**kwargs)
+                except Exception as e2:
+                    raise ChybaModelu(f"{type(e2).__name__}: {e2}") from None
             else:
                 raise ChybaModelu(f"{type(e).__name__}: {e}") from None
         ms = int((time.monotonic() - t0) * 1000)

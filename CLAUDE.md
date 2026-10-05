@@ -57,6 +57,8 @@ dosažitelná jako `joda`).
 - **Agent Právníka**: `rag/agent/` — osm nástrojů (search_law, get_paragraph,
   šablony, intake, render, revize, ask_user), intake v Postgresu
   (`lawyer_sessions`), deterministická revize cizích smluv. Model je injektovaný,
-  takže `make eval-agent` (22 scénářů) běží bez LLM; `POST /agent/chat` potřebuje
-  model, který v parku přes den neběží. Stav a otevřené věci: `docs/lawyer/AGENT.md`
+  takže `make eval-agent` (22 scénářů) běží bez LLM; `POST /agent/chat` jede na
+  aliasu `pravnik-agent` (`--agent-model`; dnes qwen36, okno 19–01) a jeho kontrakt
+  pro appku Ol1nLLM (persona „Právník – smlouvy 📝") je v `rag/agent/klient.py`.
+  Stav, kontrakt a nasazení: `docs/lawyer/AGENT.md`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)

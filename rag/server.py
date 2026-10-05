@@ -139,6 +139,9 @@ class AgentChatRequest(BaseModel):
     mode: str | None = None          # qa | draft | review; None = rozhodne router
     zdroj: str = "uzivatel"          # "dokument" = obsah souboru, bez vedlejších efektů
     ma_prilohu: bool = False
+    # odpovědi z karet ask_user: [{id, hodnota, otazka?}] — uloží se do intake
+    # deterministicky, ne až když si na to model vzpomene (agent/klient.py)
+    odpovedi: list[dict] | None = None
 
 
 class ResetRequest(BaseModel):
@@ -176,6 +179,8 @@ class RAGServer:
         # Zapnou se u právní instance (má --cite-registry a PG); knihovna je nemá.
         self.nastroje = None
         self.agent_sessions = None
+        from agent.klient import HistorieAgenta
+        self.agent_historie = HistorieAgenta()
 
         url = urlparse(args.chroma_url)
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
@@ -1313,28 +1318,36 @@ def create_app(args) -> FastAPI:
 
     @app.post("/agent/chat")
     def agent_chat(req: AgentChatRequest):
-        """Krok agenta s tool callingem. Potřebuje model — v denním režimu SPARKu
-        žádný chat model neběží, pak vrací 503 s vysvětlením."""
+        """Krok agenta s tool callingem — kontrakt pro appku v docs/lawyer/AGENT.md.
+        Model je alias `--agent-model` (pravnik-agent → Gemma, mimo profil gemma
+        qwen36 v okně 19–01). Když model neběží, 503 s větou pro člověka."""
+        from datetime import datetime
+
+        from agent.klient import hlaska_modelu, krok_pro_klienta
         from agent.llm import ChybaModelu, OpenAIKlient
         from agent.loop import Pravnik
 
         nastroje = _nastroje()
-        klient = OpenAIKlient(server.args.llm_url, req.model or server.args.llm_model)
+        model = req.model or server.args.agent_model
+        klient = OpenAIKlient(server.args.llm_url, model)
         agent = Pravnik(nastroje, server.agent_sessions, llm=klient,
                         max_volani=server.args.agent_max_volani,
                         router=server.args.agent_router)
+        session_id = req.session_id or str(uuid.uuid4())
         try:
-            krok = agent.krok(req.message, session_id=req.session_id or str(uuid.uuid4()),
-                              zdroj=req.zdroj, mode=req.mode, ma_prilohu=req.ma_prilohu)
+            return krok_pro_klienta(agent, nastroje, server.agent_sessions, server.agent_historie,
+                                    zprava=req.message, session_id=session_id, mode=req.mode,
+                                    zdroj=req.zdroj, ma_prilohu=req.ma_prilohu,
+                                    odpovedi=req.odpovedi, model=model)
         except ChybaModelu as e:
-            raise HTTPException(status_code=503, detail=f"model není dostupný: {e}") from None
-        return {"odpoved": krok.odpoved, "mode": krok.mode, "session_id": krok.session_id,
-                "otazky": krok.otazky, "dokument": krok.dokument,
-                "volani": krok.volani, "ms_modelu": krok.ms_modelu}
+            print(f"[agent] {session_id}: model {model} nedostupný: {e}", flush=True)
+            raise HTTPException(status_code=503,
+                                detail=hlaska_modelu(str(e), datetime.now().hour)) from None
 
     @app.post("/reset")
     def reset(req: ResetRequest):
         server.sessions.pop(req.session_id, None)
+        server.agent_historie.smaz(req.session_id)   # rozhovor agenta; intake v PG zůstává
         return {"ok": True}
 
     @app.get("/status")
@@ -1374,8 +1387,8 @@ def _load_dotenv(path: Path) -> None:
             os.environ.setdefault(k.strip(), v.strip())
 
 
-def main():
-    _load_dotenv(Path(__file__).parent / ".env")
+def parser() -> argparse.ArgumentParser:
+    """Přepínače serveru — zvlášť od main(), ať se dají testovat bez startu."""
     p = argparse.ArgumentParser(description="RAG chatbot server")
     p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://127.0.0.1:8007"),
                    help="Chroma na JODA (AiStack swarm.nas)")
@@ -1423,6 +1436,9 @@ def main():
                    help="u kolika prvních hitů expandovat přilehlé § (--sibling-window)")
     p.add_argument("--law-terms", default="",
                    help="mapa laických pojmů → právní terminologie (registry/law/legal_terms.yaml)")
+    p.add_argument("--agent-model", default="pravnik-agent",
+                   help="alias LiteLLM pro agenta (/agent/chat); pravnik-agent = Gemma, "
+                        "mimo profil gemma fallback na qwen36 (openclaw-default)")
     p.add_argument("--agent-max-volani", type=int, default=8,
                    help="nejvíc volání nástrojů na jeden krok agenta")
     p.add_argument("--agent-router", default="llm", choices=["llm", "heuristika"],
@@ -1465,7 +1481,12 @@ def main():
     p.add_argument("--host", default="0.0.0.0")
     p.add_argument("--port", type=int, default=8090,
                    help="8090 — port 8080 má na SPARKu AiStack Go gateway")
-    args = p.parse_args()
+    return p
+
+
+def main():
+    _load_dotenv(Path(__file__).parent / ".env")
+    args = parser().parse_args()
 
     app = create_app(args)
     uvicorn.run(app, host=args.host, port=args.port)

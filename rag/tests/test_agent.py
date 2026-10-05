@@ -249,7 +249,9 @@ def test_smycka_projde_draft_az_k_dokumentu(prostredi, sid):
     assert krok.dokument and "{{" not in krok.dokument
     assert "DOHODA O MLČENLIVOSTI" in krok.dokument
     assert krok.odpoved.startswith("Hotovo")
-    assert len(sessions.log(sid)) == 4
+    # 4 volání modelu + save_intake(typ), kterým get_template v draftu přiřadí šablonu
+    log = sessions.log(sid)
+    assert len(log) == 5 and sum(x["nastroj"] == "save_intake" for x in log) == 2
 
 
 @bez_pg
