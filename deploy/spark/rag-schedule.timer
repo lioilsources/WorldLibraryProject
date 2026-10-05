@@ -1,4 +1,6 @@
-# 00:00 promo (ClownPROMO), 01:00 rag (obohacení korpusu), 07:00 comfy.
+# 07:00 comfy (ComfyUI + audio + flux-schnell), 13:00 rag (denní směna directora),
+# 19:00 llm (qwen36 + flux-schnell), 01:00 rag (director + noční dávky).
+# Profily a důvody: AiStack/PLAN-spark-scheduler.md (2026-10-01).
 #
 # Jeden timer pro obě hodiny a režim si odvodí skript z hodin — díky tomu
 # smí být Persistent=true, aniž by reboot ve 3 ráno nastartoval ComfyUI:
@@ -16,7 +18,7 @@
 Description=Rozvrh denního a nočního režimu SPARKu
 
 [Timer]
-OnCalendar=*-*-* 00,01,07:00:00
+OnCalendar=*-*-* 01,07,13,19:00:00
 OnBootSec=3min
 Persistent=true
 Unit=rag-schedule.service

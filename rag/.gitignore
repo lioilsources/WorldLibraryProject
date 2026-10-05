@@ -11,3 +11,4 @@ tests/fixtures/*.tmp
 # Lomítko na začátku je nutné: vzor „law/" bez něj chytal i registry/law/, takže
 # kurátorský tier1.yaml (53 zákonů, aliasy, zkratky) tiše nebyl ve gitu.
 /law/
+build/

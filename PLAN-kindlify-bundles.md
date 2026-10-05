@@ -15,6 +15,33 @@ skutečně vypadne. To je práce tohohle plánu.
 Export je **read-only** vůči Postgresu (jen SELECT) a Chromu nepotřebuje
 vůbec. Jediné, co něco přepisuje, je zápis JSON souborů do `--out`.
 
+## Stav 2026-10-01 (M2)
+
+- **Fáze 0** ✔ — `PG_DSN` v `rag/.env`, psycopg, 24 testů (22 + 2 nové).
+  `psql` na M2 není, dotazy z Fáze 1 běží přes `.venv/bin/python3` + psycopg.
+- **Fáze 1** ✘ **blokuje.** Sloupce v `fetch_chunk_rows`/`fetch_keywords`
+  sedí na živé schéma. `enrich_chunks` je u priority 1 malých děl hotové
+  (daodejing 81/81, lunyu 58/58; velká stojí na ~720 chuncích — breadth),
+  ale `chapters_summarized = 0`, `heading_cs` nikde, `works.keywords_cs`
+  prázdné: `library-enrich.service` pouští **jen** `enrich_chunks.py`,
+  `enrich_chapters`/`enrich_works` nemá v rozvrhu nic. Pravidlo „aspoň
+  polovina kapitol se souhrnem" dnes nesplňuje žádné dílo. Souhrn díla
+  (kořen) je, protože je kurátorský z registru.
+- **Fáze 2** ✔ jako diagnostika do `build/bundles` (daodejing 79 kB,
+  lunyu 58 kB, dhammapada 64 kB). Cloud jsou pojmy, písma originálu dost.
+  Opraveny dvě vady exportéru: `norm_term` uřezával `)` („Tao (Cesta"),
+  a stejný pojem jako slovo i entita / v jiné velikosti písmen dával dvě
+  bubliny. Zbývá vada obohacení: „Dao" vs. „Tao", „Svätý člověk".
+- **Fáze 3** ✔ pro `zh.daodejing` (jednorázový `kindlify-zh` na SPARKu,
+  81/81 souhrnů): `zh_daodejing.json` v Kindlify, `verify_flow_test` ho
+  importuje za ~1 s. `zh.lunyu` 16/20 — 4 kapitoly useknuté na
+  `max_tokens=900`; `enrich_chapters --max-tokens` (výchozí 1600) to řeší
+  po nasazení na SPARK.
+- **Fáze 4** nahrazena průběžným syncem: `make kindlify-sync` (`rag/kindlify_sync.py`)
+  exportuje hotová díla (≥95 % chunků i kapitol), přepisuje jen změněné a
+  obnovuje `index.json`, ze kterého Kindlify staví seznam knih. Souhrny
+  kapitol dělá noční `library-chapters.service` (Director, PR #8).
+
 ---
 
 ## Fáze 0 — prerekvizity

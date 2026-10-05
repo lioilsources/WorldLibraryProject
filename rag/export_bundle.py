@@ -41,6 +41,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 import os
 import sys
 import unicodedata
@@ -52,7 +53,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from catalog import query_chapters, query_works, summary_for  # noqa: E402
 
 SCHEMA_VERSION = "1.0"
-EXPORT_VERSION = "pg-1"      # zvednout při změně formátu; appka podle pipelineVersion reimportuje
+EXPORT_VERSION = "pg-2"   # pg-2: listy z úseků (glosy), texts, souhrny long      # zvednout při změně formátu; appka podle pipelineVersion reimportuje
 
 # Písmo textu v bundlu — řídí se jazykem KORPUSU (labels a souhrny), ne
 # jazykem díla: Avesta je v korpusu anglicky, takže 'latin'. Termy z
@@ -71,6 +72,7 @@ SCRIPT_BY_LANG = {
 MAX_TERM_LEN = 40
 SCORE_FLOOR = 0.3            # nejmenší bublina zůstane čitelná
 TOP_TERMS = 50               # kolik termů na uzel (plán Kindlify: top 50)
+LEAF_TOP_TERMS = 5           # list = úsek textu, stačí jeho vlastní klíčová slova
 
 
 # --- pomocné čisté funkce -------------------------------------------------------
@@ -116,11 +118,37 @@ def node_kind(level: int) -> str:
 
 def norm_term(term: str) -> str | None:
     """NFC, oříznuté, bez balastu. None = term do cloudu nepatří.
-    Apostrof se neodřezává — je součástí české transkripce (Lao-c', Čuang-c')."""
-    t = unicodedata.normalize("NFC", (term or "").strip().strip(",.;:!?\"“”„()[]"))
+    Apostrof se neodřezává — je součástí české transkripce (Lao-c', Čuang-c').
+    Závorky se tu neodřezávají: „Tao (Cesta)" by skončilo jako „Tao (Cesta" —
+    vysvětlivky v závorce rozebírá `split_gloss()`."""
+    t = unicodedata.normalize("NFC", (term or "").strip().strip(",.;:!?\"“”„[]"))
+    if t.startswith("(") and t.endswith(")"):
+        t = t[1:-1].strip()
     if not t or len(t) > MAX_TERM_LEN or t.isdigit():
         return None
     return t
+
+
+def is_latin(text: str) -> bool:
+    """Obsahuje latinková písmena (i s diakritikou: nibbāna, ťing)?"""
+    return any(c.isalpha() and "LATIN" in unicodedata.name(c, "") for c in text)
+
+
+def split_gloss(term: str) -> tuple[str, str | None]:
+    """„Wu wei (無為)" → („Wu wei", „無為"), „Tao (Cesta)" → („Tao", None).
+    LLM obohacení k pojmu rádo připíše vysvětlivku. V cloudu jako filtru by
+    „Tao", „Tao (Cesta)" a „Cesta (Tao)" byly tři bubliny pro jeden pojem,
+    proto zůstává hlava. Když je v závorce původní písmo, vrátí se zvlášť
+    jako `orig` — to je přesně ten term, který má čtečka ukazovat."""
+    head, sep, rest = term.partition("(")
+    head = head.strip()
+    if not sep or not head:
+        return term, None
+    inner = rest.split(")")[0].strip()
+    return head, (inner if inner and not is_latin(inner) else None)
+
+
+KIND_RANK = {"orig": 0, "entity": 1, "word": 2}   # který druh vyhraje u shody termů
 
 
 def build_tree(work: dict, chapters: list[dict]) -> dict:
@@ -166,28 +194,57 @@ def chunk_terms(row: dict) -> set[tuple[str, str]]:
     """Termy jednoho chunku jako množina (term, kind) — opakování uvnitř
     chunku se nepočítá, `count` v bundlu je počet chunků, ne výskytů.
     `quality == 0` je podle schématu balast (patička, rejstřík) a vyhazuje
-    ho i retrieval, takže do cloudu nepatří."""
+    ho i retrieval, takže do cloudu nepatří.
+
+    Jeden pojem = jeden term: „Dao" jako klíčové slovo i jako entita, nebo
+    „Brāhmaṇa" vedle „brāhmaṇa", se sloučí (bez ohledu na velikost písmen)
+    a druh vybere `KIND_RANK`."""
     if row.get("quality") == 0:
         return set()
-    out: set[tuple[str, str]] = set()
+    raw: list[tuple[str, str]] = []
     for term in row.get("keywords_cs") or []:
-        if (t := norm_term(term)):
-            out.add((t, "word"))
+        raw.append((term, "word"))
     for term in row.get("keywords_orig") or []:
-        if (t := norm_term(term)):
-            out.add((t, "orig"))
+        raw.append((term, "orig"))
     for ent in row.get("entities") or []:
-        name = ent.get("name") if isinstance(ent, dict) else ent
-        if (t := norm_term(name or "")):
-            out.add((t, "entity"))
-    return out
+        raw.append((ent.get("name") if isinstance(ent, dict) else ent, "entity"))
+
+    best: dict[str, tuple[str, str]] = {}
+    def add(term: str | None, kind: str) -> None:
+        if not (t := norm_term(term or "")):
+            return
+        key = t.casefold()
+        if key not in best or KIND_RANK[kind] < KIND_RANK[best[key][1]]:
+            best[key] = (t, kind)
+
+    for term, kind in raw:
+        head, orig = split_gloss(norm_term(term or "") or "")
+        add(head, kind)
+        add(orig, "orig")
+    return set(best.values())
 
 
-def own_counts(chunk_rows: list[dict]) -> Counter:
+def canonical_terms(chunk_rows: dict) -> dict[str, tuple[str, str]]:
+    """casefold → (term, kind) s nejčastější podobou v celém díle. Bez toho
+    by „Tao" (entita v jedné kapitole) a „tao" (slovo v jiné) byly v kořeni
+    dvě bubliny — slučování uvnitř chunku nestačí."""
+    variants: dict[str, Counter] = {}
+    for rows in chunk_rows.values():
+        for row in rows:
+            for term, kind in chunk_terms(row):
+                variants.setdefault(term.casefold(), Counter())[(term, kind)] += 1
+    return {key: min(c, key=lambda v: (-c[v], KIND_RANK[v[1]], v[0]))
+            for key, c in variants.items()}
+
+
+def own_counts(chunk_rows: list[dict], canon: dict[str, tuple[str, str]] | None = None) -> Counter:
     """Chunky jednoho uzlu → Counter[(term, kind)] = v kolika chuncích je."""
     counts: Counter = Counter()
     for row in chunk_rows:
-        counts.update(chunk_terms(row))
+        terms = chunk_terms(row)
+        if canon:
+            terms = {canon.get(t.casefold(), (t, k)) for t, k in terms}
+        counts.update(terms)
     return counts
 
 
@@ -229,17 +286,17 @@ def score_terms(counts: Counter, idf: dict[str, float], *, top: int = TOP_TERMS,
     nejsilnějšímu termu uzlu (ne absolutní TF-IDF) — Kindlify z něj dělá
     velikost bubliny, takže musí být srovnatelné napříč uzly.
     `boost` jsou kurátorská klíčová slova díla/kapitoly: jdou navrch."""
-    boosted = {t for t in (norm_term(b) for b in (boost or [])) if t}
+    boosted = {t.casefold(): t for t in (norm_term(b) for b in (boost or [])) if t}
     ranked = []
     for (term, kind), count in counts.items():
         weight = count * idf.get(term, 1.0)
-        ranked.append((0 if term in boosted else 1, -weight, term, kind, count))
+        ranked.append((0 if term.casefold() in boosted else 1, -weight, term, kind, count))
     ranked.sort()
 
     # Termy z boostu, které v chuncích vůbec nejsou (např. dílo bez obohacení).
-    seen = {term for _, _, term, _, _ in ranked}
-    for term in boosted - seen:
-        ranked.insert(0, (0, 0.0, term, "word", 1))
+    seen = {term.casefold() for _, _, term, _, _ in ranked}
+    for key in sorted(boosted.keys() - seen, reverse=True):
+        ranked.insert(0, (0, 0.0, boosted[key], "word", 1))
 
     ranked = ranked[:top]
     if not ranked:
@@ -262,7 +319,10 @@ def build_words(tree: dict, per_node: dict[str, Counter], *, work_keywords: list
     for node in walk_nodes(tree):
         nid = node["id"]
         boost = work_keywords if nid == "root" else chapter_keywords.get(nid, [])
-        terms = score_terms(totals.get(nid, Counter()), idf, top=top, boost=boost)
+        # List (úsek, ~1 200 znaků) má pár klíčových slov; plných 50 termů na
+        # tisíce listů nafouklo assety z 6 na 49 MB, aniž by cloud něco získal.
+        limit = min(top, LEAF_TOP_TERMS) if node.get("kind") == "paragraph" else top
+        terms = score_terms(totals.get(nid, Counter()), idf, top=limit, boost=boost)
         if terms:
             nodes[nid] = {"terms": terms}
     return {"nodes": nodes}
@@ -285,27 +345,124 @@ def build_summaries(work: dict, chapters: list[dict], *, root_detail: str = "lon
 
 # --- bundle ---------------------------------------------------------------------
 
-def content_digest(tree: dict, words: dict, summaries: dict) -> str:
+def content_digest(tree: dict, words: dict, summaries: dict, texts: dict | None = None) -> str:
     """Otisk obsahu → `pipelineVersion`. `BundleLoader.ensureFresh()`
     reimportuje knihu, právě když se pipelineVersion změní, takže se
     doobohacené dílo dostane do appky, a pouhý re-export beze změny ne
     (`generatedAt` se mění pokaždé, proto se do otisku nepočítá)."""
-    payload = json.dumps([tree, words, summaries], sort_keys=True, ensure_ascii=False)
+    parts = [tree, words, summaries] + ([texts] if texts else [])   # bez textů stejný otisk jako dřív
+    payload = json.dumps(parts, sort_keys=True, ensure_ascii=False)
     return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:8]
+
+
+# --- listy z úseků a text originálu -----------------------------------------------
+
+def leaf_id(seq: int) -> str:
+    """ID listu = pořadí chunku v díle (unikátní, na rozdíl od seq_in_chapter)."""
+    return f"k{seq:05d}"
+
+
+def cite(ref: str) -> str:
+    """CTS '1.12' → česká citace '1,12' (kapitola, verš)."""
+    return ref.replace(".", ",")
+
+
+def leaf_label(row: dict) -> str:
+    """„1,1–12" z CTS odkazů (verše od verse_refs.py); přes hranici kapitoly
+    „1,44–2,3"; bez odkazu aspoň pořadí úseku v kapitole."""
+    a, b = row.get("ref_start"), row.get("ref_end")
+    if not a:
+        return f"Úsek {row.get('seq_in_chapter') or row.get('seq') or ''}".strip()
+    if not b or b == a:
+        return cite(a)
+    ca, _, va = a.partition(".")
+    cb, _, vb = b.partition(".")
+    if ca == cb and va and vb:
+        return f"{cite(a)}–{vb}"
+    return f"{cite(a)}–{cite(b)}"
+
+
+def strip_overlap(prev: str, cur: str, max_ratio: float = 0.3) -> str:
+    """Chunky se překrývají (~10 %, ingest_books.OVERLAP_RATIO): začátek
+    `cur`, kterým končí `prev`, se uřízne, ať čtecí režim neopakuje text."""
+    limit = int(min(len(prev), len(cur)) * max_ratio)
+    for k in range(limit, 20, -1):
+        if prev.endswith(cur[:k]):
+            return cur[k:].lstrip()
+    return cur
+
+
+def add_leaves(tree: dict, chunk_rows: dict) -> dict[str, list[dict]]:
+    """Pod každou kapitolu s víc než jedním chunkem pověsí list na chunk
+    (kind paragraph). Vrací {id kapitoly: řádky chunků}, ať se další kroky
+    nemusí znovu ptát. Kapitola s jediným chunkem list nedostane — byl by to
+    jen její duplikát (Tao te ťing: 81 kapitol = 81 chunků)."""
+    by_node = {n["id"]: n for n in walk_nodes(tree)}
+    leaves: dict[str, list[dict]] = {}
+    for ordinal, rows in chunk_rows.items():
+        if ordinal is None or len(rows) < 2:
+            continue
+        parent = by_node.get(node_id(ordinal))
+        if parent is None:
+            continue
+        for row in rows:
+            parent["children"].append({
+                "id": leaf_id(row["seq"]), "kind": "paragraph", "label": leaf_label(row),
+                "byteStart": 0, "byteEnd": 0, "children": [],
+            })
+        leaves[node_id(ordinal)] = rows
+    return leaves
+
+
+def build_texts(chunk_rows: dict, leaves: dict[str, list[dict]]) -> dict[str, str]:
+    """{nodeId: text originálu}: list nese svůj úsek (bez překryvu s
+    předchozím), kapitola bez listů celý svůj text."""
+    out: dict[str, str] = {}
+    for ordinal, rows in chunk_rows.items():
+        if ordinal is None:
+            continue
+        nid = node_id(ordinal)
+        prev = ""
+        for row in rows:
+            # Řádky kopírují sazbu edice (NZ i verše mají ⌀ ~35–45 znaků), takže
+            # spojovat je do odstavců by rozbilo verše; jen prázdné řádky mezi
+            # nimi se zhustí, ať se text čte jako tištěný sloupec.
+            text = re.sub(r"\n{2,}", "\n", (row.get("text") or "").strip())
+            piece = strip_overlap(prev, text) if prev else text
+            prev = text
+            key = leaf_id(row["seq"]) if nid in leaves else nid
+            if piece:
+                out[key] = (out[key] + "\n\n" + piece) if key in out else piece
+    return out
 
 
 def build_bundle(work: dict, chapters: list[dict], chunk_rows: dict[int, list[dict]], *,
                  work_keywords: list[str] | None = None,
                  chapter_keywords: dict[int, list[str]] | None = None,
-                 top: int = TOP_TERMS, chapter_detail: str = "medium",
+                 top: int = TOP_TERMS, chapter_detail: str = "long",
+                 leaves: bool = False, with_text: bool = False,
                  generated_at: str | None = None) -> dict:
     """Řádky z Postgresu → hotový bundle. `chunk_rows` a `chapter_keywords`
-    jsou klíčované ordinálem kapitoly (None = chunk mimo kapitoly)."""
+    jsou klíčované ordinálem kapitoly (None = chunk mimo kapitoly).
+
+    `leaves`: úseky (chunky) jako listy pod kapitolami, souhrnem je jejich
+    česká glosa. `with_text`: bundle nese i text originálu (`texts`) pro
+    čtecí režim — nepovinný klíč, starší Kindlify ho ignoruje."""
     tree = build_tree(work, chapters)
-    per_node = {node_id(o): own_counts(rows) for o, rows in chunk_rows.items() if o is not None}
+    canon = canonical_terms(chunk_rows)
+    leaf_rows = add_leaves(tree, chunk_rows) if leaves else {}
+    per_node = {}
+    for o, rows in chunk_rows.items():
+        if o is None:
+            continue
+        if node_id(o) in leaf_rows:      # termy nesou listy, kapitola je sečte zdola
+            for row in rows:
+                per_node[leaf_id(row["seq"])] = own_counts([row], canon)
+        else:
+            per_node[node_id(o)] = own_counts(rows, canon)
     orphan = chunk_rows.get(None)
     if orphan:                       # chunky bez kapitoly patří dílu jako celku
-        per_node["root"] = own_counts(orphan)
+        per_node["root"] = own_counts(orphan, canon)
     words = build_words(
         tree, per_node,
         work_keywords=work_keywords or [],
@@ -313,6 +470,11 @@ def build_bundle(work: dict, chapters: list[dict], chunk_rows: dict[int, list[di
         top=top,
     )
     summaries = build_summaries(work, chapters, chapter_detail=chapter_detail)
+    for rows in leaf_rows.values():
+        for row in rows:
+            if (gloss := (row.get("gloss_cs") or "").strip()):
+                summaries[leaf_id(row["seq"])] = {"cs": gloss}
+    texts = build_texts(chunk_rows, leaf_rows) if with_text else {}
     lang = work.get("lang_corpus") or work.get("lang_original") or ""
     manifest = {
         "schemaVersion": SCHEMA_VERSION,
@@ -320,11 +482,14 @@ def build_bundle(work: dict, chapters: list[dict], chunk_rows: dict[int, list[di
         "title": work.get("name_cs") or work.get("title") or work["id"],
         "sourceLanguage": work.get("lang_original") or lang,
         "script": SCRIPT_BY_LANG.get(lang, "latin"),
-        "pipelineVersion": f"{EXPORT_VERSION}+{content_digest(tree, words, summaries)}",
+        "pipelineVersion": f"{EXPORT_VERSION}+{content_digest(tree, words, summaries, texts)}",
         "generatedAt": generated_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "tree": tree,
     }
-    return {"manifest": manifest, "words": words, "summaries": summaries}
+    bundle = {"manifest": manifest, "words": words, "summaries": summaries}
+    if texts:
+        bundle["texts"] = texts
+    return bundle
 
 
 def validate_bundle(bundle: dict) -> None:
@@ -373,6 +538,11 @@ def validate_bundle(bundle: dict) -> None:
             need(isinstance(term.get("count"), int) and not isinstance(term["count"], bool),
                  f"{where}.count musí být celé číslo")
             need(isinstance(term.get("kind"), str) and term["kind"], f"{where}.kind prázdný")
+    texts = bundle.get("texts", {})
+    need(isinstance(texts, dict), "texts musí být objekt nodeId → text")
+    for nid, text in texts.items():
+        need(nid in ids, f"texts['{nid}'] ukazuje na neznámý uzel")
+        need(isinstance(text, str), f"texts['{nid}'] musí být text")
     for nid, locales in bundle["summaries"].items():
         need(nid in ids, f"summaries['{nid}'] ukazuje na neznámý uzel")
         need(isinstance(locales, dict), f"summaries['{nid}'] musí být objekt locale → text")
@@ -402,30 +572,43 @@ def fetch_chunk_rows(conn, work_id: str) -> dict[int, list[dict]]:
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT ch.ordinal, ce.keywords_cs, ce.keywords_orig, ce.entities, ce.quality
+            SELECT ch.ordinal, ce.keywords_cs, ce.keywords_orig, ce.entities, ce.quality,
+                   c.seq, c.seq_in_chapter, c.ref_start, c.ref_end, ce.gloss_cs, c.text
             FROM chunks c
-            JOIN chunk_enrichment ce ON ce.chunk_id = c.id
+            LEFT JOIN chunk_enrichment ce ON ce.chunk_id = c.id
             LEFT JOIN chapters ch ON ch.id = c.chapter_id
             WHERE c.work_id = %s
             ORDER BY c.seq
             """,
             (work_id,),
         )
-        for ordinal, kw_cs, kw_orig, entities, quality in cur.fetchall():
+        for (ordinal, kw_cs, kw_orig, entities, quality,
+             seq, seq_in_chapter, ref_start, ref_end, gloss, text) in cur.fetchall():
             out.setdefault(ordinal, []).append({
                 "keywords_cs": kw_cs or [], "keywords_orig": kw_orig or [],
                 "entities": entities or [], "quality": quality,
+                "seq": seq, "seq_in_chapter": seq_in_chapter,
+                "ref_start": ref_start, "ref_end": ref_end, "gloss_cs": gloss, "text": text,
             })
     return out
 
 
-def export_work(conn, work: dict, *, top: int, chapter_detail: str) -> dict:
+def export_work(conn, work: dict, *, top: int, chapter_detail: str = "long",
+                leaves: bool = False, text_max_chars: int = 0, leaves_max_chars: int = 0) -> dict:
+    """`text_max_chars`: text originálu jen u děl do té délky (0 = nikdy) —
+    celý korpus by assety appky nafoukl na desítky MB."""
     chapters = query_chapters(conn, work["id"])
     work_kw, chapter_kw = fetch_keywords(conn, work["id"])
+    chunk_rows = fetch_chunk_rows(conn, work["id"])
+    # catalog_v délku díla nenese; chunky se překrývají ~10 %, na limit to stačí
+    size = sum(len(r.get("text") or "") for rows in chunk_rows.values() for r in rows)
+    with_text = bool(text_max_chars) and size <= text_max_chars * 1.1
+    if leaves_max_chars and size > leaves_max_chars * 1.1:
+        leaves = False               # velké dílo: jen kapitoly (assety appky)
     bundle = build_bundle(
-        work, chapters, fetch_chunk_rows(conn, work["id"]),
+        work, chapters, chunk_rows,
         work_keywords=work_kw, chapter_keywords=chapter_kw,
-        top=top, chapter_detail=chapter_detail,
+        top=top, chapter_detail=chapter_detail, leaves=leaves, with_text=with_text,
     )
     validate_bundle(bundle)
     return bundle
@@ -453,8 +636,11 @@ def main() -> int:
     p.add_argument("--stdout", action="store_true", help="vypsat bundle na stdout místo do souboru")
     p.add_argument("--pretty", action="store_true", help="odsazený JSON (čitelný, ale větší)")
     p.add_argument("--top-terms", type=int, default=TOP_TERMS, help=f"termů na uzel (výchozí {TOP_TERMS})")
-    p.add_argument("--chapter-detail", default="medium", choices=("short", "medium", "long"),
-                   help="délka souhrnu kapitoly (výchozí medium ~50 slov)")
+    p.add_argument("--chapter-detail", default="long", choices=("short", "medium", "long"),
+                   help="délka souhrnu kapitoly (výchozí long ~150 slov; medium ~50)")
+    p.add_argument("--leaves", action="store_true", help="úseky jako listy pod kapitolami (glosa = souhrn)")
+    p.add_argument("--text-max-chars", type=int, default=0,
+                   help="přibalit text originálu u děl do N znaků (0 = ne)")
     p.add_argument("--dsn", default=os.getenv("PG_DSN"))
     args = p.parse_args()
 
@@ -482,7 +668,8 @@ def main() -> int:
         if args.out:
             args.out.mkdir(parents=True, exist_ok=True)
         for work in works:
-            bundle = export_work(conn, work, top=args.top_terms, chapter_detail=args.chapter_detail)
+            bundle = export_work(conn, work, top=args.top_terms, chapter_detail=args.chapter_detail,
+                                 leaves=args.leaves, text_max_chars=args.text_max_chars)
             if args.stdout:
                 print(dumps(bundle))
             else:

@@ -26,6 +26,8 @@ na téže GPU odliší hardware od stacku modelu.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
+import re
 import os
 import sys
 import time
@@ -40,13 +42,31 @@ from enrich_chunks import build_messages, load_dotenv, load_topics, pending  # n
 from llm_batch import parse_json  # noqa: E402
 
 
+REPEAT_RE = re.compile(r"(.{2,12}?)\1{6,}", re.S)
+
+
+def degenerate(txt: str) -> bool:
+    """Smyčka, jakou dělal rozbitý director (3.–8. 9. 2026: „СудиСудиСуди…“,
+    týž token pořád dokola). Dlouhá, ale souvislá odpověď to není — 4. 10.
+    model občas vypsal do keywords_orig celý řecký úryvek a přetáhl 1300
+    tokenů, i když ze stejného promptu jindy vrátil čistých 450."""
+    if REPEAT_RE.search(txt):
+        return True
+    words = re.findall(r"\w+", txt)
+    if len(words) >= 60:
+        top = Counter(words).most_common(1)[0][1]
+        if top / len(words) > 0.2:
+            return True
+    return False
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--llm-url", default="http://localhost:8012/v1")
     p.add_argument("--model", default="swarm-director")
     p.add_argument("--limit", type=int, default=6, help="kolik chunků z hlavy fronty")
     p.add_argument("--priority", type=int, default=1)
-    p.add_argument("--max-tokens", type=int, default=1300, help="stejně jako library-enrich.service")
+    p.add_argument("--max-tokens", type=int, default=1800, help="stejně jako library-enrich.service")
     p.add_argument("--workers", type=int, default=6, help="musí být pod --max-num-seqs modelu")
     p.add_argument("--variants", default="json,nojson,short")
     p.add_argument("--timeout", type=float, default=420.0)
@@ -80,10 +100,13 @@ def main() -> int:
             return False, f"{head} EXC {time.time() - t0:4.0f}s {str(exc)[:90]}"
         c = r.choices[0]
         txt = c.message.content or ""
-        ok = c.finish_reason == "stop" and parse_json(txt) is not None
+        ok = (c.finish_reason == "stop" and parse_json(txt) is not None) or \
+             (c.finish_reason == "length" and not degenerate(txt))
         u = r.usage
         return ok, (f"{head} fin={c.finish_reason:6} in={u.prompt_tokens:5} out={u.completion_tokens:5} "
-                    f"parse={'OK ' if parse_json(txt) is not None else 'BAD'} {time.time() - t0:4.0f}s | {txt[:100]!r}")
+                    f"parse={'OK ' if parse_json(txt) is not None else 'BAD'}"
+                    f"{' LONG' if c.finish_reason == 'length' and ok else ''}{' SMYČKA' if degenerate(txt) else ''}"
+                    f" {time.time() - t0:4.0f}s | {txt[:100]!r}")
 
     variants = [v.strip() for v in args.variants.split(",") if v.strip()]
     jobs = [(it, v) for it in items for v in variants]

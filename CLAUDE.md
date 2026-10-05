@@ -37,7 +37,7 @@ dosažitelná jako `joda`).
 - `rag/chapters.py`, `rag/clean_text.py`, `rag/perseus_tei.py` — kapitoly per tradice, čištění, TEI
 - `rag/retriever.py` + `rag/pg_search.py` + `rag/hybrid.py` — hybridní retrieval (vektor + fulltext → RRF)
 - `rag/planner.py` + `rag/catalog.py` — intent dotazu a katalogové odpovědi z Postgresu
-- `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na TRT-LLM :8004, fallback se zahazuje)
+- `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na swarm-director :8012 v okně director, fallback se zahazuje; rozvrh oken v AiStack `PLAN-spark-scheduler.md`)
 - `rag/sql/` + `rag/pg_migrate.py` — schéma Postgresu; `rag/.env` (mimo git): `PG_DSN`, `CHROMA_URL`, `COLLECTION`
 - `rag/export_bundle.py` — export díla z Postgresu do bundlu pro Kindlify (čtečka); kontrakt hlídá `validate_bundle()`
 - `rag/eval/` — měření retrievalu bez LLM proti zlatému standardu; baseline
