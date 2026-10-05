@@ -128,6 +128,11 @@ def main() -> int:
     p.add_argument("--include-translations", action="store_true",
                    help="i díla, která jsou v korpusu překladem (is_translation)")
     p.add_argument("--top-terms", type=int, default=50)
+    p.add_argument("--no-leaves", action="store_true", help="bez listů z úseků (jen kapitoly)")
+    p.add_argument("--leaves-max-chars", type=int, default=150_000,
+                   help="listy z úseků jen u děl do N znaků (výchozí 150 000: 18 MB assetů; 0 = u všech: 31 MB)")
+    p.add_argument("--text-max-chars", type=int, default=150_000,
+                   help="text originálu u děl do N znaků (výchozí 150 000 ≈ 48 děl, +7 MB; 0 = ne)")
     p.add_argument("--write", action="store_true", help="zapsat (bez něj jen výpis hotových děl)")
     p.add_argument("--commit", action="store_true", help="s --write: commitnout změny v repu Kindlify")
     p.add_argument("--branch", default="main",
@@ -152,7 +157,9 @@ def main() -> int:
                           include_translations=args.include_translations)
         print(f"hotových děl: {len(ids)}", file=sys.stderr)
         for work in query_works(conn, work_ids=ids, hide_priority=None) if ids else []:
-            bundle = export_work(conn, work, top=args.top_terms, chapter_detail="medium")
+            bundle = export_work(conn, work, top=args.top_terms, chapter_detail="long",
+                                 leaves=not args.no_leaves, text_max_chars=args.text_max_chars,
+                                 leaves_max_chars=args.leaves_max_chars)
             path = args.out / asset_name(bundle["manifest"]["slug"])
             old = read_json(path)
             same = old and old["manifest"].get("pipelineVersion") == bundle["manifest"]["pipelineVersion"]
