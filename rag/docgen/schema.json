@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Šablona smlouvy nebo jednostranného dokumentu (Právník, Ol1nLLM)",
+  "description": "Data, ne prompt. Každá klauzule a každý limit nese § účinného předpisu; existenci § kontroluje docgen/validate.py proti právnímu indexu.",
+  "type": "object",
+  "required": ["typ", "nazev", "verze", "jazyk", "druh", "pravni_zaklad", "promenne", "klauzule"],
+  "additionalProperties": false,
+  "properties": {
+    "typ": {"type": "string", "pattern": "^[a-z0-9_]+$", "description": "id šablony = jméno souboru"},
+    "nazev": {"type": "string", "minLength": 3},
+    "verze": {"type": "integer", "minimum": 1},
+    "jazyk": {"enum": ["cs"]},
+    "druh": {"enum": ["smlouva", "jednostranny_dokument"]},
+    "popis": {"type": "string"},
+    "forma": {
+      "type": "object",
+      "description": "Vyžaduje zákon písemnou formu? S §, pokud ano.",
+      "required": ["pisemna"],
+      "additionalProperties": false,
+      "properties": {"pisemna": {"type": "boolean"}, "zaklad": {"$ref": "#/$defs/zaklad"}}
+    },
+    "pravni_zaklad": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["zakon"], "additionalProperties": false,
+        "properties": {
+          "zakon": {"$ref": "#/$defs/zakon"},
+          "paragrafy": {"type": "string", "description": "rozsah pro hlavičku dokumentu, např. „§ 2235 a násl.“"},
+          "poznamka": {"type": "string"}
+        }
+      }
+    },
+    "strany": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["role", "nazev", "typ"], "additionalProperties": false,
+        "properties": {
+          "role": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "nazev": {"type": "string"},
+          "typ": {"type": "array", "minItems": 1, "items": {"enum": ["fyzicka", "pravnicka", "podnikatel", "spotrebitel"]}},
+          "oznaceni": {"type": "string", "description": "co se u strany uvede v závorce; u jednostranného dokumentu bez něj vyjde „(odesílatel)“ a „(adresát)“"},
+          "podpisuje": {"type": "boolean", "description": "u jednostranného dokumentu: podepisuje i tato strana (např. zmocněnec přijímá plnou moc)"}
+        }
+      }
+    },
+    "promenne": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "typ", "povinna", "otazka"], "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "typ": {"enum": ["string", "text", "money", "date", "int", "enum", "bool"]},
+          "povinna": {"type": "boolean"},
+          "otazka": {"type": "string", "minLength": 3, "description": "takhle se na to zeptá agent"},
+          "hodnoty": {"type": "array", "items": {"type": "string"}, "description": "povinné u typu enum"},
+          "napoveda": {"type": "string"},
+          "zaklad": {"$ref": "#/$defs/zaklad"}
+        },
+        "allOf": [{
+          "if": {"properties": {"typ": {"const": "enum"}}},
+          "then": {"required": ["hodnoty"]}
+        }]
+      }
+    },
+    "kontroly": {
+      "type": "array",
+      "description": "Strojové kontroly vstupu — kogentní limity zákona (se `zaklad`), nebo formální úplnost dokumentu (bez něj).",
+      "items": {
+        "type": "object", "required": ["vyraz", "zprava"], "additionalProperties": false,
+        "properties": {
+          "vyraz": {"type": "string", "minLength": 3},
+          "zprava": {"type": "string", "minLength": 3},
+          "zaklad": {"$ref": "#/$defs/zaklad"}
+        }
+      }
+    },
+    "klauzule": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "nazev", "povinna"], "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "nazev": {"type": "string", "minLength": 2},
+          "povinna": {"type": "boolean"},
+          "podminka": {"type": "string", "description": "u nepovinné klauzule: kdy se má vložit"},
+          "zaklad": {"type": "array", "items": {"$ref": "#/$defs/zaklad"}},
+          "text": {"type": "string", "minLength": 10},
+          "varianty": {
+            "type": "object", "required": ["podle", "hodnoty"], "additionalProperties": false,
+            "properties": {
+              "podle": {"type": "string", "description": "id proměnné typu enum"},
+              "hodnoty": {"type": "object", "minProperties": 2, "additionalProperties": {"type": "string"}}
+            }
+          },
+          "poznamka": {"type": "string", "description": "pro člověka, do dokumentu nejde"}
+        },
+        "oneOf": [{"required": ["text"]}, {"required": ["varianty"]}]
+      }
+    },
+    "checklist": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["bod"], "additionalProperties": false,
+        "properties": {"bod": {"type": "string", "minLength": 5}, "zaklad": {"$ref": "#/$defs/zaklad"}}
+      }
+    },
+    "upozorneni": {
+      "type": "array",
+      "description": "Co do dokumentu nepatří nebo na co si dát pozor — s §. Nahrazuje regexy nad textem: šablonu píšeme my, takže zakázanou klauzuli v ní prostě nemáme.",
+      "items": {
+        "type": "object", "required": ["text", "zaklad"], "additionalProperties": false,
+        "properties": {"text": {"type": "string", "minLength": 10}, "zaklad": {"$ref": "#/$defs/zaklad"}}
+      }
+    }
+  },
+  "$defs": {
+    "zakon": {"type": "string", "pattern": "^[0-9]{1,3}/[0-9]{4} Sb\\.$", "description": "např. „89/2012 Sb.“ — musí být v právním indexu"},
+    "zaklad": {
+      "type": "object", "required": ["zakon"], "additionalProperties": false,
+      "properties": {
+        "zakon": {"$ref": "#/$defs/zakon"},
+        "par": {"type": "string", "pattern": "^(§|čl\\.) [0-9]+[a-z]?$", "description": "jeden paragraf, přesně jak stojí v indexu"},
+        "odst": {"type": "string"},
+        "poznamka": {"type": "string"}
+      }
+    }
+  }
+}

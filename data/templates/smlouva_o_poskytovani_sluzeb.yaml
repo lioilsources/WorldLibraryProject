@@ -1,0 +1,243 @@
+# Smlouva o poskytování služeb (typicky IT: vývoj, správa, konzultace). „Smlouva
+# o službách" není pojmenovaný smluvní typ — § 1746 odst. 2 umožňuje uzavřít
+# i smlouvu, která není zvlášť upravena, a pro obstarání záležitosti pro jiného
+# se nejblíž hodí příkazní smlouva (§ 2430 a násl.). Pozor na hranici:
+#  * je-li výsledkem hmotné nebo nehmotné dílo s předáním, jde o smlouvu o dílo
+#    (§ 2587) a platí pro ni její pravidla o vadách a předání;
+#  * jde-li o průběžnou činnost bez zaručeného výsledku, sedí příkaz — odměna
+#    přísluší, i když výsledek nenastal (§ 2438 odst. 2).
+# Vzniká-li při službách kód, patří sem i licence (§ 2371) — jinak zadavatel dostane
+# dílo, ale nesmí ho užít.
+typ: smlouva_o_poskytovani_sluzeb
+nazev: Smlouva o poskytování služeb
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Průběžné poskytování služeb (vývoj, správa, konzultace) na dobu určitou nebo
+  neurčitou. Pro jednorázový výsledek s předáním použij smlouvu o dílo.
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 1746 odst. 2 a § 2430 a násl.", poznamka: "nepojmenovaná smlouva, přiměřeně příkaz"}
+
+strany:
+  - {role: poskytovatel, nazev: Poskytovatel, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: klient, nazev: Klient, typ: [fyzicka, pravnicka, podnikatel]}
+
+promenne:
+  - {id: poskytovatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma poskytovatele?"}
+  - {id: poskytovatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození poskytovatele?"}
+  - {id: poskytovatel_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa poskytovatele?"}
+  - {id: klient_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma klienta?"}
+  - {id: klient_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození klienta?"}
+  - {id: klient_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa klienta?"}
+
+  - id: sluzby
+    typ: text
+    povinna: true
+    otazka: "Jaké služby se poskytují? Popiš rozsah a způsob zadávání práce."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2430"}
+  - {id: doba, typ: enum, hodnoty: [neurcita, urcita], povinna: true, otazka: "Na dobu neurčitou, nebo určitou?"}
+  - {id: doba_do, typ: date, povinna: false, otazka: "Do kdy smlouva trvá (u doby určité)?"}
+  - id: odmena_rezim
+    typ: enum
+    hodnoty: [hodinova, mesicni_pausal]
+    povinna: true
+    otazka: "Je odměna hodinová, nebo měsíční paušál?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2438"}
+  - {id: odmena, typ: money, povinna: true, otazka: "Jaká je odměna (za hodinu, nebo za měsíc)?"}
+  - {id: splatnost_dni, typ: int, povinna: true, otazka: "Za kolik dnů od vystavení faktury je odměna splatná?"}
+  - {id: bankovni_ucet, typ: string, povinna: true, otazka: "Číslo účtu poskytovatele?"}
+  - id: naklady_zvlast
+    typ: bool
+    povinna: false
+    otazka: "Hradí klient nad odměnu i účelně vynaložené náklady (licence, cloud, cestovní)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2436"}
+  - id: licence_k_vysledkum
+    typ: bool
+    povinna: false
+    otazka: "Vzniká při službách autorské dílo (kód, grafika), ke kterému má klient dostat licenci?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2371"}
+  - id: plna_moc_k_jednani
+    typ: bool
+    povinna: false
+    otazka: "Bude poskytovatel jednat jménem klienta s třetími stranami (registrátor domén, úřady)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2439"}
+  - {id: mlcenlivost_mesice, typ: int, povinna: true, otazka: "Jak dlouho po skončení trvá mlčenlivost (v měsících)?"}
+
+kontroly:
+  - vyraz: "odmena > 0"
+    zprava: "Odměna musí být větší než nula."
+  - vyraz: "splatnost_dni >= 1"
+    zprava: "Splatnost musí být alespoň jeden den."
+  - vyraz: "mlcenlivost_mesice > 0"
+    zprava: "Doba mlčenlivosti musí být větší než nula."
+  - vyraz: "doba == 'neurcita' or doba_do != null"
+    zprava: "U smlouvy na dobu určitou chybí datum, do kterého trvá."
+
+klauzule:
+  - id: predmet
+    nazev: Předmět smlouvy
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1746"}
+      - {zakon: "89/2012 Sb.", par: "§ 2430"}
+    text: |
+      Poskytovatel se zavazuje poskytovat klientovi tyto služby: {{ sluzby }}.
+
+      Klient se zavazuje za poskytnuté služby platit odměnu podle této smlouvy a poskytovat
+      poskytovateli součinnost, kterou plnění vyžaduje.
+
+  - id: doba
+    nazev: Doba trvání
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1746"}
+    varianty:
+      podle: doba
+      hodnoty:
+        neurcita: |
+          Smlouva se uzavírá na dobu neurčitou.
+        urcita: |
+          Smlouva se uzavírá na dobu určitou do {{ doba_do|datum }}.
+
+  - id: zpusob_plneni
+    nazev: Způsob poskytování služeb
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2432"}
+      - {zakon: "89/2012 Sb.", par: "§ 2434"}
+    text: |
+      Poskytovatel plní poctivě a pečlivě podle svých schopností a podle pokynů klienta.
+      Od pokynů se může odchýlit, je-li to nezbytné v zájmu klienta a nemůže-li si včas vyžádat
+      jeho souhlas; o odchylce klienta bez zbytečného odkladu informuje.
+
+      Poskytovatel je oprávněn plnit prostřednictvím svých zaměstnanců nebo poddodavatelů;
+      za jejich plnění odpovídá, jako by plnil sám.
+
+  - id: odmena
+    nazev: Odměna
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2438"}
+    varianty:
+      podle: odmena_rezim
+      hodnoty:
+        hodinova: |
+          Odměna poskytovatele činí {{ odmena|kc }} za jednu hodinu práce. Poskytovatel vyúčtuje
+          odměnu vždy za kalendářní měsíc na základě přehledu odpracovaných hodin.
+
+          Odměna je splatná do {{ splatnost_dni|cislo }} dnů od vystavení faktury na účet
+          č. {{ bankovni_ucet }}.
+
+          Odměna přísluší poskytovateli i tehdy, nedostaví-li se výsledek, ledaže byl nezdar
+          způsoben tím, že poskytovatel porušil své povinnosti.
+        mesicni_pausal: |
+          Odměna poskytovatele činí {{ odmena|kc }} za kalendářní měsíc bez ohledu na počet
+          hodin, nedohodnou-li se strany na rozšíření rozsahu služeb.
+
+          Odměna je splatná do {{ splatnost_dni|cislo }} dnů od vystavení faktury na účet
+          č. {{ bankovni_ucet }}.
+
+          Odměna přísluší poskytovateli i tehdy, nedostaví-li se výsledek, ledaže byl nezdar
+          způsoben tím, že poskytovatel porušil své povinnosti.
+
+  - id: naklady
+    nazev: Náklady
+    povinna: false
+    podminka: "naklady_zvlast == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2436"}
+    text: |
+      Klient nahradí poskytovateli náklady účelně vynaložené při poskytování služeb, byť se
+      výsledek nedostavil; na žádost poskytovatele složí na jejich úhradu přiměřenou zálohu.
+      Náklady nad 5 000 Kč poskytovatel předem odsouhlasí.
+
+  - id: plna_moc
+    nazev: Jednání za klienta
+    povinna: false
+    podminka: "plna_moc_k_jednani == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2439"}
+    text: |
+      Vyžaduje-li poskytování služeb, aby poskytovatel za klienta právně jednal, vystaví mu
+      klient včas písemnou plnou moc v potřebném rozsahu. Samo ujednání v této smlouvě plnou
+      moc nenahrazuje.
+
+  - id: licence
+    nazev: Práva k výsledkům
+    povinna: false
+    podminka: "licence_k_vysledkum == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2371"}
+      - {zakon: "121/2000 Sb.", par: "§ 65"}
+    text: |
+      Vznikne-li při poskytování služeb autorské dílo, zejména počítačový program, poskytuje
+      poskytovatel klientovi k jeho užití nevýhradní licenci, časově i územně neomezenou,
+      pro účel, ke kterému byly služby poskytovány. Odměna za licenci je součástí odměny
+      podle této smlouvy.
+
+      Počítačový program je chráněn jako dílo literární; myšlenky a principy, na nichž je
+      založen, chráněné nejsou.
+
+  - id: mlcenlivost
+    nazev: Mlčenlivost
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1730"}
+      - {zakon: "89/2012 Sb.", par: "§ 504"}
+    text: |
+      Strany se zavazují zachovávat mlčenlivost o důvěrných informacích druhé strany, zejména
+      o skutečnostech tvořících obchodní tajemství, a to po dobu trvání smlouvy a dalších
+      {{ mlcenlivost_mesice|cislo }} měsíců po jejím skončení.
+
+  - id: vypoved
+    nazev: Ukončení smlouvy
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2440"}
+    text: |
+      Smlouvu může vypovědět každá strana. Výpověď poskytovatele nabývá účinnosti nejdříve ke
+      konci kalendářního měsíce následujícího po měsíci, v němž byla doručena klientovi.
+
+      Vypoví-li poskytovatel smlouvu před dokončením činnosti, kterou byl zvlášť pověřen nebo
+      s níž začal, nahradí škodu z toho vzniklou.
+
+      Ke dni ukončení předá poskytovatel klientovi rozpracované výsledky, přístupy a podklady.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1746"}
+    text: |
+      Smlouva je vyhotovena ve dvou vyhotoveních; každá strana obdrží jedno. Změny vyžadují
+      písemnou formu.
+
+      Není-li v této smlouvě něco ujednáno, použijí se přiměřeně ustanovení o příkazu.
+
+      Smlouva nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Rozsah služeb a způsob zadávání práce jsou popsané", zaklad: {zakon: "89/2012 Sb.", par: "§ 2430"}}
+  - {bod: "Zváženo, zda nejde spíš o dílo s předáním — pak platí pravidla o vadách a převzetí díla", zaklad: {zakon: "89/2012 Sb.", par: "§ 2587"}}
+  - {bod: "Odměna, splatnost a fakturace jsou uvedené", zaklad: {zakon: "89/2012 Sb.", par: "§ 2438"}}
+  - {bod: "Vzniká-li kód nebo grafika, je vyřešena licence pro klienta", zaklad: {zakon: "89/2012 Sb.", par: "§ 2371"}}
+  - {bod: "Má-li poskytovatel jednat jménem klienta, byla vystavena plná moc", zaklad: {zakon: "89/2012 Sb.", par: "§ 2439"}}
+  - {bod: "Zpracovávají-li se osobní údaje klienta nebo jeho zákazníků, je potřeba smlouva o zpracování podle GDPR — mimo tuto šablonu"}
+  - {bod: "U dlouhodobé spolupráce zváženo, zda nejde o zastřený pracovní poměr (švarcsystém)"}
+
+upozorneni:
+  - text: >-
+      Odměna z příkazu přísluší, i když výsledek nenastal, ledaže nezdar způsobilo porušení
+      povinností příkazníka. Chce-li klient platit za výsledek, patří to do smlouvy o dílo,
+      ne sem.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2438"}
+  - text: >-
+      Ujednání, že poskytovatel jedná jménem klienta, nenahrazuje plnou moc — tu je třeba
+      vystavit zvlášť a včas.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2439"}
+  - text: >-
+      Bez licenční klauzule nemá klient právo vzniklý kód nebo grafiku užít; dílo vytvořené
+      na zakázku není zaměstnanecké dílo a majetková práva nepřecházejí samo tím, že se zaplatí.
+    zaklad: {zakon: "121/2000 Sb.", par: "§ 58"}

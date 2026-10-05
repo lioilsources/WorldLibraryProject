@@ -1,0 +1,19 @@
+{
+  "_popis": "DPČ na hranici dvaceti hodin týdně, průměr za 52 týdnů.",
+  "_k_datu": "2026-09-28",
+  "zamestnavatel_jmeno": "Ol1n Studio s.r.o.",
+  "zamestnavatel_identifikace": "IČO 12345678",
+  "zamestnavatel_adresa": "Nádražní 5, 602 00 Brno",
+  "zamestnanec_jmeno": "Petra Malá",
+  "zamestnanec_identifikace": "nar. 21. 3. 1996",
+  "zamestnanec_adresa": "Veveří 70, 602 00 Brno",
+  "sjednana_prace": "správa sociálních sítí a příprava příspěvků podle obsahového plánu",
+  "misto_vykonu": "sídlo zaměstnavatele a místo bydliště zaměstnance",
+  "rozsah_hodin_tydne": 20,
+  "doba_od": "2026-10-01",
+  "doba_do": "2027-09-30",
+  "obdobi_prumeru_tydnu": 52,
+  "odmena_za_hodinu": 290,
+  "splatnost_den": 15,
+  "bankovni_ucet": "1900123456/2010"
+}

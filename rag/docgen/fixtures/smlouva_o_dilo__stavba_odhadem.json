@@ -1,0 +1,18 @@
+{
+  "_popis": "Stavební úprava s cenou určenou odhadem — pětiletá lhůta pro skryté vady a oznamovací povinnost u překročení ceny.",
+  "_k_datu": "2026-09-28",
+  "zhotovitel_jmeno": "Stavby Beran s.r.o.",
+  "zhotovitel_identifikace": "IČO 24681357",
+  "zhotovitel_adresa": "Skladová 44, 190 00 Praha 9",
+  "objednatel_jmeno": "Jana Dvořáková",
+  "objednatel_identifikace": "nar. 3. 5. 1971",
+  "objednatel_adresa": "Krátká 12, 602 00 Brno",
+  "dilo": "rekonstrukce bytového jádra v bytě č. 7, Luční 1480/6, Brno — bourání, nové rozvody vody a elektřiny, obklady, dlažba, montáž zařizovacích předmětů",
+  "misto_provedeni": "byt č. 7, Luční 1480/6, 616 00 Brno",
+  "termin_dokonceni": "2027-03-31",
+  "cena": 390000,
+  "cena_rezim": "odhadem",
+  "splatnost_dni": 21,
+  "bankovni_ucet": "1900123456/2010",
+  "je_stavba_rezim": "stavba"
+}

@@ -1,0 +1,210 @@
+# Kupní smlouva na movitou věc, s variantou pro spotřebitele. Práva z vad se
+# u spotřebitele a u podnikatele liší natolik, že to nejde jednou klauzulí:
+#  * spotřebitel: § 2161 (jakost při převzetí), § 2165 (vytknout vadu do dvou let),
+#    § 2169 (odstranění vady — volba mezi opravou a novou věcí);
+#  * mimo spotřebitelský vztah: § 2106 (podstatné porušení) a § 2107 (nepodstatné).
+# Pododdíl o prodeji zboží spotřebiteli se podle § 2158 použije, je-li kupujícím
+# spotřebitel — a to i na věc, kterou je nutné vyrobit nebo vytvořit.
+typ: kupni_smlouva_movita_vec
+nazev: Kupní smlouva (movitá věc)
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Prodej hmotné movité věci. Jako koupě movité věci se posoudí každá koupě,
+  jejímž předmětem není nemovitá věc (§ 2085).
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 2079 a násl.", poznamka: "kupní smlouva, koupě movité věci"}
+
+strany:
+  - {role: prodavajici, nazev: Prodávající, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: kupujici, nazev: Kupující, typ: [fyzicka, pravnicka, spotrebitel]}
+
+promenne:
+  - {id: prodavajici_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma prodávajícího?"}
+  - {id: prodavajici_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození prodávajícího?"}
+  - {id: prodavajici_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo prodávajícího?"}
+  - {id: kupujici_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma kupujícího?"}
+  - {id: kupujici_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození kupujícího?"}
+  - {id: kupujici_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo kupujícího?"}
+
+  - id: predmet
+    typ: text
+    povinna: true
+    otazka: "Co se prodává? Popiš věc tak, aby byla nezaměnitelná (typ, výrobní číslo, stav)."
+    napoveda: "Prodávající odevzdá věc v ujednaném množství, jakosti a provedení; bez ujednání v jakosti vhodné pro účel patrný ze smlouvy."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2095"}
+  - {id: cena, typ: money, povinna: true, otazka: "Kupní cena v Kč?"}
+  - id: zpusob_platby
+    typ: enum
+    hodnoty: [hotove, prevodem]
+    povinna: true
+    otazka: "Platí se hotově, nebo převodem?"
+  - {id: bankovni_ucet, typ: string, povinna: false, otazka: "Číslo účtu prodávajícího (u platby převodem)?"}
+  - {id: datum_predani, typ: date, povinna: true, otazka: "Kdy se věc předává?"}
+  - {id: misto_predani, typ: string, povinna: true, otazka: "Kde se věc předává?"}
+
+  - id: kupujici_je_spotrebitel
+    typ: enum
+    hodnoty: [ano, ne]
+    povinna: true
+    otazka: "Je kupující spotřebitel a prodávající podnikatel?"
+    napoveda: "Pak platí navíc pododdíl o prodeji zboží spotřebiteli — dvouletá lhůta k vytknutí vady a další práva, která nelze zkrátit."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2158"}
+  - id: vyhrada_vlastnictvi
+    typ: bool
+    povinna: false
+    otazka: "Chce si prodávající vyhradit vlastnické právo do úplného zaplacení?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2132"}
+  - id: zaruka_mesice
+    typ: int
+    povinna: false
+    otazka: "Poskytuje prodávající záruku za jakost? Na kolik měsíců?"
+    napoveda: "Záruka je plnění nad rámec zákonných práv z vadného plnění; zákonná práva jí nelze zkrátit."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2113"}
+
+kontroly:
+  - vyraz: "cena > 0"
+    zprava: "Kupní cena musí být větší než nula."
+  - vyraz: "zpusob_platby == 'hotove' or bankovni_ucet != null"
+    zprava: "U platby převodem chybí číslo účtu."
+  - vyraz: "zaruka_mesice >= 0"
+    zprava: "Délka záruky nemůže být negativní."
+
+klauzule:
+  - id: predmet
+    nazev: Předmět koupě
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2079"}
+      - {zakon: "89/2012 Sb.", par: "§ 2085"}
+      - {zakon: "89/2012 Sb.", par: "§ 2095"}
+    text: |
+      Prodávající se zavazuje odevzdat kupujícímu tuto věc: {{ predmet }} (dále jen „věc“)
+      a umožnit mu nabýt k ní vlastnické právo. Kupující se zavazuje věc převzít a zaplatit
+      prodávajícímu kupní cenu.
+
+      Prodávající odevzdá věc v ujednaném množství, jakosti a provedení.
+
+  - id: cena
+    nazev: Kupní cena
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2079"}
+    varianty:
+      podle: zpusob_platby
+      hodnoty:
+        hotove: |
+          Kupní cena činí {{ cena|kc }} a kupující ji zaplatí v hotovosti při předání věci.
+          O zaplacení vydá prodávající kupujícímu potvrzení.
+        prevodem: |
+          Kupní cena činí {{ cena|kc }} a kupující ji zaplatí bezhotovostně na účet
+          prodávajícího č. {{ bankovni_ucet }}.
+
+  - id: predani
+    nazev: Odevzdání a převzetí věci
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2095"}
+      - {zakon: "89/2012 Sb.", par: "§ 2121"}
+    text: |
+      Prodávající odevzdá věc kupujícímu dne {{ datum_predani|datum }} v {{ misto_predani }}.
+
+      Nebezpečí škody na věci přechází na kupujícího převzetím věci; týž následek má,
+      nepřevezme-li kupující věc, ač mu s ní prodávající umožnil nakládat.
+
+  - id: vyhrada_vlastnictvi
+    nazev: Výhrada vlastnického práva
+    povinna: false
+    podminka: "vyhrada_vlastnictvi == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2132"}
+    text: |
+      Prodávající si vyhrazuje k věci vlastnické právo; kupující se stane vlastníkem teprve
+      úplným zaplacením kupní ceny. Nebezpečí škody na věci přechází na kupujícího již
+      jejím převzetím.
+
+  - id: vady
+    nazev: Práva z vadného plnění
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2161"}
+      - {zakon: "89/2012 Sb.", par: "§ 2165"}
+      - {zakon: "89/2012 Sb.", par: "§ 2169"}
+      - {zakon: "89/2012 Sb.", par: "§ 2106"}
+      - {zakon: "89/2012 Sb.", par: "§ 2107"}
+    varianty:
+      podle: kupujici_je_spotrebitel
+      hodnoty:
+        ano: |
+          Prodávající odpovídá kupujícímu, že věc při převzetí nemá vady, zejména že odpovídá
+          ujednanému popisu, druhu a množství, jakosti, funkčnosti a dalším ujednaným
+          vlastnostem a že je vhodná k účelu, k němuž se věc tohoto druhu obvykle používá.
+
+          Kupující může vytknout vadu, která se na věci projeví v době dvou let od převzetí.
+
+          Má-li věc vadu, může kupující požadovat její odstranění — podle své volby dodání nové
+          věci bez vady nebo opravu věci, ledaže je zvolený způsob nemožný nebo ve srovnání
+          s druhým nepřiměřeně nákladný. Za podmínek stanovených zákonem může kupující
+          požadovat přiměřenou slevu z kupní ceny nebo od smlouvy odstoupit.
+
+          Tato práva kupujícímu jako spotřebiteli nelze touto smlouvou zkrátit.
+        ne: |
+          Je-li vadné plnění podstatným porušením smlouvy, má kupující právo na dodání nové věci
+          bez vady nebo chybějící věci, na opravu věci, na přiměřenou slevu z kupní ceny, anebo
+          na odstoupení od smlouvy.
+
+          Je-li vadné plnění nepodstatným porušením smlouvy, má kupující právo na odstranění
+          vady, anebo na přiměřenou slevu z kupní ceny.
+
+          Kupující oznámí vadu prodávajícímu bez zbytečného odkladu poté, co ji zjistil nebo
+          při náležité pozornosti zjistit měl.
+
+  - id: zaruka
+    nazev: Záruka za jakost
+    povinna: false
+    podminka: "zaruka_mesice != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2113"}
+    text: |
+      Prodávající poskytuje kupujícímu záruku za jakost v délce {{ zaruka_mesice|cislo }} měsíců
+      od převzetí věci: zavazuje se, že věc bude po tuto dobu způsobilá k použití pro obvyklý
+      účel a zachová si obvyklé vlastnosti.
+
+      Záruka se poskytuje nad rámec zákonných práv kupujícího z vadného plnění a nijak je
+      neomezuje.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2079"}
+    text: |
+      Smlouva je vyhotovena ve dvou vyhotoveních; každá strana obdrží jedno. Není-li v ní
+      něco ujednáno, platí občanský zákoník.
+
+      Smlouva nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Obě strany jsou identifikované — jméno, IČO nebo datum narození, adresa"}
+  - {bod: "Věc je popsaná nezaměnitelně (typ, výrobní číslo, stav)", zaklad: {zakon: "89/2012 Sb.", par: "§ 2095"}}
+  - {bod: "Kupní cena a způsob její úhrady jsou uvedené", zaklad: {zakon: "89/2012 Sb.", par: "§ 2079"}}
+  - {bod: "Den a místo předání jsou uvedené; je jasné, kdy přechází nebezpečí škody", zaklad: {zakon: "89/2012 Sb.", par: "§ 2121"}}
+  - {bod: "U spotřebitele nejsou zkrácena jeho práva z vadného plnění", zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}}
+  - {bod: "U koupě použité věci zvážit, zda popis stavu odpovídá skutečnosti — na popsané vady se práva z vad nevztahují", zaklad: {zakon: "89/2012 Sb.", par: "§ 2161"}}
+  - {bod: "U vozidla, zbraně nebo jiné registrované věci vyřešit přepis v registru — to tato smlouva neřeší"}
+
+upozorneni:
+  - text: >-
+      Je-li kupujícím spotřebitel a prodávajícím podnikatel, použije se pododdíl o prodeji
+      zboží spotřebiteli i tehdy, když si strany ujednají něco jiného — jeho práva zkrátit nelze.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2158"}
+  - text: >-
+      Dvouletá lhůta k vytknutí vady u spotřebitele není záruka: běží od převzetí a jde
+      o zákonné právo, nikoli o dobrovolné plnění prodávajícího.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2165"}
+  - text: >-
+      Vyhradí-li si prodávající vlastnické právo, přechází nebezpečí škody na kupujícího
+      i tak už převzetím věci — kupující tedy nese riziko dřív, než se stane vlastníkem.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2132"}

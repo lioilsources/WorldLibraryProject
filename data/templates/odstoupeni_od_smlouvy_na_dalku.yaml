@@ -1,0 +1,149 @@
+# Odstoupení spotřebitele od smlouvy uzavřené distančním způsobem (e-shop) nebo
+# mimo obchodní prostory. Jednostranný dokument, ne smlouva — renderuje se
+# stejným strojem, jen „strany“ jsou odesílatel a adresát.
+# Lhůta i následky jsou z účinného znění OZ v právním indexu: 14 dnů (§ 1829),
+# jakékoli jednoznačné prohlášení (§ 1830), vrácení zboží do 14 dnů od odstoupení
+# (§ 1831), vrácení peněz včetně nákladů na dodání do 14 dnů (§ 1832).
+typ: odstoupeni_od_smlouvy_na_dalku
+nazev: Odstoupení od smlouvy uzavřené na dálku
+verze: 1
+jazyk: cs
+druh: jednostranny_dokument
+popis: >-
+  Pro spotřebitele, který koupil zboží v e-shopu nebo mimo obchodní prostory
+  podnikatele a chce od smlouvy odstoupit ve čtrnáctidenní lhůtě. Nepoužívat
+  u výjimek podle § 1837 (zboží na míru, rozbalené audio/video, plně poskytnutá
+  služba a další).
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 1829 a násl.", poznamka: "odstoupení od smlouvy uzavřené distančním způsobem"}
+
+strany:
+  - {role: spotrebitel, nazev: Spotřebitel, typ: [fyzicka, spotrebitel]}
+  - {role: podnikatel, nazev: Podnikatel, typ: [pravnicka, podnikatel]}
+
+promenne:
+  - {id: spotrebitel_jmeno, typ: string, povinna: true, otazka: "Vaše jméno?"}
+  - {id: spotrebitel_identifikace, typ: string, povinna: false, otazka: "E-mail nebo telefon, na kterém vás obchod dohledá?"}
+  - {id: spotrebitel_adresa, typ: string, povinna: true, otazka: "Vaše adresa?"}
+  - {id: podnikatel_jmeno, typ: string, povinna: true, otazka: "Název obchodu (podnikatele)?"}
+  - {id: podnikatel_identifikace, typ: string, povinna: false, otazka: "IČO obchodu, pokud ho víte?"}
+  - {id: podnikatel_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo obchodu?"}
+
+  - {id: cislo_objednavky, typ: string, povinna: true, otazka: "Číslo objednávky nebo faktury?"}
+  - {id: datum_objednavky, typ: date, povinna: false, otazka: "Kdy jste objednávku uzavřel(a)?"}
+  - id: datum_prevzeti
+    typ: date
+    povinna: true
+    otazka: "Kdy jste zboží převzal(a)?"
+    napoveda: "Od převzetí zboží běží čtrnáctidenní lhůta k odstoupení."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1829"}
+  - {id: zbozi, typ: text, povinna: true, otazka: "Jaké zboží vracíte?"}
+  - {id: cena, typ: money, povinna: true, otazka: "Kolik jste za zboží zaplatil(a)?"}
+  - {id: naklady_na_dodani, typ: money, povinna: false, otazka: "Kolik jste zaplatil(a) za dodání (poštovné)?"}
+  - id: bankovni_ucet
+    typ: string
+    povinna: false
+    otazka: "Na jaký účet chcete peníze vrátit?"
+    napoveda: "Podnikatel vrací peníze stejným způsobem, jakým je přijal; jinou cestou jen s vaším souhlasem."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1832"}
+  - {id: datum_odeslani, typ: date, povinna: true, otazka: "Jakým dnem odstoupení odesíláte?"}
+
+kontroly:
+  - vyraz: "cena > 0"
+    zprava: "Zaplacená cena musí být větší než nula."
+
+klauzule:
+  - id: odstoupeni
+    nazev: Odstoupení od smlouvy
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1829"}
+      - {zakon: "89/2012 Sb.", par: "§ 1830"}
+    text: |
+      Dne {{ datum_odeslani|datum }} tímto jednoznačně prohlašuji, že odstupuji od smlouvy
+      uzavřené distančním způsobem, jejímž předmětem bylo zboží: {{ zbozi }}, objednávka
+      č. {{ cislo_objednavky }}.
+
+      Zboží jsem převzal(a) dne {{ datum_prevzeti|datum }}; odstupuji tedy ve čtrnáctidenní
+      lhůtě, kterou mi zákon dává. Důvod odstoupení nejsem povinen(a) uvádět.
+
+  - id: uzavreni_smlouvy
+    nazev: Uzavření smlouvy
+    povinna: false
+    podminka: "datum_objednavky != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1829"}
+    text: |
+      Smlouva byla uzavřena dne {{ datum_objednavky|datum }}.
+
+  - id: vraceni_zbozi
+    nazev: Vrácení zboží
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1831"}
+    text: |
+      Zboží vám odešlu nebo předám bez zbytečného odkladu, nejpozději do čtrnácti dnů od
+      tohoto odstoupení, ledaže mi nabídnete, že si je sami vyzvednete. Lhůta je zachována,
+      odešlu-li zboží před jejím uplynutím.
+
+  - id: vraceni_penez
+    nazev: Vrácení peněz
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1832"}
+    text: |
+      Žádám o vrácení všech peněžních prostředků, které jste na základě smlouvy přijali,
+      tj. {{ cena|kc }} za zboží včetně nákladů na dodání, a to bez zbytečného odkladu,
+      nejpozději do čtrnácti dnů od tohoto odstoupení, stejným způsobem, jakým jste je přijali.
+
+  - id: naklady_na_dodani
+    nazev: Náklady na dodání
+    povinna: false
+    podminka: "naklady_na_dodani != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1832"}
+    text: |
+      Za dodání zboží jsem zaplatil(a) {{ naklady_na_dodani|kc }}; tuto částku žádám vrátit
+      spolu s cenou zboží.
+
+  - id: ucet
+    nazev: Způsob vrácení peněz
+    povinna: false
+    podminka: "bankovni_ucet != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1832"}
+    text: |
+      Souhlasím s vrácením peněz na bankovní účet č. {{ bankovni_ucet }}, nevzniknou-li mi
+      tím další náklady.
+
+  - id: zaver
+    nazev: Závěr
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 1830"}
+    text: |
+      Žádám o písemné potvrzení přijetí tohoto odstoupení.
+
+checklist:
+  - {bod: "Odstoupení odesláno do 14 dnů od převzetí zboží", zaklad: {zakon: "89/2012 Sb.", par: "§ 1829"}}
+  - {bod: "Prohlášení je jednoznačné a prokazatelně odeslané (doporučeně nebo e-mailem s potvrzením)", zaklad: {zakon: "89/2012 Sb.", par: "§ 1830"}}
+  - {bod: "Zboží odeslané do 14 dnů od odstoupení", zaklad: {zakon: "89/2012 Sb.", par: "§ 1831"}}
+  - {bod: "Peníze včetně nákladů na dodání vrácené do 14 dnů", zaklad: {zakon: "89/2012 Sb.", par: "§ 1832"}}
+  - {bod: "Zkontrolováno, že nejde o výjimku, u které odstoupit nelze", zaklad: {zakon: "89/2012 Sb.", par: "§ 1837"}}
+
+upozorneni:
+  - text: >-
+      U některých smluv odstoupit nelze — mimo jiné u plně poskytnuté služby, u zboží
+      upraveného na míru, u zboží podléhajícího rychlé zkáze a u rozbaleného zvukového či
+      obrazového záznamu. Před odesláním ověř § 1837.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1837"}
+  - text: >-
+      Zvolil-li spotřebitel jiný než nejlevnější nabízený způsob dodání, vrací podnikatel
+      náklady na dodání jen do výše nejlevnějšího způsobu.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1832"}
+  - text: >-
+      Podnikatel smí po spotřebiteli požadovat jen úhradu podle § 1832 odst. 2, § 1833
+      nebo § 1834 — tedy zejména snížení hodnoty zboží způsobené zacházením nad rámec
+      seznámení se se zbožím.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 1831"}

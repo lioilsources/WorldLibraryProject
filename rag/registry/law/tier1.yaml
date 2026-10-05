@@ -1,0 +1,282 @@
+# Kurátorský registr zákonů pro Právníka — vrstva 1 (jádro). Čte ho
+# ingest_law.py (--tier 1). Klíč work_id se odvozuje: cz.sb.{rok}.{cislo}.
+#
+# aliases  = kmeny pro směrování (retrieval.route(): folded, bez diakritiky,
+#            hledá se od hranice slova) — čeština skloňuje, takže každý pád
+#            zvlášť; číslo předpisu je bezpečný kmen.
+# abbr     = zkratky jako CELÉ tokeny pro parser citací (§ 51 ZP) — do stem
+#            aliasů nepatří: „zp" by od hranice slova chytilo „zpět".
+# name_cs  = když chybí, vezme se uplnaCitace z e-Sbírky.
+# short    = krátký název do UI a do promptu.
+# subgroup = podtyp e-Sbírky (ZAKON | ZAKONUST); group = odvětví (topics.yaml).
+
+groups:
+  ustavni: Ústavní právo
+  obcanske: Občanské právo
+  obchodni: Obchodní a hospodářské právo
+  trestni: Trestní právo
+  pracovni_socialni: Pracovní právo a sociální zabezpečení
+  spravni: Správní právo
+  danove: Daňové právo
+  justice: Justice a právnické profese
+
+acts:
+  # --- ústavní pořádek ---
+  - cislo: 1/1993
+    short: Ústava České republiky
+    group: ustavni
+    subgroup: ZAKONUST
+    aliases: [ustava ceske republiky, ustavy ceske republiky, ustave ceske republiky, ustavou ceske republiky, ustava cr, ustavy cr, ustave cr, 1/1993]
+    # skloněné tvary jako celé tokeny — kmen „ustav" by chytil i „ústavní soud"
+    abbr: [Ústava, Ústavy, Ústavě, Ústavou]
+  - cislo: 2/1993
+    short: Listina základních práv a svobod
+    name_cs: usnesení č. 2/1993 Sb., Listina základních práv a svobod
+    group: ustavni
+    subgroup: ZAKONUST
+    aliases: [listina zakladnich prav, listiny zakladnich prav, listine zakladnich prav, listinou zakladnich prav, 2/1993]
+    abbr: [LZPS, Listina, Listiny, Listině, Listinou]
+  - cislo: 182/1993
+    short: zákon o Ústavním soudu
+    group: ustavni
+    aliases: [zakon o ustavnim soudu, zakona o ustavnim soudu, zakone o ustavnim soudu, 182/1993]
+    abbr: [ZÚS]
+  - cislo: 110/1998
+    short: ústavní zákon o bezpečnosti České republiky
+    group: ustavni
+    subgroup: ZAKONUST
+    aliases: [zakon o bezpecnosti ceske republiky, zakona o bezpecnosti ceske republiky, 110/1998]
+  - cislo: 247/1995
+    short: zákon o volbách do Parlamentu
+    group: ustavni
+    aliases: [zakon o volbach do parlamentu, zakona o volbach do parlamentu, volebni zakon, volebniho zakona, 247/1995]
+
+  # --- občanské právo ---
+  - cislo: 89/2012
+    short: občanský zákoník
+    group: obcanske
+    aliases: [obcansky zakonik, obcanskeho zakoniku, obcanskem zakoniku, obcanskemu zakoniku, obcanskym zakonikem, novy obcansky zakonik, noveho obcanskeho zakoniku, 89/2012]
+    abbr: [OZ, NOZ]
+  - cislo: 90/2012
+    short: zákon o obchodních korporacích
+    group: obchodni
+    aliases: [zakon o obchodnich korporacich, zakona o obchodnich korporacich, zakone o obchodnich korporacich, zakonem o obchodnich korporacich, 90/2012]
+    abbr: [ZOK]
+  - cislo: 91/2012
+    short: zákon o mezinárodním právu soukromém
+    group: obcanske
+    aliases: [zakon o mezinarodnim pravu soukromem, zakona o mezinarodnim pravu soukromem, 91/2012]
+    abbr: [ZMPS]
+  - cislo: 99/1963
+    short: občanský soudní řád
+    group: obcanske
+    aliases: [obcansky soudni rad, obcanskeho soudniho radu, obcanskem soudnim radu, obcanskym soudnim radem, 99/1963]
+    abbr: [OSŘ]
+  - cislo: 292/2013
+    short: zákon o zvláštních řízeních soudních
+    group: obcanske
+    aliases: [zakon o zvlastnich rizenich soudnich, zakona o zvlastnich rizenich soudnich, 292/2013]
+    abbr: [ZŘS]
+  - cislo: 120/2001
+    short: exekuční řád
+    group: obcanske
+    aliases: [exekucni rad, exekucniho radu, exekucnim radu, exekucnim radem, 120/2001]
+    abbr: [EŘ]
+  - cislo: 182/2006
+    short: insolvenční zákon
+    group: obcanske
+    aliases: [insolvencni zakon, insolvencniho zakona, insolvencnim zakone, insolvencnim zakonem, 182/2006]
+    abbr: [IZ]
+  - cislo: 634/1992
+    short: zákon o ochraně spotřebitele
+    group: obcanske
+    aliases: [zakon o ochrane spotrebitele, zakona o ochrane spotrebitele, zakone o ochrane spotrebitele, 634/1992]
+    abbr: [ZOS]
+  - cislo: 256/2013
+    short: katastrální zákon
+    group: obcanske
+    aliases: [katastralni zakon, katastralniho zakona, katastralnim zakone, 256/2013]
+  - cislo: 121/2000
+    short: autorský zákon
+    group: obcanske
+    aliases: [autorsky zakon, autorskeho zakona, autorskem zakone, autorskym zakonem, 121/2000]
+    abbr: [AZ]
+  - cislo: 441/2003
+    short: zákon o ochranných známkách
+    group: obcanske
+    aliases: [zakon o ochrannych znamkach, zakona o ochrannych znamkach, 441/2003]
+
+  # --- trestní právo ---
+  - cislo: 40/2009
+    short: trestní zákoník
+    group: trestni
+    aliases: [trestni zakonik, trestniho zakoniku, trestnim zakoniku, trestnim zakonikem, 40/2009]
+    abbr: [TZ]
+  - cislo: 141/1961
+    short: trestní řád
+    group: trestni
+    aliases: [trestni rad, trestniho radu, trestnim radu, trestnim radem, 141/1961]
+    abbr: [TŘ]
+  - cislo: 418/2011
+    short: zákon o trestní odpovědnosti právnických osob
+    group: trestni
+    aliases: [zakon o trestni odpovednosti pravnickych osob, zakona o trestni odpovednosti pravnickych osob, trestni odpovednost pravnickych osob, 418/2011]
+    abbr: [TOPO]
+  - cislo: 218/2003
+    short: zákon o soudnictví ve věcech mládeže
+    group: trestni
+    aliases: [zakon o soudnictvi ve vecech mladeze, zakona o soudnictvi ve vecech mladeze, 218/2003]
+    abbr: [ZSM]
+  - cislo: 45/2013
+    short: zákon o obětech trestných činů
+    group: trestni
+    aliases: [zakon o obetech trestnych cinu, zakona o obetech trestnych cinu, 45/2013]
+
+  # --- pracovní právo a sociální zabezpečení ---
+  - cislo: 262/2006
+    short: zákoník práce
+    group: pracovni_socialni
+    aliases: [zakonik prace, zakoniku prace, zakonikem prace, 262/2006]
+    abbr: [ZP]
+  - cislo: 435/2004
+    short: zákon o zaměstnanosti
+    group: pracovni_socialni
+    aliases: [zakon o zamestnanosti, zakona o zamestnanosti, zakone o zamestnanosti, 435/2004]
+  - cislo: 187/2006
+    short: zákon o nemocenském pojištění
+    group: pracovni_socialni
+    aliases: [zakon o nemocenskem pojisteni, zakona o nemocenskem pojisteni, nemocenske pojisteni, 187/2006]
+  - cislo: 155/1995
+    short: zákon o důchodovém pojištění
+    group: pracovni_socialni
+    aliases: [zakon o duchodovem pojisteni, zakona o duchodovem pojisteni, duchodove pojisteni, 155/1995]
+  - cislo: 589/1992
+    short: zákon o pojistném na sociální zabezpečení
+    group: pracovni_socialni
+    aliases: [zakon o pojistnem na socialni zabezpeceni, pojistne na socialni zabezpeceni, 589/1992]
+  - cislo: 48/1997
+    short: zákon o veřejném zdravotním pojištění
+    group: pracovni_socialni
+    aliases: [zakon o verejnem zdravotnim pojisteni, zakona o verejnem zdravotnim pojisteni, verejne zdravotni pojisteni, 48/1997]
+  - cislo: 251/2005
+    short: zákon o inspekci práce
+    group: pracovni_socialni
+    aliases: [zakon o inspekci prace, zakona o inspekci prace, 251/2005]
+
+  # --- správní právo ---
+  - cislo: 500/2004
+    short: správní řád
+    group: spravni
+    aliases: [spravni rad, spravniho radu, spravnim radu, spravnim radem, 500/2004]
+    abbr: [SŘ]
+  - cislo: 150/2002
+    short: soudní řád správní
+    group: spravni
+    aliases: [soudni rad spravni, soudniho radu spravniho, soudnim radu spravnim, 150/2002]
+    abbr: [SŘS]
+  - cislo: 250/2016
+    short: zákon o odpovědnosti za přestupky a řízení o nich
+    group: spravni
+    aliases: [zakon o odpovednosti za prestupky, zakona o odpovednosti za prestupky, prestupkovy zakon, prestupkoveho zakona, 250/2016]
+  - cislo: 251/2016
+    short: zákon o některých přestupcích
+    group: spravni
+    aliases: [zakon o nekterych prestupcich, zakona o nekterych prestupcich, 251/2016]
+  - cislo: 106/1999
+    short: zákon o svobodném přístupu k informacím
+    group: spravni
+    aliases: [zakon o svobodnem pristupu k informacim, zakona o svobodnem pristupu k informacim, svobodny pristup k informacim, 106/1999]
+  - cislo: 110/2019
+    short: zákon o zpracování osobních údajů
+    group: spravni
+    aliases: [zakon o zpracovani osobnich udaju, zakona o zpracovani osobnich udaju, 110/2019]
+  - cislo: 128/2000
+    short: zákon o obcích (obecní zřízení)
+    group: spravni
+    aliases: [zakon o obcich, zakona o obcich, obecni zrizeni, obecniho zrizeni, 128/2000]
+  - cislo: 361/2000
+    short: zákon o silničním provozu
+    group: spravni
+    aliases: [zakon o silnicnim provozu, zakona o silnicnim provozu, zakone o silnicnim provozu, silnicni provoz, 361/2000]
+  - cislo: 283/2021
+    short: stavební zákon
+    group: spravni
+    aliases: [stavebni zakon, stavebniho zakona, stavebnim zakone, stavebnim zakonem, 283/2021]
+    abbr: [StavZ]
+  - cislo: 326/1999
+    short: zákon o pobytu cizinců
+    group: spravni
+    aliases: [zakon o pobytu cizincu, zakona o pobytu cizincu, pobyt cizincu, 326/1999]
+  - cislo: 134/2016
+    short: zákon o zadávání veřejných zakázek
+    group: spravni
+    aliases: [zakon o zadavani verejnych zakazek, zakona o zadavani verejnych zakazek, verejne zakazky, verejnych zakazek, 134/2016]
+    abbr: [ZZVZ]
+
+  # --- obchodní a hospodářské právo ---
+  - cislo: 455/1991
+    short: živnostenský zákon
+    group: obchodni
+    aliases: [zivnostensky zakon, zivnostenskeho zakona, zivnostenskem zakone, zivnostenskym zakonem, 455/1991]
+    abbr: [ŽZ]
+  - cislo: 304/2013
+    short: zákon o veřejných rejstřících
+    group: obchodni
+    aliases: [zakon o verejnych rejstricich, zakona o verejnych rejstricich, verejne rejstriky, 304/2013]
+  - cislo: 563/1991
+    short: zákon o účetnictví
+    group: obchodni
+    aliases: [zakon o ucetnictvi, zakona o ucetnictvi, zakone o ucetnictvi, 563/1991]
+  - cislo: 143/2001
+    short: zákon o ochraně hospodářské soutěže
+    group: obchodni
+    aliases: [zakon o ochrane hospodarske souteze, zakona o ochrane hospodarske souteze, hospodarska soutez, 143/2001]
+  - cislo: 21/1992
+    short: zákon o bankách
+    group: obchodni
+    aliases: [zakon o bankach, zakona o bankach, 21/1992]
+
+  # --- daňové právo ---
+  - cislo: 280/2009
+    short: daňový řád
+    group: danove
+    aliases: [danovy rad, danoveho radu, danovem radu, danovym radem, 280/2009]
+    abbr: [DŘ]
+  - cislo: 586/1992
+    short: zákon o daních z příjmů
+    group: danove
+    aliases: [zakon o danich z prijmu, zakona o danich z prijmu, dan z prijmu, dane z prijmu, 586/1992]
+    abbr: [ZDP]
+  - cislo: 235/2004
+    short: zákon o dani z přidané hodnoty
+    group: danove
+    aliases: [zakon o dani z pridane hodnoty, zakona o dani z pridane hodnoty, dan z pridane hodnoty, 235/2004]
+    # „DPH" je běžnější než „ZDPH" („§ 29 zákona o DPH") a jako celý token nemá
+    # v češtině s čím kolidovat — eval 2026-09-28 na tom padal
+    abbr: [ZDPH, DPH]
+  - cislo: 338/1992
+    short: zákon o dani z nemovitých věcí
+    group: danove
+    aliases: [zakon o dani z nemovitych veci, zakona o dani z nemovitych veci, dan z nemovitych veci, 338/1992]
+  - cislo: 353/2003
+    short: zákon o spotřebních daních
+    group: danove
+    aliases: [zakon o spotrebnich danich, zakona o spotrebnich danich, spotrebni dan, spotrebni dane, 353/2003]
+
+  # --- justice a právnické profese ---
+  - cislo: 6/2002
+    short: zákon o soudech a soudcích
+    group: justice
+    aliases: [zakon o soudech a soudcich, zakona o soudech a soudcich, 6/2002]
+  - cislo: 85/1996
+    short: zákon o advokacii
+    group: justice
+    aliases: [zakon o advokacii, zakona o advokacii, 85/1996]
+  - cislo: 358/1992
+    short: notářský řád
+    group: justice
+    aliases: [notarsky rad, notarskeho radu, notarskem radu, 358/1992]
+  - cislo: 283/1993
+    short: zákon o státním zastupitelství
+    group: justice
+    aliases: [zakon o statnim zastupitelstvi, zakona o statnim zastupitelstvi, 283/1993]

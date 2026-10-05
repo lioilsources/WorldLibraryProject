@@ -1,0 +1,18 @@
+{
+  "_popis": "Reklamace s požadavkem na opravu — účet není potřeba.",
+  "_k_datu": "2026-09-28",
+  "spotrebitel_jmeno": "Petr Novák",
+  "spotrebitel_identifikace": "petr.novak@example.com",
+  "spotrebitel_adresa": "Dlouhá 3, 110 00 Praha 1",
+  "prodavajici_jmeno": "Elektro Rychle s.r.o.",
+  "prodavajici_identifikace": "IČO 24681357",
+  "prodavajici_adresa": "Skladová 44, 190 00 Praha 9",
+  "zbozi": "pračka Bosch WAN2812, výrobní číslo FD9812345678",
+  "cislo_dokladu": "2026-114873",
+  "datum_prevzeti": "2025-11-20",
+  "cena": 12490,
+  "popis_vady": "při odstřeďování nad 1000 otáček pračka hlasitě skřípe a posouvá se po podlaze; závada se objevila po deseti měsících běžného používání dvakrát týdně, stroj stojí vyrovnaný na rovné podlaze a je bez transportních šroubů",
+  "datum_zjisteni": "2026-09-20",
+  "pozadavek": "oprava",
+  "datum_odeslani": "2026-09-28"
+}

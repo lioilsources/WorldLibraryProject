@@ -1,0 +1,18 @@
+{
+  "_popis": "Nezaplacená faktura za služby, s úroky z prodlení a čtrnáctidenní lhůtou.",
+  "_k_datu": "2026-09-28",
+  "veritel_jmeno": "Ol1n Studio s.r.o.",
+  "veritel_identifikace": "IČO 12345678",
+  "veritel_adresa": "Nádražní 5, 602 00 Brno",
+  "dluznik_jmeno": "Rychlé weby s.r.o.",
+  "dluznik_identifikace": "IČO 30987654",
+  "dluznik_adresa": "Průmyslová 9, 618 00 Brno",
+  "dluh_duvod": "cena za služby poskytnuté na základě smlouvy o poskytování služeb ze dne 3. 2. 2026 za období červen a červenec 2026, vyúčtovaná fakturou se splatností 31. 8. 2026",
+  "dluh_castka": 48400,
+  "cislo_dokladu": "FV-2026-0117",
+  "datum_splatnosti": "2026-08-31",
+  "lhuta_dni": 14,
+  "bankovni_ucet": "1029384756/0300",
+  "pozaduji_uroky": true,
+  "datum_odeslani": "2026-09-28"
+}

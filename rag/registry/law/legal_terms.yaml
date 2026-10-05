@@ -1,0 +1,134 @@
+# Mapa laických pojmů → právní terminologie (čte ji rag/law_terms.py,
+# server přepínačem --law-terms). Levný krok před embeddingem, bez LLM.
+#
+# lay    = KMENY bez diakritiky, malými (jako aliasy v tier1.yaml): hledají se od
+#          hranice slova, takže „kauc" trefí „kauce" i „kauci". Kmen musí být tak
+#          dlouhý, aby nechytal cizí slova („najem" ano, „naj" ne).
+# terms  = právní pojmy přilepené k dotazu, který jde do embeddingu. Tady patří
+#          formulace, jak stojí v zákoně (nadpis §, ustálený termín).
+# works  = předpis, na který se smí zúžit, KDYŽ si dotaz žádný nejmenuje sám
+#          (aliasy v retrieval.route() mají přednost). Vyplňovat jen tam, kde je
+#          pojem svázaný s jedním kodexem — u „náhrady nákladů" se civilní,
+#          správní a trestní řízení liší, tak se uvedou oba kodexy, ne jeden.
+# note    = proč je položka v mapě (pro člověka, kód ji ignoruje).
+#
+# Startovní sada psaná 28. 9. 2026 proti nálezům evalu (procesní 0,25,
+# insolvence 0,00, daňové 0,667, nájem 0,714) — pojmově, ne na konkrétní otázky.
+# Rozšiřovat z logů reálných dotazů; po každé změně `make eval-law`.
+
+# --- civilní proces: vektor nerozliší OSŘ / ZŘS / SŘS ---------------------------
+- lay: [naklady rizeni, naklady soudniho rizeni, kdo plati soud, kdo hradi soudni]
+  terms: ["náhrada nákladů řízení", "účastník, který měl ve věci plný úspěch"]
+  works: ["99/1963 Sb.", "150/2002 Sb."]
+  note: laik neřekne „náhrada nákladů"; ZŘS a SŘS mají vlastní § o nákladech a vyhrávají nad OSŘ
+
+- lay: [zalob, podani zaloby, jak zaluj, chci zalovat]
+  terms: ["návrh na zahájení řízení", "žalobní návrh", "obecné náležitosti podání"]
+  works: ["99/1963 Sb."]
+  note: žaloba = „návrh"; bez toho se trefí § o žalobě proti rozhodnutí správního orgánu
+
+- lay: [ktery soud, dohodnout soud, dohoda o soudu, prorogac, rozhodovat spor]
+  terms: ["místní příslušnost", "písemná dohoda o místní příslušnosti"]
+  works: ["99/1963 Sb."]
+  note: „dohodneme si soud" je prorogační doložka (§ 89a OSŘ), vektor sahal do ZMPS
+
+- lay: [odvolani proti rozsudku, odvolat se proti rozsudku, lhuta na odvolani]
+  terms: ["odvolání", "lhůta patnácti dnů od doručení písemného vyhotovení rozhodnutí"]
+  works: ["99/1963 Sb."]
+
+# --- insolvence ----------------------------------------------------------------
+- lay: [oddluzeni, osobni bankrot, chci oddluz]
+  terms: ["návrh na povolení oddlužení", "dlužník"]
+  works: ["182/2006 Sb."]
+  note: „kdo může navrhnout oddlužení" vracelo § 390/391 (kdy se podává), ne § 389 (kdo)
+
+# --- daně ----------------------------------------------------------------------
+- lay: [odvest dph, kdy se plati dph, povinnost priznat dph, vznika dph]
+  terms: ["uskutečnění zdanitelného plnění", "povinnost přiznat daň"]
+  works: ["235/2004 Sb."]
+
+- lay: [faktur, danovy doklad, co musi byt na fakture]
+  terms: ["náležitosti daňového dokladu"]
+  works: ["235/2004 Sb."]
+
+# --- nájem ---------------------------------------------------------------------
+- lay: [vystehovat, vyhodit z bytu, vyhodit z najmu, chce me dostat z bytu]
+  terms: ["výpověď nájmu bytu", "hrubé porušení povinnosti vyplývající z nájmu", "výpovědní doba"]
+  note: strana pronajímatele (§ 2288 OZ) — „hrubé porušení" je jeho výpovědní důvod
+
+- lay: [dat vypoved z najmu, vypoved z najmu, ukoncit najem, zrusit najem]
+  terms: ["výpověď nájmu", "výpovědní doba", "skončení nájmu"]
+  note: |
+    Neutrálně, bez výpovědních důvodů pronajímatele: s nimi v termínech spadla
+    otázka na výpověď nájemce z nájmu na dobu určitou (§ 2287) ze 4. místa mimo
+    top-8 — eval 28. 9. 2026.
+
+- lay: [kauc, vratna zaloha za byt]
+  terms: ["jistota", "peněžitá jistota"]
+  note: zákon zná jen „jistotu" (§ 2254 OZ), slovo „kauce" v textu není
+
+- lay: [opravy v byte, kdo plati opravy, rozbil se bojler, drobne opravy]
+  terms: ["běžná údržba a drobné opravy", "udržovat byt ve stavu způsobilém k užívání"]
+
+- lay: [zvyseni najemneho, zdrazit najem, zvysit najem]
+  terms: ["zvyšování nájemného", "návrh na zvýšení nájemného"]
+
+- lay: [podnajem, pustit si nekoho do bytu, pronajmout dal]
+  terms: ["podnájem", "souhlas pronajímatele"]
+
+# --- spotřebitel, kupní --------------------------------------------------------
+- lay: [vratit zbozi, vadne zbozi, rozbilo se to, uplatnit vadu, do kdy muzu reklamovat]
+  terms: ["práva z vadného plnění", "vytknout vadu", "jakost při převzetí"]
+  note: hmotná práva kupujícího jsou v OZ (§§ 2161, 2165), ne v zákoně o ochraně spotřebitele
+
+- lay: [vyridit reklamaci, lhuta na reklamaci, 30 dnu na reklamaci, prijmout reklamaci]
+  terms: ["přijmout reklamaci", "rozhodnout o reklamaci", "vyřídit reklamaci včetně odstranění vady"]
+  works: ["634/1992 Sb."]
+  note: |
+    Odděleno od hmotných práv: jedna položka „reklamac" s termíny OZ přetáhla
+    otázku na 30denní lhůtu (§ 19 zákona o ochraně spotřebitele) z 1. na 7. místo
+    — eval 28. 9. 2026. Lhůta a postup jsou ve 634/1992, práva z vad v OZ.
+
+- lay: [odstoupit od smlouvy z internetu, koupil jsem na netu, 14 dnu na vraceni, nakup na dalku]
+  terms: ["odstoupení od smlouvy uzavřené distančním způsobem", "čtrnáct dnů"]
+
+- lay: [nekala praktik, klamava reklama, zavadejici nabidka]
+  terms: ["nekalá obchodní praktika", "odborná péče"]
+  works: ["634/1992 Sb."]
+
+# --- práce ---------------------------------------------------------------------
+- lay: [vyhazov, padak, dostal jsem vypoved, vyhodili me z prace]
+  terms: ["výpověď z pracovního poměru", "výpovědní doba", "důvody výpovědi"]
+  works: ["262/2006 Sb."]
+
+- lay: [home office, prace z domova, pracovat z domu]
+  terms: ["práce na dálku", "písemná dohoda o práci na dálku"]
+  works: ["262/2006 Sb."]
+
+- lay: [brigad, privydelek u zamestnavatele, dohoda o provedeni prace, dpp, dpc]
+  terms: ["dohoda o provedení práce", "dohoda o pracovní činnosti",
+          "rozsah práce nejvýše 300 hodin v kalendářním roce"]
+  works: ["262/2006 Sb."]
+  note: |
+    Zkratky DPP/DPČ přidané 28. 9. po holdoutu (golden_law_v2): „Kolik nejvýš můžu
+    odpracovat na DPP?" netrefilo ani zákoník práce, šlo to do důchodového pojištění.
+    Tím pádem už tahle položka není na v2 sadě měřená out-of-sample.
+
+- lay: [konkurencni dolozk, zakaz konkurence po odchodu]
+  terms: ["konkurenční doložka", "zdržet se výkonu výdělečné činnosti"]
+  works: ["262/2006 Sb."]
+
+# --- autorské ------------------------------------------------------------------
+- lay: [program v praci, kod ktery napsal zamestnanec, dilo v zamestnani]
+  terms: ["zaměstnanecké dílo", "majetková práva k dílu vytvořenému ke splnění povinností z pracovního vztahu"]
+  works: ["121/2000 Sb."]
+  note: „program, který napíšu v práci" táhlo do zákoníku práce (§ 316, § 335a)
+
+- lay: [kopie pro sebe, stahnout film pro sebe, nahrat si]
+  terms: ["volné užití", "užití pro osobní potřebu fyzické osoby"]
+  works: ["121/2000 Sb."]
+
+# --- korporace -----------------------------------------------------------------
+- lay: [ruci jednatel, odpovednost jednatele, jednatel spatne rozhod]
+  terms: ["péče řádného hospodáře", "pravidlo podnikatelského úsudku", "informovaně a v obhajitelném zájmu"]
+  works: ["90/2012 Sb."]

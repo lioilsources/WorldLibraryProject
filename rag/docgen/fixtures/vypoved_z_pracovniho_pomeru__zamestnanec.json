@@ -1,0 +1,14 @@
+{
+  "_popis": "Výpověď daná zaměstnancem bez uvedení důvodu — odstupné se nevkládá.",
+  "_k_datu": "2026-09-28",
+  "odesilatel_jmeno": "Eva Horáková",
+  "odesilatel_identifikace": "nar. 2. 2. 1988",
+  "odesilatel_adresa": "Luční 1480/6, 616 00 Brno",
+  "adresat_jmeno": "Ol1n Studio s.r.o.",
+  "adresat_identifikace": "IČO 12345678",
+  "adresat_adresa": "Nádražní 5, 602 00 Brno",
+  "kdo": "zamestnanec",
+  "druh_prace": "programátorka — vývoj webových aplikací",
+  "den_nastupu": "2024-03-01",
+  "datum_doruceni": "2026-09-30"
+}

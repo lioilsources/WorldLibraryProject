@@ -1,0 +1,19 @@
+{
+  "_popis": "Prodej spotřebiteli, převodem, s výhradou vlastnictví a záruční dobou.",
+  "_k_datu": "2026-09-28",
+  "prodavajici_jmeno": "Kola Krátká s.r.o.",
+  "prodavajici_identifikace": "IČO 27182818",
+  "prodavajici_adresa": "Krátká 12, 602 00 Brno",
+  "kupujici_jmeno": "Petr Novák",
+  "kupujici_identifikace": "nar. 14. 11. 1994",
+  "kupujici_adresa": "Dlouhá 3, 110 00 Praha 1",
+  "predmet": "horské kolo Merida Big Nine 400, rám velikost L, rok 2026, výrobní číslo WMD2600178, nové, nepoužité",
+  "cena": 32900,
+  "zpusob_platby": "prevodem",
+  "bankovni_ucet": "2901234567/2010",
+  "datum_predani": "2026-10-05",
+  "misto_predani": "prodejna Krátká 12, Brno",
+  "kupujici_je_spotrebitel": "ano",
+  "vyhrada_vlastnictvi": true,
+  "zaruka_mesice": 24
+}

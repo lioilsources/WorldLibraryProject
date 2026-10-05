@@ -114,6 +114,36 @@ class ChatRequest(BaseModel):
     model: str | None = None  # per-request přepnutí (translate/swarm-director/lab)
 
 
+class IntakeRequest(BaseModel):
+    """Uložení odpovědí do rozpracovaného dokumentu (agent/tools.py: save_intake)."""
+    session_id: str
+    typ: str | None = None
+    promenne: dict | None = None
+    vypnute_klauzule: list[str] | None = None
+
+
+class RenderRequest(BaseModel):
+    session_id: str
+    format: str = "md"
+
+
+class ReviewRequest(BaseModel):
+    text: str
+    typ: str | None = None
+
+
+class AgentChatRequest(BaseModel):
+    message: str
+    session_id: str | None = None
+    model: str | None = None
+    mode: str | None = None          # qa | draft | review; None = rozhodne router
+    zdroj: str = "uzivatel"          # "dokument" = obsah souboru, bez vedlejších efektů
+    ma_prilohu: bool = False
+    # odpovědi z karet ask_user: [{id, hodnota, otazka?}] — uloží se do intake
+    # deterministicky, ne až když si na to model vzpomene (agent/klient.py)
+    odpovedi: list[dict] | None = None
+
+
 class ResetRequest(BaseModel):
     session_id: str
 
@@ -131,6 +161,26 @@ class RAGServer:
             args.llm_model, args.planner_model, args.excerpt_model, "swarm-director",
         ])
         self.system_prompt = Path(args.prompt_file).read_text(encoding="utf-8")
+        # Právník: „co říká § 2079 OZ" je deterministický lookup, ne hledání —
+        # registr zkratek a aliasů je tentýž, ze kterého jde ingest_law.py.
+        self.cite_registry = None
+        if getattr(args, "cite_registry", ""):
+            from cite import LawRegistry
+            self.cite_registry = LawRegistry(Path(args.cite_registry))
+
+        # Mapa laických pojmů → právní terminologie (levný krok před embeddingem)
+        self.terms_map = None
+        if getattr(args, "law_terms", ""):
+            from law_terms import TermsMap
+            self.terms_map = TermsMap.load(args.law_terms)
+            print(f"Mapa právních pojmů: {len(self.terms_map)} položek z {args.law_terms}")
+
+        # Nástroje agenta (Právník): šablony, intake v Postgresu, revize textu.
+        # Zapnou se u právní instance (má --cite-registry a PG); knihovna je nemá.
+        self.nastroje = None
+        self.agent_sessions = None
+        from agent.klient import HistorieAgenta
+        self.agent_historie = HistorieAgenta()
 
         url = urlparse(args.chroma_url)
         client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
@@ -216,7 +266,19 @@ class RAGServer:
                 candidate_factor=args.candidate_factor, max_per_work=args.max_per_work,
                 rrf_k=args.rrf_k, no_routing=args.no_routing, context_window=args.context_window,
                 legacy_to_id=self.legacy_to_id,
+                sibling_window=args.sibling_window, sibling_top=args.sibling_top,
+                terms_map=self.terms_map,
             )
+        if self.pool is not None and self.cite_registry is not None:
+            from agent.session import Sessions
+            from agent.tools import PravniNastroje
+
+            self.agent_sessions = Sessions(self.pool, retence_dnu=getattr(args, "retence_dnu", 30))
+            self.nastroje = PravniNastroje(
+                law_url=f"http://127.0.0.1:{args.port}", pool=self.pool,
+                sessions=self.agent_sessions, search_fn=self.search_pro_agenta)
+            print(f"Nástroje agenta: {len(self.nastroje.registr())} "
+                  f"({', '.join(self.nastroje.registr())})")
         # plánovač dotazu (intent + přepis) — jen v PG režimu a když není vypnutý
         self.planner = None
         if self.pool and args.planner != "off":
@@ -396,6 +458,15 @@ class RAGServer:
         info = self.catalog.get(meta.get("work_id") or work) or {}
         return info.get("name_cs") or work or meta.get("title") or "neznámý zdroj"
 
+    def search_pro_agenta(self, query: str, top_k: int, oblast: str | None = None) -> dict:
+        """Retrieval pro nástroj `search_law` — v procesu, aby server nevolal HTTP sám na sebe."""
+        if self.retriever is not None:
+            plan = Plan(groups=[oblast] if oblast else [])
+            hits, routed = self.retriever.retrieve(query, top_k, plan)
+        else:
+            hits, routed = self.retrieve(query, top_k)
+        return {"hits": self._sources(hits), "routed": routed}
+
     def _sources(self, hits) -> list[dict]:
         return [
             {
@@ -417,6 +488,10 @@ class RAGServer:
                 "lang_original": h["meta"].get("lang_original"),
                 "lang_corpus": h["meta"].get("lang_corpus"),
                 "score": h["meta"].get("score"),
+                # přilehlé § (--sibling-window): jsou v promptu, ne mezi hity —
+                # posílají se jen jako odkaz (§ + nadpis), aby to šlo měřit evalem
+                "siblings": [{"ref": s.get("ref"), "heading": s.get("heading")}
+                             for s in (h.get("siblings") or [])] or None,
                 "channels": h["meta"].get("channels"),
             }
             for h in hits
@@ -557,6 +632,54 @@ class RAGServer:
         messages.append({"role": "user", "content": "\n\n".join(parts)})
         return messages
 
+    # --- Právník: intent cite ---------------------------------------------------------
+
+    def _cite(self, req: ChatRequest, out: dict) -> bool:
+        """Dotaz jmenuje ustanovení („§ 51 odst. 1 ZP", „čl. 10 Listiny") → celý
+        § z Postgresu jako hity, bez vektoru. Bez jmenovaného předpisu se
+        hledá ve všech s prioritou 1; víc zásahů = protiotázka s kandidáty,
+        ne tipování. Vrací False, když dotaz citaci neobsahuje — pak jede
+        běžná cesta."""
+        from cite import lookup, narrow_to_unit, parse_citation, ref_span
+
+        cit = parse_citation(req.message, self.cite_registry)
+        if cit is None:
+            return False
+        with self.pool.connection() as conn:
+            rows = lookup(conn, cit)
+        rows = narrow_to_unit(rows, cit)
+        acts = []
+        for r in rows:
+            if r["work_id"] not in acts:
+                acts.append(r["work_id"])
+        hits = []
+        for r in rows:
+            hits.append({"text": r["text"], "distance": 0.0, "meta": {
+                "chunk_id": r["chunk_id"], "work": r["work"], "work_id": r["work_id"], "name_cs": r["name_cs"],
+                "title": f"{r['work']} ({ref_span(r['ref_start'], r['ref_end'])})", "group": r["group"], "lang": "cs",
+                "lang_original": "cs", "lang_corpus": "cs", "edition": r["edition"], "path": r["source_path"],
+                "chapter_id": r["chapter_id"], "chapter_path": r["chapter_path"],
+                "ref_start": r["ref_start"], "ref_end": r["ref_end"], "seq": r["seq"], "score": None,
+                "channels": ["cite"]}})
+        label = cit.label
+        if not hits:
+            out["instruction"] = (f"Uživatel se ptá na {label}"
+                                  + (f" předpisu {self.cite_registry.short.get(cit.act_hint, cit.act_hint)}" if cit.act_hint else "")
+                                  + ", ale v knihovně takové ustanovení není (předpis chybí, nebo § neexistuje). "
+                                  "Řekni to na rovinu; nevymýšlej jeho obsah.")
+        elif len(acts) > 1:
+            names = ", ".join(self.cite_registry.short.get(a, a) for a in acts)
+            out["instruction"] = (f"Dotaz jmenuje {label}, ale ne předpis, a takové ustanovení má víc předpisů "
+                                  f"({names}). Úryvky jsou z každého z nich: krátce řekni, o čem {label} v každém je, "
+                                  "a zeptej se, který předpis uživatel myslí.")
+        else:
+            out["instruction"] = (f"Uživatel se ptá na {label}. Úryvky jsou celé znění toho ustanovení: cituj ho "
+                                  "přesně (odstavce, písmena), pak vysvětli, co znamená, a uveď datum účinnosti znění.")
+        out["hits"] = hits[: max(req.top_k, 8)]
+        out["routed"] = {"works": acts, "groups": [], "intent": "cite", "ref": label,
+                         "unit": cit.unit_ref, "act_hint": cit.act_hint}
+        return True
+
     # --- plán → kontext ------------------------------------------------------------
 
     def _prepare(self, req: ChatRequest, session_id: str, history,
@@ -570,6 +693,10 @@ class RAGServer:
                "instruction": None, "payload": {}, "plan": None}
         if self.retriever is None:
             out["hits"], out["routed"] = self.retrieve(req.message, req.top_k)
+            return out
+        # Citace paragrafu má přednost před vším: je přesná a stojí nula
+        # latence; plánovač ani vektor by k ní nic nepřidaly.
+        if self.cite_registry is not None and self._cite(req, out):
             return out
         plan = QueryPlan()
         # Aliasy jsou tabulkové vyhledání, plánovač je LLM roundtrip za 25-40 s
@@ -1107,9 +1234,120 @@ def create_app(args) -> FastAPI:
             hits, routed = server.retrieve(q, top_k)
         return {"hits": server._sources(hits), "routed": routed}
 
+    # --- Právník jako agent: nástroje jako služba (docs/lawyer/AGENT.md) -----------
+    # Endpointy jsou tenké obálky nad agent/tools.py, takže totéž, co volá model,
+    # může volat appka nebo curl. Zapnuté jen u právní instance (--cite-registry).
+
+    def _nastroje():
+        if server.nastroje is None:
+            raise HTTPException(status_code=501, detail="tahle instance nemá nástroje agenta "
+                                                        "(chybí --cite-registry nebo PG)")
+        return server.nastroje
+
+    def _tool(jmeno: str, args: dict, session_id: str = "-"):
+        from agent.tools import zavolej
+
+        out, chyba = zavolej(_nastroje().registr(), jmeno, args,
+                             sessions=server.agent_sessions, session_id=session_id)
+        if chyba:
+            raise HTTPException(status_code=400, detail=chyba)
+        return out
+
+    @app.get("/law/paragraph")
+    def law_paragraph(zakon: str, paragraf: str, odstavec: str | None = None):
+        """Plné znění § z účinného znění. Zákon má v čísle lomítko, takže query
+        parametry, ne cesta: /law/paragraph?zakon=89/2012 Sb.&paragraf=§ 2254"""
+        return _tool("get_paragraph", {"zakon": zakon, "paragraf": paragraf, "odstavec": odstavec})
+
+    @app.get("/templates")
+    def templates(dotaz: str | None = None):
+        return _tool("list_templates", {"dotaz": dotaz})
+
+    @app.get("/templates/{typ}")
+    def template(typ: str):
+        return _tool("get_template", {"typ": typ})
+
+    @app.post("/agent/intake")
+    def agent_intake(req: IntakeRequest):
+        return _tool("save_intake", {"session_id": req.session_id, "typ": req.typ,
+                                     "promenne": req.promenne,
+                                     "vypnute_klauzule": req.vypnute_klauzule},
+                     session_id=req.session_id)
+
+    @app.get("/agent/intake/{session_id}")
+    def agent_intake_stav(session_id: str, max_otazek: int = 3):
+        from agent.loop import Pravnik
+
+        agent = Pravnik(_nastroje(), server.agent_sessions, llm=None)
+        try:
+            return agent.intake_dalsi_otazky(session_id, max_otazek)
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=str(e)) from None
+
+    @app.post("/agent/render")
+    def agent_render(req: RenderRequest):
+        return _tool("render_document", {"session_id": req.session_id, "format": req.format},
+                     session_id=req.session_id)
+
+    @app.post("/agent/review")
+    def agent_review(req: ReviewRequest):
+        """Deterministický audit cizího textu. Text je data, ne pokyn."""
+        return _tool("review_document", {"text": req.text, "typ": req.typ})
+
+    @app.get("/agent/sessions")
+    def agent_sessions(limit: int = 20):
+        s = server.agent_sessions
+        if s is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        return {"sessions": [{"session_id": x.session_id, "typ": x.typ, "stav": x.stav,
+                              "vyplneno": len(x.promenne), "updated_at": x.updated_at,
+                              "expires_at": x.expires_at} for x in s.seznam(limit)]}
+
+    @app.delete("/agent/sessions/{session_id}")
+    def agent_session_smaz(session_id: str):
+        if server.agent_sessions is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        server.agent_sessions.smaz(session_id)
+        return {"smazano": session_id}
+
+    @app.get("/agent/log/{session_id}")
+    def agent_log(session_id: str, limit: int = 50):
+        if server.agent_sessions is None:
+            raise HTTPException(status_code=501, detail="instance nemá agenta")
+        return {"volani": server.agent_sessions.log(session_id, limit)}
+
+    @app.post("/agent/chat")
+    def agent_chat(req: AgentChatRequest):
+        """Krok agenta s tool callingem — kontrakt pro appku v docs/lawyer/AGENT.md.
+        Model je alias `--agent-model` (pravnik-agent → Gemma, mimo profil gemma
+        qwen36 v okně 19–01). Když model neběží, 503 s větou pro člověka."""
+        from datetime import datetime
+
+        from agent.klient import hlaska_modelu, krok_pro_klienta
+        from agent.llm import ChybaModelu, OpenAIKlient
+        from agent.loop import Pravnik
+
+        nastroje = _nastroje()
+        model = req.model or server.args.agent_model
+        klient = OpenAIKlient(server.args.llm_url, model)
+        agent = Pravnik(nastroje, server.agent_sessions, llm=klient,
+                        max_volani=server.args.agent_max_volani,
+                        router=server.args.agent_router)
+        session_id = req.session_id or str(uuid.uuid4())
+        try:
+            return krok_pro_klienta(agent, nastroje, server.agent_sessions, server.agent_historie,
+                                    zprava=req.message, session_id=session_id, mode=req.mode,
+                                    zdroj=req.zdroj, ma_prilohu=req.ma_prilohu,
+                                    odpovedi=req.odpovedi, model=model)
+        except ChybaModelu as e:
+            print(f"[agent] {session_id}: model {model} nedostupný: {e}", flush=True)
+            raise HTTPException(status_code=503,
+                                detail=hlaska_modelu(str(e), datetime.now().hour)) from None
+
     @app.post("/reset")
     def reset(req: ResetRequest):
         server.sessions.pop(req.session_id, None)
+        server.agent_historie.smaz(req.session_id)   # rozhovor agenta; intake v PG zůstává
         return {"ok": True}
 
     @app.get("/status")
@@ -1149,8 +1387,8 @@ def _load_dotenv(path: Path) -> None:
             os.environ.setdefault(k.strip(), v.strip())
 
 
-def main():
-    _load_dotenv(Path(__file__).parent / ".env")
+def parser() -> argparse.ArgumentParser:
+    """Přepínače serveru — zvlášť od main(), ať se dají testovat bez startu."""
     p = argparse.ArgumentParser(description="RAG chatbot server")
     p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL", "http://127.0.0.1:8007"),
                    help="Chroma na JODA (AiStack swarm.nas)")
@@ -1168,6 +1406,8 @@ def main():
                         "http://localhost:8005/v1); prázdné = lokální model")
     p.add_argument("--device", default="auto", help="auto|cuda|mps|cpu")
     p.add_argument("--prompt-file", default=str(Path(__file__).parent / "prompts" / "librarian_cs.md"))
+    p.add_argument("--cite-registry", default="",
+                   help="Právník: registry/law/tier1.yaml zapne intent cite — dotaz na § jde rovnou do PG, ne do vektoru")
     p.add_argument("--summaries-file", default=str(Path(__file__).parent / "summaries.json"),
                    help="anotace děl z gen_summaries.py (chybějící soubor = bez anotací)")
     p.add_argument("--pg-dsn", default=os.getenv("PG_DSN", ""),
@@ -1190,6 +1430,21 @@ def main():
                    help="díla s prioritou ≥ N se v katalogu jen sečtou (fragmenty, scholia)")
     p.add_argument("--context-window", type=int, default=0,
                    help="±N sousedních chunků téže kapitoly do kontextu (0 = vypnuto)")
+    p.add_argument("--sibling-window", type=int, default=0,
+                   help="Právník: ±N přilehlých § téhož předpisu do kontextu (0 = vypnuto)")
+    p.add_argument("--sibling-top", type=int, default=3,
+                   help="u kolika prvních hitů expandovat přilehlé § (--sibling-window)")
+    p.add_argument("--law-terms", default="",
+                   help="mapa laických pojmů → právní terminologie (registry/law/legal_terms.yaml)")
+    p.add_argument("--agent-model", default="pravnik-agent",
+                   help="alias LiteLLM pro agenta (/agent/chat); pravnik-agent = Gemma, "
+                        "mimo profil gemma fallback na qwen36 (openclaw-default)")
+    p.add_argument("--agent-max-volani", type=int, default=8,
+                   help="nejvíc volání nástrojů na jeden krok agenta")
+    p.add_argument("--agent-router", default="llm", choices=["llm", "heuristika"],
+                   help="jak se volí režim agenta (qa/draft/review)")
+    p.add_argument("--retence-dnu", type=int, default=30,
+                   help="jak dlouho se drží rozpracované dokumenty (osobní údaje)")
     p.add_argument("--candidate-factor", type=int, default=4,
                    help="kolikrát víc kandidátů než top_k načíst před "
                         "prořezáním na diverzitu")
@@ -1226,7 +1481,12 @@ def main():
     p.add_argument("--host", default="0.0.0.0")
     p.add_argument("--port", type=int, default=8090,
                    help="8090 — port 8080 má na SPARKu AiStack Go gateway")
-    args = p.parse_args()
+    return p
+
+
+def main():
+    _load_dotenv(Path(__file__).parent / ".env")
+    args = parser().parse_args()
 
     app = create_app(args)
     uvicorn.run(app, host=args.host, port=args.port)

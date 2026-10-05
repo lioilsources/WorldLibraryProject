@@ -1,0 +1,67 @@
+{"q": "Co říká § 2079 občanského zákoníku?", "area": "kupni", "intent": "cite", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2079"}
+{"q": "§ 51 odst. 1 ZP", "area": "pracovni", "intent": "cite", "expect_work": "262/2006 Sb.", "expect_ref": "§ 51"}
+{"q": "čl. 10 Listiny", "area": "ustavni", "intent": "cite", "expect_work": "2/1993 Sb.", "expect_ref": "čl. 10"}
+{"q": "Co je v § 29 trestního zákoníku?", "area": "trestni", "intent": "cite", "expect_work": "40/2009 Sb.", "expect_ref": "§ 29"}
+{"q": "paragraf 204 OSŘ", "area": "procesni", "intent": "cite", "expect_work": "99/1963 Sb.", "expect_ref": "§ 204"}
+{"q": "§ 2048 OZ", "area": "zavazky", "intent": "cite", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2048"}
+{"q": "§ 58 autorského zákona", "area": "autorske", "intent": "cite", "expect_work": "121/2000 Sb.", "expect_ref": "§ 58"}
+{"q": "§ 29 odst. 1 zákona o DPH", "area": "danove", "intent": "cite", "expect_work": "235/2004 Sb.", "expect_ref": "§ 29"}
+{"q": "Jaká je výpovědní doba u pracovního poměru?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 51"}
+{"q": "Z jakých důvodů může zaměstnavatel dát zaměstnanci výpověď?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 52"}
+{"q": "Kolik týdnů dovolené mám ze zákona?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 212"}
+{"q": "Co je minimální mzda?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 111"}
+{"q": "Jak dlouhá může být zkušební doba?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 35"}
+{"q": "Co musí obsahovat pracovní smlouva?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 34"}
+{"q": "Kdy může zaměstnavatel okamžitě zrušit pracovní poměr?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 55"}
+{"q": "Kdy mi patří odstupné a v jaké výši?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 67"}
+{"q": "Kolik hodin ročně můžu odpracovat na dohodu o provedení práce?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 75"}
+{"q": "Musí být práce z domova sjednaná písemně?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 317"}
+{"q": "Jak dlouho mě může vázat konkurenční doložka po odchodu z práce?", "area": "pracovni", "expect_work": "262/2006 Sb.", "expect_ref": "§ 310"}
+{"q": "Kdy jde o nutnou obranu?", "area": "trestni", "expect_work": "40/2009 Sb.", "expect_ref": "§ 29"}
+{"q": "Co je krajní nouze?", "area": "trestni", "expect_work": "40/2009 Sb.", "expect_ref": "§ 28"}
+{"q": "Jaký trest hrozí za krádež?", "area": "trestni", "expect_work": "40/2009 Sb.", "expect_ref": "§ 205"}
+{"q": "Za jakých podmínek smí být obviněný vzat do vazby?", "area": "trestni", "expect_work": "141/1961 Sb.", "expect_ref": "§ 67"}
+{"q": "Jak dlouhá je obecná promlčecí lhůta?", "area": "zavazky", "expect_work": "89/2012 Sb.", "expect_ref": "§ 629"}
+{"q": "Kdo nahradí škodu při porušení smluvní povinnosti?", "area": "zavazky", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2913"}
+{"q": "Můžu si ve smlouvě sjednat smluvní pokutu?", "area": "zavazky", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2048"}
+{"q": "Kdy je dlužník v prodlení?", "area": "zavazky", "expect_work": "89/2012 Sb.", "expect_ref": "§ 1968"}
+{"q": "Co se zavazuje pojistitel pojistnou smlouvou?", "area": "zavazky", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2758"}
+{"q": "K čemu se zavazuje prodávající kupní smlouvou?", "area": "kupni", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2079"}
+{"q": "Do kdy můžu reklamovat vadu zboží?", "area": "kupni", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2165"}
+{"q": "Za jaké vady odpovídá prodávající při převzetí věci?", "area": "kupni", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2161"}
+{"q": "Do kdy může spotřebitel odstoupit od smlouvy uzavřené na dálku?", "area": "spotrebitel", "expect_work": "89/2012 Sb.", "expect_ref": "§ 1829"}
+{"q": "Kdy od smlouvy uzavřené přes internet odstoupit nemůžu?", "area": "spotrebitel", "expect_work": "89/2012 Sb.", "expect_ref": "§ 1837"}
+{"q": "Do kdy musí obchod vyřídit reklamaci?", "area": "spotrebitel", "expect_work": "634/1992 Sb.", "expect_ref": "§ 19"}
+{"q": "Co je nekalá obchodní praktika?", "area": "spotrebitel", "expect_work": "634/1992 Sb.", "expect_ref": "§ 4"}
+{"q": "Co je nájem bytu a k čemu se pronajímatel zavazuje?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2235"}
+{"q": "Pronajímatel mě chce vystěhovat z bytu, kdy to může?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2288"}
+{"q": "Můžu dát výpověď z nájmu sjednaného na dobu určitou?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2287"}
+{"q": "Jak vysokou kauci po mně může pronajímatel chtít?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2254"}
+{"q": "Může mi pronajímatel zvýšit nájemné?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2249"}
+{"q": "Kdo platí drobné opravy v nájemním bytě?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2257"}
+{"q": "Potřebuju souhlas pronajímatele k podnájmu?", "area": "najem", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2275"}
+{"q": "K čemu se zhotovitel zavazuje smlouvou o dílo?", "area": "dilo", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2586"}
+{"q": "Co když cena díla určená odhadem bude výrazně vyšší?", "area": "dilo", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2612"}
+{"q": "Co tvoří pozůstalost?", "area": "dedicke", "expect_work": "89/2012 Sb.", "expect_ref": "§ 1475"}
+{"q": "Jaký je minimální vklad do společnosti s ručením omezeným?", "area": "korporace", "expect_work": "90/2012 Sb.", "expect_ref": "§ 142"}
+{"q": "Ručí jednatel za rozhodnutí, když jednal informovaně a v dobré víře?", "area": "korporace", "expect_work": "90/2012 Sb.", "expect_ref": "§ 51"}
+{"q": "Můžu převést svůj podíl ve s.r.o. na někoho jiného?", "area": "korporace", "expect_work": "90/2012 Sb.", "expect_ref": "§ 207"}
+{"q": "Komu patří program, který zaměstnanec napíše v práci?", "area": "autorske", "expect_work": "121/2000 Sb.", "expect_ref": "§ 58"}
+{"q": "Můžu si udělat kopii filmu pro svoje osobní použití?", "area": "autorske", "expect_work": "121/2000 Sb.", "expect_ref": "§ 30"}
+{"q": "Co autor poskytuje licenční smlouvou k autorskému dílu?", "area": "autorske", "expect_work": "89/2012 Sb.", "expect_ref": "§ 2371"}
+{"q": "Do kdy se podává odvolání proti rozsudku v civilní věci?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 204"}
+{"q": "Co musí obsahovat žaloba?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 79"}
+{"q": "Kdo platí náklady soudního řízení?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 142"}
+{"q": "Můžeme si ve smlouvě dohodnout, který soud bude spor rozhodovat?", "area": "procesni", "expect_work": "99/1963 Sb.", "expect_ref": "§ 89a"}
+{"q": "V jaké lhůtě musí správní orgán vydat rozhodnutí?", "area": "spravni", "expect_work": "500/2004 Sb.", "expect_ref": "§ 71"}
+{"q": "Jaké správní tresty lze uložit za přestupek?", "area": "spravni", "expect_work": "250/2016 Sb.", "expect_ref": "§ 35"}
+{"q": "Za jak dlouho se přestupek promlčí?", "area": "spravni", "expect_work": "250/2016 Sb.", "expect_ref": "§ 30"}
+{"q": "Kdy může úřad zpracovávat osobní údaje bez souhlasu?", "area": "osobni_udaje", "expect_work": "110/2019 Sb.", "expect_ref": "§ 5"}
+{"q": "Jaké jsou sazby DPH?", "area": "danove", "expect_work": "235/2004 Sb.", "expect_ref": "§ 47"}
+{"q": "Co musí obsahovat faktura jako daňový doklad?", "area": "danove", "expect_work": "235/2004 Sb.", "expect_ref": "§ 29"}
+{"q": "Kdy vzniká povinnost odvést DPH při dodání zboží?", "area": "danove", "expect_work": "235/2004 Sb.", "expect_ref": "§ 21"}
+{"q": "Kdo může navrhnout oddlužení?", "area": "insolvence", "expect_work": "182/2006 Sb.", "expect_ref": "§ 389"}
+{"q": "Právo na zachování lidské důstojnosti a dobré pověsti", "area": "ustavni", "expect_work": "2/1993 Sb.", "expect_ref": "čl. 10"}
+{"q": "Je Česká republika právní stát?", "area": "ustavni", "expect_work": "1/1993 Sb.", "expect_ref": "čl. 1"}
+{"q": "Jaké zákony máš k pracovnímu právu?", "area": "pracovni", "catalog": true, "expect_group": "pracovni_socialni"}
+{"q": "Které trestní předpisy znáš?", "area": "trestni", "catalog": true, "expect_group": "trestni"}

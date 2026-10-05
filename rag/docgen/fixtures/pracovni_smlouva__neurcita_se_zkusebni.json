@@ -1,0 +1,21 @@
+{
+  "_popis": "Poměr na dobu neurčitou, měsíční mzda, čtyřměsíční zkušební doba na hranici § 35.",
+  "_k_datu": "2026-09-28",
+  "zamestnavatel_jmeno": "Ol1n Studio s.r.o.",
+  "zamestnavatel_identifikace": "IČO 12345678",
+  "zamestnavatel_adresa": "Nádražní 5, 602 00 Brno",
+  "zamestnanec_jmeno": "Eva Horáková",
+  "zamestnanec_identifikace": "nar. 2. 2. 1988",
+  "zamestnanec_adresa": "Luční 1480/6, 616 00 Brno",
+  "druh_prace": "programátorka — vývoj webových aplikací",
+  "misto_vykonu": "Nádražní 5, 602 00 Brno",
+  "den_nastupu": "2026-11-02",
+  "doba_pomeru": "neurcita",
+  "je_vedouci": "ne",
+  "zkusebni_doba_mesice": 4,
+  "tydenni_doba": 40,
+  "mzda_forma": "mesicni",
+  "mzda": 78000,
+  "dovolena_tydny": 5,
+  "bankovni_ucet": "1029384756/0300"
+}

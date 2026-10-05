@@ -1,0 +1,18 @@
+{
+  "_popis": "Konzultace na dobu určitou, hodinová odměna, bez licence a plné moci.",
+  "_k_datu": "2026-09-28",
+  "poskytovatel_jmeno": "Ing. Tomáš Beran",
+  "poskytovatel_identifikace": "IČO 87651234",
+  "poskytovatel_adresa": "Sokolská 18, 120 00 Praha 2",
+  "klient_jmeno": "DataMost a.s.",
+  "klient_identifikace": "IČO 29876543",
+  "klient_adresa": "Pobřežní 22, 186 00 Praha 8",
+  "sluzby": "konzultace k návrhu datové architektury a revize stávajících ETL procesů, účast na projektových schůzkách, písemná doporučení k jednotlivým tématům",
+  "doba": "urcita",
+  "doba_do": "2027-03-31",
+  "odmena_rezim": "hodinova",
+  "odmena": 1800,
+  "splatnost_dni": 21,
+  "bankovni_ucet": "2801234567/2010",
+  "mlcenlivost_mesice": 36
+}

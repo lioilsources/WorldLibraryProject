@@ -1,0 +1,16 @@
+{
+  "_popis": "Výpověď od zaměstnavatele pro nadbytečnost podle § 52 písm. c) — přidá se klauzule o odstupném.",
+  "_k_datu": "2026-09-28",
+  "odesilatel_jmeno": "Ol1n Studio s.r.o.",
+  "odesilatel_identifikace": "IČO 12345678",
+  "odesilatel_adresa": "Nádražní 5, 602 00 Brno",
+  "adresat_jmeno": "Tomáš Beran",
+  "adresat_identifikace": "nar. 9. 7. 2001",
+  "adresat_adresa": "Sokolská 18, 120 00 Praha 2",
+  "kdo": "zamestnavatel",
+  "druh_prace": "korektor textů",
+  "den_nastupu": "2023-09-01",
+  "datum_doruceni": "2026-09-30",
+  "duvod_pismeno": "c",
+  "duvod_skutkove": "rozhodnutím jednatele ze dne 15. 9. 2026 o organizační změně se ruší pozice korektora textů s účinností od 1. 11. 2026; korektury budou zajišťovány externě, takže zaměstnanec se stal nadbytečným. Jiná práce odpovídající jeho kvalifikaci u zaměstnavatele není."
+}

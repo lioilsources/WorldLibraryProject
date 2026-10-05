@@ -1,0 +1,20 @@
+{
+  "_popis": "Nestavební dílo s pevnou cenou, zálohou a součinností objednatele.",
+  "_k_datu": "2026-09-28",
+  "zhotovitel_jmeno": "Ol1n Studio s.r.o.",
+  "zhotovitel_identifikace": "IČO 12345678",
+  "zhotovitel_adresa": "Nádražní 5, 602 00 Brno",
+  "objednatel_jmeno": "Květinářství U Tří růží s.r.o.",
+  "objednatel_identifikace": "IČO 45678912",
+  "objednatel_adresa": "Masarykova 8, 602 00 Brno",
+  "dilo": "návrh a výroba firemní webové prezentace na pěti stranách včetně redakčního systému, nasazení na hosting objednatele a zaškolení dvou osob; účelem je prezentace nabídky a přijímání objednávek e-mailem",
+  "misto_provedeni": "sídlo zhotovitele; nasazení na hosting objednatele",
+  "termin_dokonceni": "2026-12-15",
+  "cena": 84000,
+  "cena_rezim": "pevna",
+  "zaloha": 25000,
+  "splatnost_dni": 14,
+  "bankovni_ucet": "1029384756/0300",
+  "soucinnost": "dodání textů a fotografií do 15. 10. 2026, přístup k hostingu a k domény, schválení grafického návrhu do pěti pracovních dnů",
+  "je_stavba_rezim": "bez_stavby"
+}

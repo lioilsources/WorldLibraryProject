@@ -1,0 +1,368 @@
+# Nájemní smlouva k bytu. Klauzule odvozené z účinného znění OZ v právním indexu
+# (kolekce law_v1, znění k 2026-09), ne z cizích vzorů — viz sources.yaml.
+# Pozor na § 2235 odst. 1: k ujednáním, která zkracují nájemcova práva podle
+# pododdílu o nájmu bytu, se nepřihlíží. Šablona proto zákon nepřepisuje ve
+# prospěch pronajímatele; kde zákon dává nájemci právo, klauzule to jen potvrzuje.
+typ: najemni_smlouva_byt
+nazev: Nájemní smlouva (byt)
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Nájem bytu k zajištění bytových potřeb nájemce. Nepoužívat na rekreaci a jiný
+  zjevně krátkodobý účel — tam se pododdíl o nájmu bytu nepoužije (§ 2235 odst. 2).
+forma:
+  pisemna: true
+  zaklad: {zakon: "89/2012 Sb.", par: "§ 2237", poznamka: "pronajímatel nemůže namítnout neplatnost pro nedostatek formy"}
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 2235 a násl.", poznamka: "nájem bytu a nájem domu"}
+
+strany:
+  - {role: pronajimatel, nazev: Pronajímatel, typ: [fyzicka, pravnicka]}
+  - {role: najemce, nazev: Nájemce, typ: [fyzicka]}
+
+promenne:
+  - {id: pronajimatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma pronajímatele?"}
+  - {id: pronajimatel_identifikace, typ: string, povinna: true, otazka: "Datum narození, nebo IČO pronajímatele?"}
+  - {id: pronajimatel_adresa, typ: string, povinna: true, otazka: "Adresa pronajímatele?"}
+  - {id: najemce_jmeno, typ: string, povinna: true, otazka: "Jméno nájemce?"}
+  - {id: najemce_identifikace, typ: string, povinna: true, otazka: "Datum narození nájemce?"}
+  - {id: najemce_adresa, typ: string, povinna: true, otazka: "Adresa nájemce (doručovací)?"}
+
+  - id: adresa_bytu
+    typ: string
+    povinna: true
+    otazka: "Označení bytu a adresa domu — bez slova „byt“, to už v textu je?"
+    napoveda: "Např. „č. 7 ve 3. podlaží domu Luční 1480/6, 616 00 Brno“. Byt musí být určen jednoznačně — místnost nebo soubor místností tvořících obytný prostor."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2236"}
+  - {id: vymera, typ: int, povinna: true, otazka: "Výměra bytu v m²?"}
+  - {id: prislusenstvi, typ: text, povinna: false, otazka: "Co k bytu patří (sklep, garážové stání, vybavení)?"}
+  - {id: den_predani, typ: date, povinna: true, otazka: "Kdy byt předáte nájemci?"}
+
+  - id: doba
+    typ: enum
+    hodnoty: [urcita, neurcita]
+    povinna: true
+    otazka: "Nájem na dobu určitou, nebo neurčitou?"
+  - id: doba_do
+    typ: date
+    povinna: false
+    otazka: "Do kdy nájem trvá (jen u doby určité)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2285", poznamka: "pokračování v užívání po skončení doby určité"}
+
+  - id: najemne
+    typ: money
+    povinna: true
+    otazka: "Měsíční nájemné v Kč?"
+    napoveda: "Zákon chce pevnou částku; není-li ujednána, platí obvyklé nájemné v místě."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2246"}
+  - id: splatnost_den
+    typ: int
+    povinna: true
+    otazka: "Do kolikátého dne v měsíci se nájemné platí?"
+    napoveda: "Bez ujednání platí pátý den platebního období; sjednat lze jen den pozdější."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2251"}
+  - {id: zaloha_sluzby, typ: money, povinna: true, otazka: "Měsíční záloha na služby v Kč?"}
+  - id: sluzby_vecet
+    typ: text
+    povinna: true
+    otazka: "Které služby zajišťuje pronajímatel?"
+    napoveda: "Bez ujednání platí nezbytné služby: voda, odpadní vody, teplo, odvoz odpadu, osvětlení a úklid společných částí, příjem vysílání, komíny, výtah."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2247"}
+
+  - id: jistota
+    typ: money
+    povinna: false
+    otazka: "Jistota (kauce) v Kč, pokud ji chcete?"
+    napoveda: "Jistota a smluvní pokuta smí v souhrnu činit nejvýš trojnásobek měsíčního nájemného."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2254"}
+  - id: smluvni_pokuta
+    typ: money
+    povinna: false
+    otazka: "Smluvní pokuta za porušení povinností z nájmu v Kč, pokud ji chcete?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2254"}
+
+  - {id: chov_zvirat, typ: bool, povinna: false, otazka: "Chcete v dokumentu výslovně zmínit chov zvířat?"}
+  - id: souhlas_s_novymi_cleny
+    typ: bool
+    povinna: false
+    otazka: "Chce si pronajímatel vyhradit souhlas s přijetím nového člena domácnosti (mimo osoby blízké)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2272"}
+  - {id: bankovni_ucet, typ: string, povinna: true, otazka: "Číslo účtu pronajímatele pro platby?"}
+
+kontroly:
+  - vyraz: "jistota + smluvni_pokuta <= 3 * najemne"
+    zprava: "Jistota a právo na smluvní pokutu smí v souhrnu činit nejvýš trojnásobek měsíčního nájemného."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2254"}
+  - vyraz: "splatnost_den >= 5"
+    zprava: "Dříve než k pátému dni platebního období nájemné splatné být nemůže; sjednat lze jen den pozdější."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2251"}
+  - vyraz: "doba == 'neurcita' or doba_do != null"
+    zprava: "U nájmu na dobu určitou chybí datum, do kterého nájem trvá."
+  - vyraz: "vymera > 0"
+    zprava: "Výměra bytu musí být větší než nula."
+
+klauzule:
+  - id: predmet
+    nazev: Předmět nájmu
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2235"}
+      - {zakon: "89/2012 Sb.", par: "§ 2236"}
+    text: |
+      Pronajímatel přenechává nájemci k zajištění jeho bytových potřeb do užívání byt
+      {{ adresa_bytu }} o výměře {{ vymera|cislo }} m² (dále jen „byt“) a nájemce se
+      zavazuje platit za to nájemné a úhrady podle této smlouvy.
+
+      Byt bude nájemci předán dne {{ den_predani|datum }}. O stavu bytu při předání
+      sepíší strany zápis s popisem bytu a stavem měřidel; k tomuto zápisu se přihlédne
+      i při odevzdání bytu při skončení nájmu.
+
+  - id: prislusenstvi
+    nazev: Příslušenství a vybavení
+    povinna: false
+    podminka: "prislusenstvi != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2236"}
+    text: |
+      Spolu s bytem se nájemci přenechává: {{ prislusenstvi }}.
+
+  - id: doba_najmu
+    nazev: Doba nájmu
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2285"}
+    varianty:
+      podle: doba
+      hodnoty:
+        urcita: |
+          Nájem se sjednává na dobu určitou do {{ doba_do|datum }}.
+
+          Bude-li nájemce pokračovat v užívání bytu alespoň tři měsíce po dni, kdy měl nájem
+          skončit, a pronajímatel jej v této době nevyzve, aby byt opustil, platí, že nájem
+          byl znovu sjednán na tutéž dobu, na jakou byl sjednán dříve, nejvýše však na dva roky.
+        neurcita: |
+          Nájem se sjednává na dobu neurčitou a začíná dnem předání bytu.
+
+  - id: najemne
+    nazev: Nájemné
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2246"}
+      - {zakon: "89/2012 Sb.", par: "§ 2251"}
+    text: |
+      Nájemné činí {{ najemne|kc }} za jeden kalendářní měsíc.
+
+      Nájemné platí nájemce předem na každý měsíc, nejpozději do {{ splatnost_den|cislo }}. dne
+      příslušného platebního období, na účet pronajímatele č. {{ bankovni_ucet }}.
+
+      Pronajímatel nesmí po nájemci požadovat jiná plnění než nájemné a zálohy nebo náklady
+      na služby podle článku o službách, a to ani ve formě vkladu nebo platby nájemného
+      později datovaným šekem či jiným obdobným způsobem.
+
+  - id: sluzby
+    nazev: Služby a jejich úhrada
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2247"}
+    text: |
+      Pronajímatel po dobu nájmu zajistí tyto služby spojené s užíváním bytu:
+      {{ sluzby_vecet }}.
+
+      Na tyto služby platí nájemce společně s nájemným měsíční zálohu ve výši
+      {{ zaloha_sluzby|kc }}. Neujednají-li strany jinak, zajistí pronajímatel nezbytné
+      služby, jimiž se rozumí dodávky vody, odvoz a odvádění odpadních vod, dodávky tepla,
+      odvoz komunálního odpadu, osvětlení a úklid společných částí domu, zajištění příjmu
+      rozhlasového a televizního vysílání, provoz a čištění komínů a provoz výtahu.
+
+      Způsob rozúčtování a vyúčtování záloh na služby se řídí právním předpisem
+      upravujícím služby spojené s užíváním bytů.
+    poznamka: >-
+      Rozúčtování a vyúčtování služeb upravuje zákon č. 67/2013 Sb., který v právním indexu
+      (vrstva 1) není — proto na něj klauzule odkazuje obecně a checklist žádá ruční kontrolu.
+
+  - id: jistota
+    nazev: Jistota
+    povinna: false
+    podminka: "jistota != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2254"}
+    text: |
+      Nájemce dá pronajímateli při předání bytu peněžitou jistotu ve výši {{ jistota|kc }} na to,
+      že zaplatí nájemné a splní jiné povinnosti vyplývající z nájmu.
+
+      Při skončení nájmu pronajímatel jistotu nájemci vrátí; započte si přitom, co mu nájemce
+      z nájmu dluží. Nájemce má právo na úroky z jistoty od jejího poskytnutí alespoň ve výši
+      zákonné sazby.
+
+  - id: smluvni_pokuta
+    nazev: Smluvní pokuta
+    povinna: false
+    podminka: "smluvni_pokuta != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2254"}
+    text: |
+      Poruší-li nájemce povinnost vyplývající z nájmu, zaplatí pronajímateli smluvní pokutu
+      ve výši {{ smluvni_pokuta|kc }}. Jistota a právo na zaplacení smluvní pokuty nesmí
+      v souhrnu přesáhnout trojnásobek měsíčního nájemného; v rozsahu přesahujícím tento
+      souhrn se k ujednání nepřihlíží.
+
+  - id: prava_povinnosti
+    nazev: Práva a povinnosti stran
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2255"}
+      - {zakon: "89/2012 Sb.", par: "§ 2257"}
+      - {zakon: "89/2012 Sb.", par: "§ 2259"}
+    text: |
+      Nájemce užívá byt řádně v souladu s touto smlouvou. Nezpůsobí-li to zvýšené zatížení
+      pro byt nebo dům, může nájemce v bytě také pracovat nebo podnikat.
+
+      Pronajímatel udržuje po dobu nájmu byt a dům ve stavu způsobilém k užívání. Nájemce
+      provádí a hradí pouze běžnou údržbu a drobné opravy související s užíváním bytu.
+
+      Úpravu, přestavbu nebo jinou změnu bytu nebo domu je nájemce povinen strpět jen tehdy,
+      nesníží-li se tím hodnota bydlení a lze-li ji provést bez většího nepohodlí pro nájemce,
+      anebo provádí-li ji pronajímatel na příkaz orgánu veřejné moci či hrozí-li zvlášť
+      závažná újma. V ostatních případech je ke změně potřeba souhlas nájemce.
+
+  - id: zvirata
+    nazev: Chov zvířat
+    povinna: false
+    podminka: "chov_zvirat == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2258"}
+    text: |
+      Nájemce má právo chovat v bytě zvíře, nepůsobí-li chov pronajímateli nebo ostatním
+      obyvatelům domu obtíže nepřiměřené poměrům v domě. Vyvolá-li chov zvířete potřebu
+      zvýšených nákladů na údržbu společných částí domu, nahradí nájemce tyto náklady
+      pronajímateli.
+
+  - id: clenove_domacnosti
+    nazev: Členové domácnosti nájemce
+    povinna: false
+    podminka: "souhlas_s_novymi_cleny == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2272"}
+    text: |
+      Pronajímatel si vyhrazuje souhlas s přijetím nového člena do nájemcovy domácnosti.
+      To neplatí, jde-li o osobu nájemci blízkou nebo o další případy zvláštního zřetele hodné.
+
+      Přijme-li nájemce nového člena domácnosti, oznámí zvýšení počtu osob žijících v bytě
+      pronajímateli bez zbytečného odkladu, nejpozději do dvou měsíců od změny.
+
+  - id: podnajem
+    nazev: Podnájem
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2275"}
+    text: |
+      Nebydlí-li nájemce v bytě sám trvale, může dát byt nebo jeho část do podnájmu třetí
+      osobě pouze se souhlasem pronajímatele. Žádost o souhlas i souhlas pronajímatele
+      vyžadují písemnou formu.
+
+  - id: vypoved
+    nazev: Skončení nájmu výpovědí
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2286"}
+      - {zakon: "89/2012 Sb.", par: "§ 2287"}
+      - {zakon: "89/2012 Sb.", par: "§ 2288"}
+      - {zakon: "89/2012 Sb.", par: "§ 2291"}
+    varianty:
+      podle: doba
+      hodnoty:
+        urcita: |
+          Výpověď nájmu vyžaduje písemnou formu a musí dojít druhé straně. Výpovědní doba běží
+          od prvního dne kalendářního měsíce následujícího po dni, kdy výpověď došla druhé straně.
+
+          Pronajímatel může nájem vypovědět v tříměsíční výpovědní době z důvodů, které stanoví
+          zákon; ve výpovědi poučí nájemce o jeho právu vznést proti výpovědi námitky a navrhnout
+          soudu přezkoumání její oprávněnosti, jinak je výpověď neplatná.
+
+          Nájemce může nájem na dobu určitou vypovědět, změní-li se okolnosti, z nichž strany při
+          vzniku závazku zřejmě vycházely, do té míry, že po nájemci nelze rozumně požadovat,
+          aby v nájmu pokračoval.
+
+          Poruší-li nájemce svou povinnost zvlášť závažným způsobem, má pronajímatel právo
+          vypovědět nájem bez výpovědní doby.
+        neurcita: |
+          Výpověď nájmu vyžaduje písemnou formu a musí dojít druhé straně. Výpovědní doba běží
+          od prvního dne kalendářního měsíce následujícího po dni, kdy výpověď došla druhé straně.
+
+          Nájemce může nájem na dobu neurčitou vypovědět v tříměsíční výpovědní době.
+
+          Pronajímatel může nájem vypovědět v tříměsíční výpovědní době z důvodů, které stanoví
+          zákon; ve výpovědi poučí nájemce o jeho právu vznést proti výpovědi námitky a navrhnout
+          soudu přezkoumání její oprávněnosti, jinak je výpověď neplatná.
+
+          Poruší-li nájemce svou povinnost zvlášť závažným způsobem, má pronajímatel právo
+          vypovědět nájem bez výpovědní doby.
+
+  - id: odevzdani
+    nazev: Odevzdání bytu
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2225"}
+      - {zakon: "89/2012 Sb.", par: "§ 2292"}
+      - {zakon: "89/2012 Sb.", par: "§ 2296"}
+    text: |
+      Nájemce odevzdá byt pronajímateli v den, kdy nájem končí. Byt je odevzdán, obdrží-li
+      pronajímatel klíče a jinak mu nic nebrání v přístupu do bytu a v jeho užívání.
+
+      Byt se odevzdává ve stavu, v jakém byl při jeho převzetí, s přihlédnutím k obvyklému
+      opotřebení při řádném užívání a k zápisu sepsanému při předání. Nájemce si při odevzdání
+      oddělí a vezme vše, co do bytu vložil vlastním nákladem, je-li to možné a nezhorší-li
+      se tím podstata bytu.
+
+      Zůstane-li v bytě věc nájemce nebo člena jeho domácnosti, postará se o ni pronajímatel
+      ve prospěch nájemce a na jeho účet.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2237"}
+      - {zakon: "89/2012 Sb.", par: "§ 2235"}
+    text: |
+      Tato smlouva je uzavřena v písemné formě ve dvou vyhotoveních; každá strana obdrží jedno.
+
+      K ujednáním, která zkracují práva nájemce podle ustanovení o nájmu bytu, se nepřihlíží.
+      Není-li v této smlouvě něco ujednáno, platí zákon.
+
+      Smlouva nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Obě strany jsou identifikované — jméno, datum narození nebo IČO, adresa"}
+  - {bod: "Byt je určen jednoznačně (adresa, číslo bytu, výměra)", zaklad: {zakon: "89/2012 Sb.", par: "§ 2236"}}
+  - {bod: "Nájemné je sjednáno pevnou částkou za měsíc", zaklad: {zakon: "89/2012 Sb.", par: "§ 2246"}}
+  - {bod: "Splatnost nájemného není dřív než pátý den platebního období", zaklad: {zakon: "89/2012 Sb.", par: "§ 2251"}}
+  - {bod: "Jistota a smluvní pokuta v souhrnu nepřesahují trojnásobek nájemného", zaklad: {zakon: "89/2012 Sb.", par: "§ 2254"}}
+  - {bod: "Je uvedeno, které služby zajišťuje pronajímatel", zaklad: {zakon: "89/2012 Sb.", par: "§ 2247"}}
+  - {bod: "U nájmu na dobu určitou je uveden den, do kterého trvá"}
+  - {bod: "Výpověď pronajímatele obsahuje poučení nájemce o námitkách a o soudním přezkumu", zaklad: {zakon: "89/2012 Sb.", par: "§ 2286"}}
+  - {bod: "Smlouva je písemná a podepsaná oběma stranami", zaklad: {zakon: "89/2012 Sb.", par: "§ 2237"}}
+  - {bod: "Sepsán zápis o stavu bytu a měřidel při předání", zaklad: {zakon: "89/2012 Sb.", par: "§ 2225"}}
+  - {bod: "Rozúčtování a vyúčtování služeb zkontrolovat podle zákona č. 67/2013 Sb. — ten v právním indexu není, ověřit ručně"}
+
+upozorneni:
+  - text: >-
+      Smluvní pokuta u nájmu bytu zakázaná není, ale jistota a právo na její zaplacení smí
+      v souhrnu činit nejvýš trojnásobek měsíčního nájemného. Výše než to se nepřihlíží.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2254"}
+  - text: >-
+      K ujednání, které nájemci ukládá povinnost vzhledem k okolnostem zjevně nepřiměřenou,
+      se nepřihlíží.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2239"}
+  - text: >-
+      K ujednáním zkracujícím nájemcova práva podle pododdílu o nájmu bytu se nepřihlíží —
+      vlastní klauzule ve prospěch pronajímatele nad rámec zákona tedy nemají účinek.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2235"}
+  - text: >-
+      Pronajímatel nesmí požadovat jiná plnění než nájemné a zálohy či náklady na služby.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2251"}
+  - text: >-
+      Zakáže-li smlouva nájemci chovat zvíře nebo přijímat členy domácnosti, jde o zkrácení
+      jeho zákonných práv a k takovému ujednání se nepřihlíží.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2258"}

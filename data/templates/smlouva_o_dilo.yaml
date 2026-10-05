@@ -1,0 +1,231 @@
+# Smlouva o dílo. Dílem je zhotovení věci, nespadá-li pod kupní smlouvu, a dále
+# údržba, oprava, úprava věci nebo činnost s jiným výsledkem (§ 2587); u stavby
+# je to vždy dílo. Cena má čtyři režimy, které se právně chovají různě — proto
+# varianty podle `cena_rezim`, ne jedna klauzule:
+#  * pevná cena;  * závazný rozpočet;  * rozpočet s výhradou (§ 2622);
+#  * cena určená odhadem (§ 2612 — podstatné překročení je nutné oznámit).
+typ: smlouva_o_dilo
+nazev: Smlouva o dílo
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Zhotovení, úprava nebo oprava věci a činnost s jiným výsledkem. U stavby počítej
+  s pětiletou lhůtou pro skryté vady (§ 2629), ne dvouletou.
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 2586 a násl.", poznamka: "smlouva o dílo"}
+
+strany:
+  - {role: zhotovitel, nazev: Zhotovitel, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: objednatel, nazev: Objednatel, typ: [fyzicka, pravnicka, spotrebitel]}
+
+promenne:
+  - {id: zhotovitel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma zhotovitele?"}
+  - {id: zhotovitel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození zhotovitele?"}
+  - {id: zhotovitel_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo zhotovitele?"}
+  - {id: objednatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma objednatele?"}
+  - {id: objednatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození objednatele?"}
+  - {id: objednatel_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo objednatele?"}
+
+  - id: dilo
+    typ: text
+    povinna: true
+    otazka: "Co je dílem? Popiš rozsah a výsledek co nejkonkrétněji."
+    napoveda: "Dílo je dokončeno, je-li předvedena jeho způsobilost sloužit svému účelu — popis účelu proto do smlouvy patří."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2587"}
+  - {id: misto_provedeni, typ: string, povinna: true, otazka: "Kde se dílo provádí?"}
+  - {id: termin_dokonceni, typ: date, povinna: true, otazka: "Do kdy má být dílo dokončeno?"}
+  - id: cena
+    typ: money
+    povinna: true
+    otazka: "Cena za dílo v Kč?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2610"}
+  - id: cena_rezim
+    typ: enum
+    hodnoty: [pevna, rozpocet_zavazny, rozpocet_s_vyhradou, odhadem]
+    povinna: true
+    otazka: "Je cena pevná, podle závazného rozpočtu, podle rozpočtu s výhradou, nebo určená odhadem?"
+    napoveda: "U odhadu musí zhotovitel podstatné překročení oznámit; u rozpočtu s výhradou lze žádat zvýšení jen za podmínek § 2622."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2612"}
+  - {id: zaloha, typ: money, povinna: false, otazka: "Záloha v Kč, pokud se platí?"}
+  - {id: splatnost_dni, typ: int, povinna: true, otazka: "Za kolik dnů od předání je cena splatná?"}
+  - {id: bankovni_ucet, typ: string, povinna: true, otazka: "Číslo účtu zhotovitele?"}
+  - id: soucinnost
+    typ: text
+    povinna: false
+    otazka: "Jakou součinnost musí objednatel poskytnout (podklady, přístup, schválení)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2591"}
+  - id: je_stavba_rezim
+    typ: enum
+    hodnoty: [bez_stavby, stavba]
+    povinna: true
+    otazka: "Jde o stavbu nebo její část, nebo o jiné dílo?"
+    napoveda: "U stavby platí pro skryté vady pětiletá lhůta místo dvouleté."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2629"}
+
+kontroly:
+  - vyraz: "cena > 0"
+    zprava: "Cena za dílo musí být větší než nula."
+  - vyraz: "splatnost_dni >= 1"
+    zprava: "Splatnost musí být alespoň jeden den od předání."
+  - vyraz: "zaloha <= cena"
+    zprava: "Záloha nemůže být vyšší než celá cena díla."
+
+klauzule:
+  - id: predmet
+    nazev: Předmět díla
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2586"}
+      - {zakon: "89/2012 Sb.", par: "§ 2587"}
+    text: |
+      Zhotovitel se zavazuje provést na svůj náklad a nebezpečí pro objednatele toto dílo:
+      {{ dilo }} (dále jen „dílo“). Objednatel se zavazuje dílo převzít a zaplatit cenu.
+
+      Místem provedení díla je {{ misto_provedeni }}.
+
+  - id: doba
+    nazev: Doba provedení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2604"}
+    text: |
+      Zhotovitel provede dílo nejpozději do {{ termin_dokonceni|datum }}. Dílo je provedeno,
+      je-li dokončeno a předáno.
+
+  - id: soucinnost
+    nazev: Součinnost objednatele
+    povinna: false
+    podminka: "soucinnost != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2591"}
+    text: |
+      Objednatel poskytne zhotoviteli tuto součinnost: {{ soucinnost }}.
+
+      Je-li k provedení díla součinnost objednatele nutná a objednatel ji neposkytne
+      v přiměřené lhůtě, kterou mu zhotovitel určí, může zhotovitel podle své volby zajistit
+      náhradní plnění na účet objednatele, anebo od smlouvy odstoupit.
+
+  - id: cena
+    nazev: Cena za dílo
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2610"}
+      - {zakon: "89/2012 Sb.", par: "§ 2612"}
+      - {zakon: "89/2012 Sb.", par: "§ 2622"}
+    varianty:
+      podle: cena_rezim
+      hodnoty:
+        pevna: |
+          Cena za dílo se sjednává pevnou částkou {{ cena|kc }}. Cenu nelze jednostranně
+          zvýšit; změna vyžaduje písemný dodatek.
+        rozpocet_zavazny: |
+          Cena za dílo činí {{ cena|kc }} podle rozpočtu, který strany prohlašují za závazný
+          a úplný. Zhotovitel nemá právo požadovat zvýšení ceny proto, že si dílo vyžádalo
+          vyšší úsilí nebo náklady, než se předpokládalo.
+        rozpocet_s_vyhradou: |
+          Cena za dílo činí {{ cena|kc }} podle rozpočtu daného s výhradou, že se nezaručuje
+          jeho úplnost. Objeví-li se potřeba činností do rozpočtu nezahrnutých, může
+          zhotovitel požadovat zvýšení ceny za podmínek stanovených zákonem; takové činnosti
+          i jejich cenu oznámí objednateli bez zbytečného odkladu, jinak právo na zvýšení
+          ceny nemá.
+        odhadem: |
+          Cena za dílo je určena odhadem ve výši {{ cena|kc }}. Zjistí-li zhotovitel po uzavření
+          smlouvy, že cenu bude třeba podstatně překročit, oznámí to objednateli bez zbytečného
+          odkladu s odůvodněným určením nové ceny; neučiní-li to bez zbytečného odkladu poté,
+          co potřebu zvýšení zjistil nebo zjistit měl, nemá právo na zaplacení rozdílu v ceně.
+
+  - id: platba
+    nazev: Platební podmínky
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2610"}
+    text: |
+      Právo na zaplacení ceny díla vzniká provedením díla. Cena je splatná do
+      {{ splatnost_dni|cislo }} dnů od předání díla na účet zhotovitele č. {{ bankovni_ucet }}.
+
+  - id: zaloha
+    nazev: Záloha
+    povinna: false
+    podminka: "zaloha != null"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2611"}
+    text: |
+      Objednatel zaplatí zhotoviteli zálohu ve výši {{ zaloha|kc }} před započetím prací.
+      Záloha se zúčtuje na cenu díla.
+
+  - id: predani
+    nazev: Předání a převzetí díla
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2605"}
+    text: |
+      Dílo je dokončeno, je-li předvedena jeho způsobilost sloužit svému účelu. Objednatel
+      převezme dokončené dílo s výhradami, nebo bez výhrad; o předání sepíší strany zápis.
+
+      Převezme-li objednatel dílo bez výhrad, nemusí mu soud později přiznat právo ze zjevné
+      vady díla — vady zjistitelné při převzetí je proto třeba uvést do zápisu.
+
+  - id: vady
+    nazev: Vady díla
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2615"}
+      - {zakon: "89/2012 Sb.", par: "§ 2617"}
+      - {zakon: "89/2012 Sb.", par: "§ 2618"}
+    varianty:
+      podle: je_stavba_rezim
+      hodnoty:
+        bez_stavby: |
+          Dílo má vadu, neodpovídá-li smlouvě. O právech objednatele z vadného plnění platí
+          obdobně ustanovení o kupní smlouvě.
+
+          Objednatel oznámí vady díla bez zbytečného odkladu poté, kdy je zjistil nebo při
+          náležité pozornosti zjistit měl, nejpozději však do dvou let od předání díla; jinak
+          mu soud právo z vadného plnění nemusí přiznat.
+        stavba: |
+          Dílo má vadu, neodpovídá-li smlouvě. O právech objednatele z vadného plnění platí
+          obdobně ustanovení o kupní smlouvě.
+
+          Objednatel oznámí vady díla bez zbytečného odkladu poté, kdy je zjistil nebo při
+          náležité pozornosti zjistit měl. U skryté vady stavby může objednatel právo uplatnit
+          nejpozději do pěti let od převzetí stavby.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2586"}
+    text: |
+      Smlouva je vyhotovena ve dvou vyhotoveních; každá strana obdrží jedno. Není-li v ní
+      něco ujednáno, platí občanský zákoník.
+
+      Smlouva nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Dílo je popsané včetně účelu, kterému má sloužit", zaklad: {zakon: "89/2012 Sb.", par: "§ 2605"}}
+  - {bod: "Termín dokončení je uvedený", zaklad: {zakon: "89/2012 Sb.", par: "§ 2604"}}
+  - {bod: "Je jasné, v jakém režimu je cena (pevná / rozpočet / odhad)", zaklad: {zakon: "89/2012 Sb.", par: "§ 2612"}}
+  - {bod: "Součinnost objednatele je popsaná, je-li pro dílo nutná", zaklad: {zakon: "89/2012 Sb.", par: "§ 2591"}}
+  - {bod: "Sjednán zápis o předání, kam se píšou výhrady a zjevné vady", zaklad: {zakon: "89/2012 Sb.", par: "§ 2605"}}
+  - {bod: "U stavby počítáno s pětiletou lhůtou pro skryté vady", zaklad: {zakon: "89/2012 Sb.", par: "§ 2629"}}
+  - {bod: "Je-li objednatelem spotřebitel, zkontrolovat, že smlouva nezkracuje jeho práva z vad", zaklad: {zakon: "89/2012 Sb.", par: "§ 2615"}}
+
+upozorneni:
+  - text: >-
+      Převzetí díla bez výhrad může objednatele připravit o právo ze zjevných vad — výhrady
+      patří do zápisu o předání.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2605"}
+  - text: >-
+      U ceny určené odhadem platí: neoznámí-li zhotovitel podstatné překročení bez zbytečného
+      odkladu, nemá právo na zaplacení rozdílu v ceně.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2612"}
+  - text: >-
+      Zmaří-li objednatel provedení díla z důvodu, za nějž odpovídá, náleží zhotoviteli cena
+      snížená o to, co neprovedením díla ušetřil.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2613"}
+  - text: >-
+      Nepřevezme-li objednatel věc, která je předmětem díla, bez zbytečného odkladu, může ji
+      zhotovitel po splnění zákonných podmínek na jeho účet prodat.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2609"}

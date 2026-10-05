@@ -1,0 +1,19 @@
+{
+  "_popis": "Nájem na dobu neurčitou, bez jistoty, pokuty i volitelných klauzulí — kontrola, že povinné minimum drží samo.",
+  "_k_datu": "2026-09-28",
+  "pronajimatel_jmeno": "Bytový dům Luční, s.r.o.",
+  "pronajimatel_identifikace": "IČO 09876543",
+  "pronajimatel_adresa": "Luční 1480/6, 616 00 Brno",
+  "najemce_jmeno": "Eva Horáková",
+  "najemce_identifikace": "nar. 2. 2. 1988",
+  "najemce_adresa": "Luční 1480/6, 616 00 Brno",
+  "adresa_bytu": "č. 2 v 1. podlaží domu Luční 1480/6, 616 00 Brno-Žabovřesky",
+  "vymera": 41,
+  "den_predani": "2026-11-01",
+  "doba": "neurcita",
+  "najemne": 12000,
+  "splatnost_den": 5,
+  "zaloha_sluzby": 2500,
+  "sluzby_vecet": "dodávky vody a odvádění odpadních vod, dodávky tepla, odvoz komunálního odpadu, osvětlení a úklid společných částí domu",
+  "bankovni_ucet": "2801234567/2010"
+}

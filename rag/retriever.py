@@ -16,9 +16,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from cite import ref_span
 from embeddings import format_query
 from hybrid import dedup_passages, rrf
-from pg_search import fts_cs, fts_orig, hydrate, known_groups, neighbors, query_terms
+from pg_search import fts_cs, fts_orig, hydrate, known_groups, neighbors, query_terms, sibling_sections
 from retrieval import diversify, looks_tabular, route, route_groups
 
 
@@ -43,7 +44,8 @@ class Retriever:
     def __init__(self, *, orig, gloss, pool, embedder, embed_model: str, alias_index,
                  channels=("vec", "gloss", "fts", "fts_cs"), candidate_factor: int = 4,
                  max_per_work: int = 2, rrf_k: int = 60, weights=None, no_routing: bool = False,
-                 context_window: int = 0, legacy_to_id: dict[str, str] | None = None):
+                 context_window: int = 0, legacy_to_id: dict[str, str] | None = None,
+                 sibling_window: int = 0, sibling_top: int = 3, terms_map=None):
         self.orig = orig            # Chroma kolekce pasáží (books_v2)
         self.gloss = gloss          # Chroma kolekce glos (books_gloss) nebo None
         self.pool = pool            # psycopg_pool.ConnectionPool
@@ -57,6 +59,12 @@ class Retriever:
         self.weights = weights or {}
         self.no_routing = no_routing
         self.context_window = context_window
+        # Právo: přilehlé § prvních `sibling_top` hitů do kontextu (viz sibling_sections).
+        # Jen několik prvních, aby prompt nenarostl osminásobkem úryvků.
+        self.sibling_window = sibling_window
+        self.sibling_top = sibling_top
+        # Mapa laických pojmů (law_terms.TermsMap) nebo None = dnešní chování
+        self.terms_map = terms_map
         # route() pracuje s dnešními jmény děl (kurátorské aliasy); filtry
         # v Chromě i PG chtějí work_id — bez převodu by směrování vracelo
         # prázdný výsledek (eval to odhalil: 17 z 23 otázek bez hitu)
@@ -78,9 +86,16 @@ class Retriever:
 
     def retrieve(self, query: str, top_k: int, plan: Plan | None = None, works_override=None):
         plan = plan or Plan()
+        # Mapa pojmů: termíny do embeddingu vždy, předpis jen jako záloha, když si
+        # ho dotaz nejmenuje sám (aliasy jsou spolehlivější než pojmová mapa).
+        embed_query, term_works = self.terms_map.expand(query) if self.terms_map else (query, [])
         works = list(works_override or plan.works)
         if not works and not self.no_routing:
             works = [self.legacy_to_id.get(w, w) for w in route(query, self.alias_index)]
+            # předpis z mapy musí jít přes katalog — překlep v yaml by jinak
+            # zúžil hledání na neexistující work_id, tj. na prázdný výsledek
+            if not works and term_works:
+                works = [self.legacy_to_id[w] for w in term_works if w in self.legacy_to_id]
         groups = plan.groups if works == [] else []
         if not works and not groups and not self.no_routing:
             groups = [g for g in route_groups(query) if g in self.known_groups]
@@ -93,7 +108,7 @@ class Retriever:
         pool_n = max(top_k, top_k * self.candidate_factor)
         rankings: dict[str, list[str]] = {}
 
-        q_emb = self._embed(query)
+        q_emb = self._embed(embed_query)
         if "vec" in self.channels:
             rankings["vec"] = self._vec(self.orig, q_emb, pool_n * 3, where)   # pasáže → chunky, proto ×3
         if "gloss" in self.channels and self.gloss is not None and self.gloss.count() > 0:
@@ -128,7 +143,11 @@ class Retriever:
                 meta = {
                     "chunk_id": cid,
                     "work": row["title"], "work_id": row["work_id"], "name_cs": row["name_cs"],
-                    "title": f"{row['title']} (část {row['seq'] + 1}/?)",
+                    # Zákon: pozice je paragraf, ne pořadí chunku — appka čte
+                    # z konce title „§ 51 odst. 1–3" stejně jako „část 30/488".
+                    "title": (f"{row['title']} ({ref_span(row['ref_start'], row['ref_end'])})"
+                              if (row.get("ref_start") or "").startswith(("§", "čl."))
+                              else f"{row['title']} (část {row['seq'] + 1}/?)"),
                     "group": row["group"], "subgroup": row["subgroup"], "lang": row["lang"],
                     "lang_original": row["lang_original"], "lang_corpus": row["lang_corpus"],
                     "author": row["author"], "author_cs": row["author_cs"], "edition": row["edition"],
@@ -145,8 +164,19 @@ class Retriever:
             if self.context_window:
                 for h in hits:
                     h["neighbors"] = neighbors(conn, h["meta"]["chunk_id"], self.context_window)
+            if self.sibling_window:
+                seen = {h["meta"].get("chapter_id") for h in hits}
+                for h in hits[: self.sibling_top]:
+                    sibs = [s for s in sibling_sections(conn, h["meta"].get("work_id"),
+                                                        h["meta"].get("chapter_id"), self.sibling_window)
+                            if s["id"] not in seen]
+                    if sibs:
+                        h["siblings"] = sibs
+                        seen.update(s["id"] for s in sibs)
 
         routed = {"works": works, "groups": groups, "channels": sorted(rankings)}
+        if embed_query != query:
+            routed["terms"] = embed_query[len(query):].strip()
         return hits, routed
 
 
@@ -163,6 +193,17 @@ def context_block(hits: list[dict]) -> str:
         translated = ""
         if m.get("lang_original") and m.get("lang_corpus") and m["lang_original"] != m["lang_corpus"]:
             translated = f" [v knihovně: překlad, {m.get('edition') or m['lang_corpus']}]"
+        # Zákon: datum znění musí být v kontextu, jinak si ho model vymyslí
+        # (pozorováno: „účinné od 1. 1. 2026" u znění ZP z 29. 8. 2026).
+        elif (m.get("ref_start") or "").startswith(("§", "čl.")) and m.get("edition"):
+            translated = f" [{m['edition']}]"
         head = f"[{i}] {label}" + (f" › {where}" if where else "") + ref + translated
-        lines.append(f"{head}:\n{h['text']}")
+        block = f"{head}:\n{h['text']}"
+        # Přilehlé paragrafy (sibling_sections): vlastní řádek s vlastním §, ať je
+        # z promptu jasné, že to není text úryvku [i] — model to má citovat podle §.
+        for s in h.get("siblings") or []:
+            title = f"{s['ref']}" + (f" {s['heading']}" if s.get("heading") else "")
+            more = " […]" if s.get("truncated") else ""
+            block += f"\n↳ k [{i}] přiléhá {title}:\n{s['text']}{more}"
+        lines.append(block)
     return "\n\n".join(lines) if lines else "(nic nenalezeno)"

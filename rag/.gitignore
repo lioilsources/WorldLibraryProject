@@ -7,4 +7,8 @@ logs/
 works.jsonl
 chapters.jsonl
 tests/fixtures/*.tmp
+# Právník: stažené stránky e-Sbírky a výstup ingest_law.py (fixture jsou v tests/fixtures/law/).
+# Lomítko na začátku je nutné: vzor „law/" bez něj chytal i registry/law/, takže
+# kurátorský tier1.yaml (53 zákonů, aliasy, zkratky) tiše nebyl ve gitu.
+/law/
 build/

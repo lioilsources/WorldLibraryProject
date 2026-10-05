@@ -1,0 +1,205 @@
+# Dohoda o provedení práce (DPP). Klauzule z účinného znění zákoníku práce
+# v právním indexu. Dvě věci, které se ve vzorech pletou a tady jsou ověřené:
+#  * § 77 odst. 2 písm. e) vylučuje na dohody ustanovení o odměňování, takže
+#    splatnost odměny se sjednává v dohodě (§ 138), nelze spoléhat na § 141;
+#  * minimální mzda na odměnu z dohody dopadá — § 111 odst. 1 to říká výslovně
+#    („Mzda nebo odměna z dohody nesmí být nižší než minimální mzda“), protože
+#    dohody jsou základní pracovněprávní vztah podle § 3.
+typ: dohoda_o_provedeni_prace
+nazev: Dohoda o provedení práce
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Práce v rozsahu nejvýše 300 hodin v kalendářním roce u jednoho zaměstnavatele.
+  Do rozsahu se počítají i jiné dohody o provedení práce u téhož zaměstnavatele.
+forma:
+  pisemna: true
+  zaklad: {zakon: "262/2006 Sb.", par: "§ 77", poznamka: "odst. 1 — písemně, jedno vyhotovení zaměstnanci"}
+
+pravni_zaklad:
+  - {zakon: "262/2006 Sb.", paragrafy: "§ 75 a § 77", poznamka: "dohody o pracích konaných mimo pracovní poměr"}
+
+strany:
+  - {role: zamestnavatel, nazev: Zaměstnavatel, typ: [fyzicka, pravnicka]}
+  - {role: zamestnanec, nazev: Zaměstnanec, typ: [fyzicka]}
+
+promenne:
+  - {id: zamestnavatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma zaměstnavatele?"}
+  - {id: zamestnavatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození zaměstnavatele?"}
+  - {id: zamestnavatel_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa zaměstnavatele?"}
+  - {id: zamestnanec_jmeno, typ: string, povinna: true, otazka: "Jméno zaměstnance?"}
+  - {id: zamestnanec_identifikace, typ: string, povinna: true, otazka: "Datum narození zaměstnance?"}
+  - {id: zamestnanec_adresa, typ: string, povinna: true, otazka: "Adresa zaměstnance?"}
+
+  - id: sjednana_prace
+    typ: text
+    povinna: true
+    otazka: "Jaká práce je sjednaná? Popiš ji konkrétně."
+    napoveda: "Sjednané práce musí být v dohodě uvedeny — bez nich je dohoda vadná."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 75", poznamka: "odst. 3"}
+  - {id: misto_vykonu, typ: string, povinna: true, otazka: "Kde se práce vykonává?"}
+  - id: doba_od
+    typ: date
+    povinna: true
+    otazka: "Od kdy se dohoda uzavírá?"
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 75", poznamka: "odst. 3 — doba, na kterou se dohoda uzavírá"}
+  - {id: doba_do, typ: date, povinna: true, otazka: "Do kdy dohoda trvá?"}
+  - id: rozsah_hodin
+    typ: int
+    povinna: true
+    otazka: "Jaký je sjednaný rozsah práce v hodinách?"
+    napoveda: "Nejvýše 300 hodin v kalendářním roce; počítají se i jiné DPP u téhož zaměstnavatele."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}
+  - id: odmena_za_hodinu
+    typ: money
+    povinna: true
+    otazka: "Jaká je odměna za hodinu práce?"
+    napoveda: "Nesmí být nižší než minimální mzda přepočtená na hodinu; její výši stanoví nařízení vlády."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 138"}
+  - id: splatnost_den
+    typ: int
+    povinna: true
+    otazka: "Do kolikátého dne následujícího měsíce se odměna vyplácí?"
+    napoveda: "U dohod se splatnost sjednává — ustanovení o odměňování se na ně nepoužijí (§ 77 odst. 2 písm. e)."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 138"}
+  - {id: bankovni_ucet, typ: string, povinna: false, otazka: "Na jaký účet se odměna vyplácí?"}
+  - id: zpusob_zruseni
+    typ: enum
+    hodnoty: [zakonny, vlastni]
+    povinna: true
+    otazka: "Zrušení dohody podle zákona, nebo si sjednáte vlastní způsob?"
+    napoveda: "Není-li způsob sjednán, platí zákonný: dohodou, výpovědí s 15denní dobou, okamžitým zrušením."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 77", poznamka: "odst. 5"}
+
+kontroly:
+  - vyraz: "rozsah_hodin <= 300"
+    zprava: "Rozsah práce z dohody o provedení práce nesmí být větší než 300 hodin v kalendářním roce."
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}
+  - vyraz: "rozsah_hodin > 0 and odmena_za_hodinu > 0"
+    zprava: "Rozsah práce i odměna musí být větší než nula."
+  - vyraz: "splatnost_den >= 1 and splatnost_den <= 31"
+    zprava: "Den splatnosti musí být dnem v měsíci."
+
+klauzule:
+  - id: predmet
+    nazev: Sjednaná práce
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 75"}
+    text: |
+      Zaměstnanec se zavazuje vykonat pro zaměstnavatele tuto práci: {{ sjednana_prace }}.
+
+      Místem výkonu práce je {{ misto_vykonu }}.
+
+  - id: doba_a_rozsah
+    nazev: Doba a rozsah práce
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 75"}
+    text: |
+      Dohoda se uzavírá na dobu od {{ doba_od|datum }} do {{ doba_do|datum }}.
+
+      Sjednaný rozsah práce je {{ rozsah_hodin|cislo }} hodin. Rozsah práce vykonávané na
+      základě dohody o provedení práce nesmí být u téhož zaměstnavatele větší než 300 hodin
+      v kalendářním roce; do tohoto rozsahu se započítává i doba práce konaná v témže
+      kalendářním roce na základě jiné dohody o provedení práce u téhož zaměstnavatele.
+
+  - id: odmena
+    nazev: Odměna z dohody
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 138"}
+      - {zakon: "262/2006 Sb.", par: "§ 111"}
+    text: |
+      Odměna z dohody se sjednává ve výši {{ odmena_za_hodinu|kc }} za jednu hodinu práce.
+
+      Odměna je splatná do {{ splatnost_den|cislo }}. dne kalendářního měsíce následujícího po
+      měsíci, v němž byla práce vykonána.
+
+      Odměna z dohody nesmí být nižší než minimální mzda; nedosáhne-li jí, poskytne
+      zaměstnavatel zaměstnanci doplatek.
+
+  - id: vyplata_na_ucet
+    nazev: Výplata odměny
+    povinna: false
+    podminka: "bankovni_ucet != null"
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 138"}
+    text: |
+      Odměna se vyplácí bezhotovostně na účet zaměstnance č. {{ bankovni_ucet }}.
+
+  - id: pracovni_neschopnost
+    nazev: Dočasná pracovní neschopnost
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 194"}
+    text: |
+      Zaměstnanci přísluší v době prvních 14 kalendářních dnů trvání dočasné pracovní
+      neschopnosti nebo karantény náhrada odměny z dohody za podmínek stanovených zákonem.
+
+  - id: zruseni
+    nazev: Zrušení dohody
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 77"}
+    varianty:
+      podle: zpusob_zruseni
+      hodnoty:
+        zakonny: |
+          Právní vztah založený touto dohodou lze zrušit dohodou smluvních stran ke sjednanému
+          dni, výpovědí danou z jakéhokoli důvodu nebo bez uvedení důvodu s patnáctidenní
+          výpovědní dobou, která začíná dnem, v němž byla výpověď doručena druhé smluvní straně,
+          anebo okamžitým zrušením, bylo-li sjednáno pro případy, kdy lze okamžitě zrušit
+          pracovní poměr.
+
+          Pro zrušení se vyžaduje písemná forma, jinak se k výpovědi nebo okamžitému zrušení
+          nepřihlíží.
+        vlastni: |
+          Právní vztah založený touto dohodou lze zrušit dohodou smluvních stran ke sjednanému
+          dni nebo výpovědí danou z jakéhokoli důvodu nebo bez uvedení důvodu s patnáctidenní
+          výpovědní dobou, která začíná dnem doručení výpovědi druhé smluvní straně. Strany se
+          dohodly, že okamžité zrušení je možné jen v případech, kdy lze okamžitě zrušit
+          pracovní poměr.
+
+          Pro zrušení se vyžaduje písemná forma, jinak se k výpovědi nebo okamžitému zrušení
+          nepřihlíží.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "262/2006 Sb.", par: "§ 77"}
+    text: |
+      Dohoda je uzavřena písemně ve dvou vyhotoveních; jedno vyhotovení vydá zaměstnavatel
+      zaměstnanci.
+
+      Není-li v této dohodě něco sjednáno, platí zákoník práce. Na právní vztah založený touto
+      dohodou se nepoužijí ustanovení o převedení na jinou práci a přeložení, o dočasném
+      přidělení, o odstupném, o skončení pracovního poměru, o odměňování a o cestovních
+      náhradách.
+
+      Dohoda nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Sjednané práce jsou v dohodě uvedeny konkrétně", zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}}
+  - {bod: "Je uvedena doba, na kterou se dohoda uzavírá", zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}}
+  - {bod: "Rozsah práce nepřesahuje 300 hodin v kalendářním roce včetně jiných DPP u téhož zaměstnavatele", zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}}
+  - {bod: "Odměna za hodinu není nižší než minimální mzda přepočtená na hodinu — její výši stanoví nařízení vlády, které v právním indexu není, ověřit ručně", zaklad: {zakon: "262/2006 Sb.", par: "§ 111"}}
+  - {bod: "Sjednána splatnost odměny (ustanovení o odměňování se na dohody nepoužijí)", zaklad: {zakon: "262/2006 Sb.", par: "§ 77"}}
+  - {bod: "Dohoda je písemná a jedno vyhotovení dostal zaměstnanec", zaklad: {zakon: "262/2006 Sb.", par: "§ 77"}}
+  - {bod: "Zaměstnavatel splnil povinnost informovat o obsahu právního vztahu", zaklad: {zakon: "262/2006 Sb.", par: "§ 77a"}}
+  - {bod: "Ověřit právo na dovolenou z dohody (od roku 2024) a odvody podle limitu příjmu — účetní/mzdová agenda, ne tato šablona"}
+
+upozorneni:
+  - text: >-
+      Na dohody se nepoužijí ustanovení zákoníku práce o odměňování, takže splatnost odměny
+      a její výplatu je nutné sjednat v dohodě; nelze se spoléhat na pravidla o splatnosti mzdy.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 77"}
+  - text: >-
+      Minimální mzda na odměnu z dohody dopadá — nižší odměna znamená povinnost doplatku.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 111"}
+  - text: >-
+      Překročení 300 hodin nelze zhojit ujednáním; na další práci je potřeba dohoda o pracovní
+      činnosti nebo pracovní poměr.
+    zaklad: {zakon: "262/2006 Sb.", par: "§ 75"}

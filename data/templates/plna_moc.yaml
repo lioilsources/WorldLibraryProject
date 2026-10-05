@@ -1,0 +1,153 @@
+# Plná moc. Jednostranné právní jednání zmocnitele, ne smlouva. Dvě věci, na které
+# doplácejí vzory: rozsah zástupčího oprávnění musí být v plné moci uveden
+# (§ 441 odst. 2) a netýká-li se zastoupení jen jednoho právního jednání, musí být
+# písemná; vyžaduje-li se pro dané jednání zvláštní forma, platí i pro plnou moc.
+# Zmocnitel se nemůže vzdát práva zmocnění odvolat (§ 442) — klauzule, která by to
+# zkoušela, je neúčinná.
+typ: plna_moc
+nazev: Plná moc
+verze: 1
+jazyk: cs
+druh: jednostranny_dokument
+popis: >-
+  Obecná (pro vymezený okruh jednání) nebo speciální (pro jedno konkrétní jednání).
+  Pro zápis do katastru a podobná jednání bývá potřeba úředně ověřený podpis —
+  to plná moc sama nevyřeší.
+forma:
+  pisemna: true
+  zaklad: {zakon: "89/2012 Sb.", par: "§ 441", poznamka: "odst. 2 — písemně, netýká-li se jen jednoho právního jednání"}
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 441 a násl.", poznamka: "smluvní zastoupení"}
+
+strany:
+  - {role: zmocnitel, nazev: Zmocnitel, typ: [fyzicka, pravnicka], oznaceni: "udílí plnou moc", podpisuje: true}
+  - {role: zmocnenec, nazev: Zmocněnec, typ: [fyzicka, pravnicka], oznaceni: "přijímá plnou moc", podpisuje: true}
+
+promenne:
+  - {id: zmocnitel_jmeno, typ: string, povinna: true, otazka: "Kdo plnou moc dává (jméno nebo firma)?"}
+  - {id: zmocnitel_identifikace, typ: string, povinna: true, otazka: "Datum narození nebo IČO zmocnitele?"}
+  - {id: zmocnitel_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo zmocnitele?"}
+  - {id: zmocnenec_jmeno, typ: string, povinna: true, otazka: "Kdo je zmocněnec (jméno nebo firma)?"}
+  - {id: zmocnenec_identifikace, typ: string, povinna: true, otazka: "Datum narození nebo IČO zmocněnce?"}
+  - {id: zmocnenec_adresa, typ: string, povinna: true, otazka: "Adresa nebo sídlo zmocněnce?"}
+
+  - id: rozsah
+    typ: enum
+    hodnoty: [specialni, obecna]
+    povinna: true
+    otazka: "Je plná moc na jedno konkrétní jednání (speciální), nebo na vymezený okruh jednání (obecná)?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 441"}
+  - id: vymezeni
+    typ: text
+    povinna: true
+    otazka: "K čemu přesně zmocňujete? Vypiš jednání co nejkonkrétněji, včetně úřadu nebo protistrany."
+    napoveda: "Rozsah zástupčího oprávnění musí být v plné moci uveden; co v ní není, zmocněnec dělat nemůže."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 441"}
+  - id: doba
+    typ: enum
+    hodnoty: [neurcita, do_data]
+    povinna: true
+    otazka: "Platí plná moc bez časového omezení, nebo do určitého dne?"
+  - {id: platnost_do, typ: date, povinna: false, otazka: "Do kdy plná moc platí?"}
+  - id: substituce
+    typ: bool
+    povinna: false
+    otazka: "Může si zmocněnec pověřit dalšího zástupce?"
+    napoveda: "Zástupce jedná osobně; dalšího může pověřit jen je-li to ujednáno nebo vyžaduje-li to nutná potřeba."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 438"}
+  - {id: datum_udeleni, typ: date, povinna: true, otazka: "Kterým dnem plnou moc udělujete?"}
+
+kontroly:
+  - vyraz: "doba == 'neurcita' or platnost_do != null"
+    zprava: "U plné moci omezené datem chybí den, do kterého platí."
+
+klauzule:
+  - id: zmocneni
+    nazev: Zmocnění
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 441"}
+    varianty:
+      podle: rozsah
+      hodnoty:
+        specialni: |
+          Já, {{ zmocnitel_jmeno }}, zmocňuji tímto zmocněnce {{ zmocnenec_jmeno }}, aby mě
+          zastupoval při tomto právním jednání: {{ vymezeni }}
+
+          Zmocněnec je oprávněn činit vše, co s uvedeným jednáním nezbytně souvisí; k jiným
+          jednáním tato plná moc neopravňuje.
+        obecna: |
+          Já, {{ zmocnitel_jmeno }}, zmocňuji tímto zmocněnce {{ zmocnenec_jmeno }}, aby mě
+          zastupoval v tomto rozsahu: {{ vymezeni }}
+
+          Zmocněnec je oprávněn za mě v uvedeném rozsahu jednat, podávat a přijímat písemnosti,
+          činit návrhy a prohlášení a přijímat doručované dokumenty. K jednáním mimo uvedený
+          rozsah tato plná moc neopravňuje.
+
+  - id: substituce
+    nazev: Další zástupce
+    povinna: false
+    podminka: "substituce == true"
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 438"}
+    text: |
+      Zmocněnec je oprávněn pověřit v rozsahu této plné moci dalšího zástupce. Za řádný výběr
+      jeho osoby odpovídá zmocněnec.
+
+  - id: doba
+    nazev: Doba platnosti a odvolání
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 442"}
+      - {zakon: "89/2012 Sb.", par: "§ 448"}
+    varianty:
+      podle: doba
+      hodnoty:
+        neurcita: |
+          Plná moc se udílí na dobu neurčitou. Zmocnění zaniká vykonáním právního jednání, na
+          které bylo omezeno, jeho odvoláním zmocnitelem, výpovědí zmocněnce, a nebylo-li
+          ujednáno jinak, i smrtí zmocnitele nebo zmocněnce, případně zánikem právnické osoby.
+
+          Zmocnitel se práva odvolat zmocnění nevzdává.
+        do_data: |
+          Plná moc se udílí do {{ platnost_do|datum }}. Zmocnění zaniká také vykonáním právního
+          jednání, na které bylo omezeno, jeho odvoláním zmocnitelem, výpovědí zmocněnce,
+          a nebylo-li ujednáno jinak, i smrtí zmocnitele nebo zmocněnce, případně zánikem
+          právnické osoby.
+
+          Zmocnitel se práva odvolat zmocnění nevzdává.
+
+  - id: zaver
+    nazev: Udělení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 441"}
+    text: |
+      Plná moc se udílí dne {{ datum_udeleni|datum }}.
+
+      Zmocněnec zmocnění přijímá, což potvrzuje svým podpisem.
+
+checklist:
+  - {bod: "Rozsah zástupčího oprávnění je v plné moci výslovně uveden", zaklad: {zakon: "89/2012 Sb.", par: "§ 441"}}
+  - {bod: "Obě osoby jsou identifikované — jméno, datum narození nebo IČO, adresa"}
+  - {bod: "Vyžaduje-li se pro zastupované jednání zvláštní forma (notářský zápis), má ji i plná moc", zaklad: {zakon: "89/2012 Sb.", par: "§ 441"}}
+  - {bod: "Je-li plná moc pro katastr, soud nebo banku, ověřeno, zda nechtějí úředně ověřený podpis — to zákon o zastoupení neřeší"}
+  - {bod: "Neobsahuje ujednání, že se zmocnitel vzdává práva zmocnění odvolat", zaklad: {zakon: "89/2012 Sb.", par: "§ 442"}}
+  - {bod: "U zmocnění právnické osoby je jasné, kdo za ni zastoupení vykonává", zaklad: {zakon: "89/2012 Sb.", par: "§ 443"}}
+
+upozorneni:
+  - text: >-
+      Zmocnitel se nemůže vzdát práva odvolat zmocnění. Ujednají-li si strany pro odvolání
+      určité důvody, nelze odvolat z jiného — to však neplatí, má-li zmocnitel zvlášť
+      závažný důvod.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 442"}
+  - text: >-
+      Kdo vlastní vinou vyvolá u třetí osoby domněnku, že někoho zmocnil, nemůže se dovolat
+      nedostatku zmocnění, byla-li třetí osoba v dobré víře — odvolanou plnou moc je proto
+      třeba také odebrat a tam, kde byla použita, oznámit.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 444"}
+  - text: >-
+      Po zániku zmocnění je zmocněnec povinen učinit vše, co nesnese odkladu, aby zmocnitel
+      neutrpěl škodu; plnou moc je vhodné fyzicky vrátit.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 448"}

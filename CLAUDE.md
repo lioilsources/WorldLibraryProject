@@ -42,4 +42,23 @@ dosažitelná jako `joda`).
 - `rag/export_bundle.py` — export díla z Postgresu do bundlu pro Kindlify (čtečka); kontrakt hlídá `validate_bundle()`
 - `rag/eval/` — měření retrievalu bez LLM proti zlatému standardu; baseline
   a výsledky režimů v `rag/eval/results/`
+- **Právník** (zákony ČR, persona v Ol1nLLM): `rag/ingest_law.py` (e-Sbírka →
+  tytéž JSONL), `rag/cite.py` (intent `cite` = lookup paragrafu bez vektoru),
+  `rag/registry/law/` (53 zákonů vrstvy 1, aliasy, zkratky, odvětví),
+  `rag/prompts/pravnik_cs.md`, `deploy/spark/law-chat.service` (**port 8098**,
+  kolekce `law_v1`, databáze `law` na JODA), `make eval-law`
+  (`rag/eval/eval_law.py` + `golden_law.jsonl`, `check_golden_law.py`); sekce
+  „Právník" a „Eval Právníka" v `rag/README.md`, stav a nálezy
+  `docs/lawyer/CURRENT_STATE.md`, plán `Ol1nLLM/docs/plan-pravnik.md`
+- **Šablony smluv** (Právník generuje dokumenty): `data/templates/*.yaml` (data,
+  ne prompt) + `rag/docgen/` (schéma, render, validace). Každá klauzule nese §
+  a `make validate-templates` ověří, že ten § v účinném znění existuje. Jak se
+  šablona píše: `docs/lawyer/TEMPLATES.md`
+- **Agent Právníka**: `rag/agent/` — osm nástrojů (search_law, get_paragraph,
+  šablony, intake, render, revize, ask_user), intake v Postgresu
+  (`lawyer_sessions`), deterministická revize cizích smluv. Model je injektovaný,
+  takže `make eval-agent` (22 scénářů) běží bez LLM; `POST /agent/chat` jede na
+  aliasu `pravnik-agent` (`--agent-model`; dnes qwen36, okno 19–01) a jeho kontrakt
+  pro appku Ol1nLLM (persona „Právník – smlouvy 📝") je v `rag/agent/klient.py`.
+  Stav, kontrakt a nasazení: `docs/lawyer/AGENT.md`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)

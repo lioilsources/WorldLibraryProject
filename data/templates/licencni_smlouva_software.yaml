@@ -1,0 +1,246 @@
+# Licenční smlouva k počítačovému programu. Základ je v OZ (§ 2358 obecná licence,
+# § 2371 licence k autorskému dílu), zvláštnosti programu v autorském zákoně
+# (§ 65 program je chráněn jako dílo literární; § 66 práva oprávněného uživatele,
+# která licence nemůže odebrat).
+# Tři věci, na kterých vzory chybují:
+#  * § 2372 odst. 1: licenci lze poskytnout jen ke způsobům užití známým v době
+#    uzavření smlouvy; k opačnému ujednání se nepřihlíží — „všechny způsoby, i budoucí"
+#    tedy nefunguje;
+#  * § 2364: nabyvatel může licenci postoupit jen se souhlasem poskytovatele, a ten
+#    vyžaduje písemnou formu;
+#  * § 2370: u smlouvy na dobu neurčitou nabývá výpověď účinnosti až uplynutím
+#    jednoho roku od konce měsíce, v němž došla druhé straně.
+typ: licencni_smlouva_software
+nazev: Licenční smlouva k počítačovému programu
+verze: 1
+jazyk: cs
+druh: smlouva
+popis: >-
+  Poskytnutí oprávnění užít počítačový program (výhradní i nevýhradní).
+  Nejde o převod autorských práv — ta se nepřevádějí, poskytuje se licence.
+
+pravni_zaklad:
+  - {zakon: "89/2012 Sb.", paragrafy: "§ 2358 a násl.", poznamka: "licenční smlouva, licence k autorskému dílu"}
+  - {zakon: "121/2000 Sb.", paragrafy: "§ 65 a § 66", poznamka: "počítačový program"}
+
+strany:
+  - {role: poskytovatel, nazev: Poskytovatel, typ: [fyzicka, pravnicka, podnikatel]}
+  - {role: nabyvatel, nazev: Nabyvatel, typ: [fyzicka, pravnicka, podnikatel]}
+
+promenne:
+  - {id: poskytovatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma poskytovatele licence?"}
+  - {id: poskytovatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození poskytovatele?"}
+  - {id: poskytovatel_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa poskytovatele?"}
+  - {id: nabyvatel_jmeno, typ: string, povinna: true, otazka: "Jméno nebo firma nabyvatele?"}
+  - {id: nabyvatel_identifikace, typ: string, povinna: true, otazka: "IČO nebo datum narození nabyvatele?"}
+  - {id: nabyvatel_adresa, typ: string, povinna: true, otazka: "Sídlo nebo adresa nabyvatele?"}
+
+  - id: software
+    typ: text
+    povinna: true
+    otazka: "Jaký program se licencuje? Uveď název, verzi a co k němu patří (dokumentace, konfigurace)."
+    zaklad: {zakon: "121/2000 Sb.", par: "§ 65"}
+  - id: vyhradnost
+    typ: enum
+    hodnoty: [nevyhradni, vyhradni]
+    povinna: true
+    otazka: "Je licence nevýhradní, nebo výhradní?"
+    napoveda: "U výhradní licence nesmí poskytovatel poskytnout tutéž licenci nikomu jinému a bez výslovného opaku se zdrží i vlastního výkonu práva."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2360"}
+  - id: zpusoby_uziti
+    typ: text
+    povinna: true
+    otazka: "Jakými způsoby smí nabyvatel program užít (instalace, počet uživatelů, provoz pro zákazníky, úpravy)?"
+    napoveda: "Licenci lze poskytnout jen ke způsobům užití známým dnes; obecné „i budoucí způsoby“ nemá účinek."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2372"}
+  - {id: teritorium, typ: string, povinna: true, otazka: "Pro jaké území licence platí?"}
+  - {id: doba, typ: enum, hodnoty: [neurcita, urcita], povinna: true, otazka: "Na dobu neurčitou, nebo určitou?"}
+  - {id: doba_do, typ: date, povinna: false, otazka: "Do kdy licence trvá (u doby určité)?"}
+  - id: odmena_rezim
+    typ: enum
+    hodnoty: [jednorazova, opakovana, bezuplatna]
+    povinna: true
+    otazka: "Je odměna jednorázová, opakovaná, nebo se licence poskytuje bezúplatně?"
+    napoveda: "Bezúplatnost musí být ujednána výslovně — jinak zákon předpokládá odměnu."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2358"}
+  - {id: odmena, typ: money, povinna: false, otazka: "Jaká je odměna v Kč (u bezúplatné licence nevyplňuj)?"}
+  - {id: bankovni_ucet, typ: string, povinna: false, otazka: "Číslo účtu poskytovatele?"}
+  - id: postoupeni_rezim
+    typ: enum
+    hodnoty: [se_souhlasem, zakazano]
+    povinna: true
+    otazka: "Může nabyvatel licenci postoupit dál s písemným souhlasem, nebo to má být vyloučeno?"
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2364"}
+  - id: zdrojove_kody
+    typ: bool
+    povinna: false
+    otazka: "Předávají se nabyvateli zdrojové kódy?"
+    zaklad: {zakon: "121/2000 Sb.", par: "§ 66"}
+
+kontroly:
+  - vyraz: "odmena_rezim == 'bezuplatna' or odmena > 0"
+    zprava: "U úplatné licence musí být odměna větší než nula; bezúplatnost je třeba zvolit výslovně."
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2358"}
+  - vyraz: "odmena_rezim == 'bezuplatna' or bankovni_ucet != null"
+    zprava: "U úplatné licence chybí číslo účtu pro platbu."
+  - vyraz: "doba == 'neurcita' or doba_do != null"
+    zprava: "U licence na dobu určitou chybí datum, do kterého trvá."
+
+klauzule:
+  - id: predmet
+    nazev: Předmět licence
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2358"}
+      - {zakon: "89/2012 Sb.", par: "§ 2371"}
+      - {zakon: "121/2000 Sb.", par: "§ 12"}
+      - {zakon: "121/2000 Sb.", par: "§ 65"}
+    text: |
+      Poskytovatel poskytuje nabyvateli oprávnění k výkonu práva užít tento počítačový program:
+      {{ software }} (dále jen „program“).
+
+      Poskytovatel prohlašuje, že je oprávněn licenci v ujednaném rozsahu poskytnout.
+
+      Autorská práva k programu se touto smlouvou nepřevádějí; poskytuje se licence v rozsahu
+      podle této smlouvy.
+
+  - id: rozsah
+    nazev: Rozsah licence
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2360"}
+      - {zakon: "89/2012 Sb.", par: "§ 2372"}
+    varianty:
+      podle: vyhradnost
+      hodnoty:
+        nevyhradni: |
+          Licence se poskytuje jako nevýhradní pro území {{ teritorium }} a pro tyto způsoby
+          užití: {{ zpusoby_uziti }}.
+
+          Poskytovatel může tutéž licenci poskytnout i dalším osobám a sám program užívat.
+
+          Licence se poskytuje ke způsobům užití známým v době uzavření této smlouvy.
+        vyhradni: |
+          Licence se poskytuje jako výhradní pro území {{ teritorium }} a pro tyto způsoby
+          užití: {{ zpusoby_uziti }}.
+
+          Po dobu trvání výhradní licence nesmí poskytovatel poskytnout tutéž licenci třetí
+          osobě a zdrží se i vlastního výkonu práva, ke kterému licenci udělil.
+
+          Licence se poskytuje ke způsobům užití známým v době uzavření této smlouvy.
+
+  - id: doba
+    nazev: Doba trvání licence
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2358"}
+    varianty:
+      podle: doba
+      hodnoty:
+        neurcita: |
+          Licence se poskytuje na dobu neurčitou.
+        urcita: |
+          Licence se poskytuje na dobu určitou do {{ doba_do|datum }}.
+
+  - id: odmena
+    nazev: Odměna
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2358"}
+    varianty:
+      podle: odmena_rezim
+      hodnoty:
+        jednorazova: |
+          Odměna za poskytnutí licence činí {{ odmena|kc }} a je splatná na účet poskytovatele
+          č. {{ bankovni_ucet }} do třiceti dnů od uzavření této smlouvy.
+        opakovana: |
+          Odměna za poskytnutí licence činí {{ odmena|kc }} za každý kalendářní měsíc trvání
+          licence a je splatná na účet poskytovatele č. {{ bankovni_ucet }} vždy do patnáctého
+          dne příslušného měsíce.
+        bezuplatna: |
+          Strany se výslovně dohodly, že licence se poskytuje bezúplatně.
+
+  - id: zdrojove_kody
+    nazev: Zdrojové kódy a úpravy
+    povinna: false
+    podminka: "zdrojove_kody == true"
+    zaklad:
+      - {zakon: "121/2000 Sb.", par: "§ 66"}
+    text: |
+      Poskytovatel předá nabyvateli zdrojové kódy programu a přípravné koncepční materiály
+      v rozsahu potřebném pro jeho užívání a údržbu.
+
+      Nabyvatel je oprávněn program rozmnožovat, překládat, zpracovávat, upravovat či jinak
+      měnit v rozsahu, v jakém to zákon umožňuje oprávněnému uživateli rozmnoženiny, a dále
+      v rozsahu ujednaném v této smlouvě.
+
+  - id: postoupeni
+    nazev: Postoupení licence
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2364"}
+      - {zakon: "89/2012 Sb.", par: "§ 2365"}
+    varianty:
+      podle: postoupeni_rezim
+      hodnoty:
+        se_souhlasem: |
+          Nabyvatel může licenci postoupit třetí osobě zcela nebo zčásti jen s předchozím
+          souhlasem poskytovatele; souhlas vyžaduje písemnou formu. O postoupení a o osobě
+          postupníka informuje nabyvatel poskytovatele bez zbytečného odkladu.
+
+          Byl-li převeden závod nabyvatele nebo jeho samostatná složka, vyžaduje se souhlas
+          poskytovatele k převedení licence jen bylo-li to zvlášť ujednáno.
+        zakazano: |
+          Nabyvatel není oprávněn licenci postoupit třetí osobě. Postoupení je možné pouze
+          s předchozím písemným souhlasem poskytovatele.
+
+  - id: vypoved
+    nazev: Ukončení licence
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2370"}
+    text: |
+      Je-li licence poskytnuta na dobu neurčitou, nabývá výpověď účinnosti uplynutím jednoho
+      roku od konce kalendářního měsíce, v němž výpověď došla druhé straně.
+
+      Skončením licence zaniká oprávnění program užívat; nabyvatel program odinstaluje
+      a rozmnoženiny zlikviduje, nestanoví-li právní předpis povinnost je uchovat.
+
+  - id: zaverecna
+    nazev: Závěrečná ustanovení
+    povinna: true
+    zaklad:
+      - {zakon: "89/2012 Sb.", par: "§ 2358"}
+    text: |
+      Smlouva je vyhotovena ve dvou vyhotoveních; každá strana obdrží jedno. Změny vyžadují
+      písemnou formu.
+
+      Smlouva nabývá platnosti a účinnosti podpisem obou stran.
+
+checklist:
+  - {bod: "Program je identifikovaný včetně verze a příslušenství", zaklad: {zakon: "121/2000 Sb.", par: "§ 65"}}
+  - {bod: "Způsoby užití jsou vyjmenované konkrétně a jsou známé dnes, ne „i budoucí“", zaklad: {zakon: "89/2012 Sb.", par: "§ 2372"}}
+  - {bod: "Je jasné, zda je licence výhradní, a u výhradní i to, zda se poskytovatel zdrží vlastního užití", zaklad: {zakon: "89/2012 Sb.", par: "§ 2360"}}
+  - {bod: "Územní a časový rozsah je uvedený"}
+  - {bod: "Bezúplatnost je ujednána výslovně, má-li být licence zdarma", zaklad: {zakon: "89/2012 Sb.", par: "§ 2358"}}
+  - {bod: "Obsahuje-li program komponenty třetích stran nebo open source, ověřeno, že jejich licence poskytnutí umožňují"}
+  - {bod: "U programu vytvořeného zaměstnancem ověřeno, kdo vykonává majetková práva", zaklad: {zakon: "121/2000 Sb.", par: "§ 58"}}
+
+upozorneni:
+  - text: >-
+      Licenci lze poskytnout jen ke způsobům užití známým v době uzavření smlouvy; k ujednání,
+      které by zahrnovalo i způsoby dosud neznámé, se nepřihlíží.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2372"}
+  - text: >-
+      Licenci je nabyvatel povinen využít, není-li ujednáno jinak — u licence „do šuplíku“
+      to patří výslovně vyloučit.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2372"}
+  - text: >-
+      U licence na dobu neurčitou je výpovědní doba dlouhá: účinnost nastává až uplynutím
+      jednoho roku od konce měsíce, v němž výpověď došla. Chtějí-li strany kratší, musí si ji
+      ujednat.
+    zaklad: {zakon: "89/2012 Sb.", par: "§ 2370"}
+  - text: >-
+      Práva oprávněného uživatele rozmnoženiny programu (záložní rozmnoženina, nezbytné úpravy
+      k využití, zkoumání funkčnosti) dává zákon; licence je nemůže odebrat.
+    zaklad: {zakon: "121/2000 Sb.", par: "§ 66"}

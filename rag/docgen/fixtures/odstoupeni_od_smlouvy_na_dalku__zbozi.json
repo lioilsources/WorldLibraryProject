@@ -1,0 +1,18 @@
+{
+  "_popis": "Vrácení zboží z e-shopu ve lhůtě, s poštovným a účtem pro vrácení peněz.",
+  "_k_datu": "2026-09-28",
+  "spotrebitel_jmeno": "Petr Novák",
+  "spotrebitel_identifikace": "petr.novak@example.com",
+  "spotrebitel_adresa": "Dlouhá 3, 110 00 Praha 1",
+  "podnikatel_jmeno": "Elektro Rychle s.r.o.",
+  "podnikatel_identifikace": "IČO 24681357",
+  "podnikatel_adresa": "Skladová 44, 190 00 Praha 9",
+  "cislo_objednavky": "2026-114873",
+  "datum_objednavky": "2026-09-14",
+  "datum_prevzeti": "2026-09-18",
+  "zbozi": "bezdrátová sluchátka AudioPro X3, černá, 1 ks",
+  "cena": 4290,
+  "naklady_na_dodani": 99,
+  "bankovni_ucet": "1900123456/2010",
+  "datum_odeslani": "2026-09-28"
+}

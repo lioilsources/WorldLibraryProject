@@ -1,0 +1,21 @@
+{
+  "_popis": "Poměr na dobu určitou, kratší pracovní doba, hodinová mzda, bez zkušební doby.",
+  "_k_datu": "2026-09-28",
+  "zamestnavatel_jmeno": "Květinářství U Tří růží s.r.o.",
+  "zamestnavatel_identifikace": "IČO 45678912",
+  "zamestnavatel_adresa": "Masarykova 8, 602 00 Brno",
+  "zamestnanec_jmeno": "Tomáš Beran",
+  "zamestnanec_identifikace": "nar. 9. 7. 2001",
+  "zamestnanec_adresa": "Sokolská 18, 120 00 Praha 2",
+  "druh_prace": "prodavač",
+  "misto_vykonu": "provozovna Masarykova 8, Brno",
+  "den_nastupu": "2026-10-15",
+  "doba_pomeru": "urcita",
+  "doba_do": "2027-04-14",
+  "je_vedouci": "ne",
+  "tydenni_doba": 20,
+  "mzda_forma": "hodinova",
+  "mzda": 210,
+  "dovolena_tydny": 4,
+  "bankovni_ucet": "2801234567/2010"
+}
