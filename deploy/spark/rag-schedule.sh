@@ -5,7 +5,8 @@
 # kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
 # qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   comfy    (07–13)  ComfyUI (~52 GiB) + flux-schnell NIM (17), audio jen na vyžádání; žádný
+#   comfy    (07–13)  ComfyUI (~52 GiB) + flux-schnell NIM (17) + TTS (CPU i GPU,
+#                     líné, ≤ 7 GiB), audio jen na vyžádání; žádný
 #                     velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
 #                     StoryTeller, Kirian, Stickers, tributy PromoClowna (12:30).
 #   rag      (13–19)  denní směna directora — stejné dávky jako v noci.
@@ -70,7 +71,12 @@ FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 LLM_CONTAINERS="${LLM_CONTAINERS:-swarm-nano swarm-embed swarm-litellm}"
 GEMMA_CONTAINERS="${GEMMA_CONTAINERS:-bench-gemma}"
 # TTS (AiStack services/audio, 2. 10. 2026): audio-tts (Kokoro + Piper, CPU ~1 GiB)
-# běží v comfy i llm; GPU enginy XTTS (~2,5 GiB) a Chatterbox (~4 GiB) jen v llm.
+# i GPU enginy XTTS (~2,5 GiB) a Chatterbox (~4 GiB) běží v comfy i llm.
+# GPU enginy v comfy od 6. 10. 2026 (uživatel, Voice Studio v Ol1nLLM klonuje
+# hlasy): váhy načítají až s prvním požadavkem a po 15 min nečinnosti je
+# odloží (TTS_IDLE_UNLOAD_S=900), naprázdno drží ~0,3 GiB každý. Vešly se
+# díky tomu, že audio-music + audio-sfx (25 GiB) v comfy samy nestartují;
+# page cache po jejich vahách (~/dev/audio/models) uklízí evict-model-cache.py.
 # V okně director nic z toho — director nechává MemAvailable jen 3–8 GiB.
 TTS_CPU_CONTAINERS="${TTS_CPU_CONTAINERS:-audio-tts}"
 TTS_GPU_CONTAINERS="${TTS_GPU_CONTAINERS:-audio-tts-xtts audio-tts-chatterbox}"
@@ -261,13 +267,12 @@ case "$mode" in
     # page cache po vahách directora/qwen36 by ComfyUI ukrojila MemFree → CPU render (2. 10.)
     python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
-    docker stop $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
     # audio-music + audio-sfx (25 GiB) se v comfy už nestartují samy (uživatel
     # 2026-10-06): s flux-schnell NIM (17) nezbývalo ComfyUI dost MemFree a po
     # vystřídání pár velkých modelů počítalo na CPU. Na vyžádání:
     #   docker start audio-music audio-sfx   (nebo controller /ctrl/activate?model=audio-music)
     # Zastavují se dál při každém přepnutí z comfy (stop_comfy).
-    docker start $TTS_CPU_CONTAINERS >/dev/null 2>&1 || true
+    docker start $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
     flux_up
     ;;
   llm|promo)
