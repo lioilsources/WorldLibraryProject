@@ -5,7 +5,7 @@
 # kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
 # qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   comfy    (07–13)  ComfyUI + audio (~52+25 GiB) + flux-schnell NIM (17); žádný
+#   comfy    (07–13)  ComfyUI (~52 GiB) + flux-schnell NIM (17), audio jen na vyžádání; žádný
 #                     velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
 #                     StoryTeller, Kirian, Stickers, tributy PromoClowna (12:30).
 #   rag      (13–19)  denní směna directora — stejné dávky jako v noci.
@@ -262,7 +262,12 @@ case "$mode" in
     python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
     docker stop $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
-    docker start $AUDIO_CONTAINERS $TTS_CPU_CONTAINERS >/dev/null 2>&1 || true
+    # audio-music + audio-sfx (25 GiB) se v comfy už nestartují samy (uživatel
+    # 2026-10-06): s flux-schnell NIM (17) nezbývalo ComfyUI dost MemFree a po
+    # vystřídání pár velkých modelů počítalo na CPU. Na vyžádání:
+    #   docker start audio-music audio-sfx   (nebo controller /ctrl/activate?model=audio-music)
+    # Zastavují se dál při každém přepnutí z comfy (stop_comfy).
+    docker start $TTS_CPU_CONTAINERS >/dev/null 2>&1 || true
     flux_up
     ;;
   llm|promo)
