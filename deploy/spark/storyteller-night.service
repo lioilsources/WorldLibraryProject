@@ -8,11 +8,15 @@ OnFailure=notify-failure@%n.service
 Description=StoryTeller noční dávka (hints světa, swarm-director)
 After=network-online.target
 
+# Od 2026-10-07 jede director seznam pozpátku (tales.world-hints.rev.jsonl = tac):
+# stejné nápovědy počítá večer qwen36 z Macu v pořadí free → p1 → …, takže se
+# potkají až uprostřed. Výstup (SPARK rag/data/hints.cs.jsonl) se slučuje do dat
+# na Macu — balíčky se staví tam.
 [Service]
 Type=simple
 WorkingDirectory=%h/deploy/storyteller
 Environment=LITELLM_BASE_URL=http://localhost:8080/v1 LITELLM_MODEL=swarm-director LITELLM_CONCURRENCY=4 LITELLM_TIMEOUT=900 PYTHONUNBUFFERED=1
-ExecStart=%h/deploy/storyteller/rag/.venv/bin/python -m rag.hints --lang cs --no-generic --tales rag/data/tales.world-hints.jsonl
+ExecStart=%h/deploy/storyteller/rag/.venv/bin/python -m rag.hints --lang cs --no-generic --tales rag/data/tales.world-hints.rev.jsonl
 Restart=no
 
 [Install]
