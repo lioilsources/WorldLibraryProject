@@ -11,7 +11,7 @@ After=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=%h/deploy/storyteller
-Environment=LITELLM_BASE_URL=http://localhost:8080/v1 LITELLM_MODEL=swarm-director LITELLM_CONCURRENCY=2 LITELLM_TIMEOUT=900 PYTHONUNBUFFERED=1
+Environment=LITELLM_BASE_URL=http://localhost:8080/v1 LITELLM_MODEL=swarm-director LITELLM_CONCURRENCY=4 LITELLM_TIMEOUT=900 PYTHONUNBUFFERED=1
 ExecStart=%h/deploy/storyteller/rag/.venv/bin/python -m rag.hints --lang cs --no-generic --tales rag/data/tales.world-hints.jsonl
 Restart=no
 

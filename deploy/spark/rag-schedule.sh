@@ -82,7 +82,11 @@ TTS_CPU_CONTAINERS="${TTS_CPU_CONTAINERS:-audio-tts}"
 TTS_GPU_CONTAINERS="${TTS_GPU_CONTAINERS:-audio-tts-xtts audio-tts-chatterbox}"
 # Noční dávky na directoru — každá je systemd --user služba, která se sama
 # dokončí / resumuje; workery v součtu 12, aby chatu zbyly 4 sloty z 16.
-DIRECTOR_JOBS="${DIRECTOR_JOBS:-library-enrich library-chapters storyteller-night}"
+# Od 2026-10-07: chunky priority 1 jsou hotové (69 954/69 954), library-enrich
+# hned skončí. Volné sloty: kapitoly 6, StoryTeller 4, souhrny děl 2 (součet 12,
+# chat 4). Prioritu 2 (991 antických děl) uživatel zatím nechce — přednost má
+# StoryTeller; až kapitoly a díla doběhnou, jejich sloty jdou jemu.
+DIRECTOR_JOBS="${DIRECTOR_JOBS:-library-enrich library-chapters library-works storyteller-night}"
 
 log() { printf '%s  %s\n' "$(date '+%F %T')" "$*"; }
 HERE="$(cd "$(dirname "$0")" && pwd)"

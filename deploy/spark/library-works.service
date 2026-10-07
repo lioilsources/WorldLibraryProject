@@ -1,4 +1,4 @@
-# Souhrny kapitol (enrich_chapters.py) — podmínka pro bundly čtečky Kindlify
+# Souhrny kapitol (enrich_works.py) — podmínka pro bundly čtečky Kindlify
 # (export_bundle.py je použitelný až po souhrnech; 2026-10-01 chapters_summarized = 0).
 # Noční dávka na swarm-directorovi vedle library-enrich: spouští a zastavuje ji
 # rag-schedule.sh (DIRECTOR_JOBS), 4 workery z 12 noci (6 Knihovník, 2 StoryTeller),
@@ -7,7 +7,7 @@
 # Priorita 1 = 12 062 kapitol ≈ několik nocí; pak --priority 2 (28 471).
 [Unit]
 OnFailure=notify-failure@%n.service
-Description=Souhrny kapitol pro Kindlify (swarm-director, priorita 1)
+Description=Souhrny děl pro katalog a Kindlify (swarm-director, priorita 1)
 After=network-online.target
 StartLimitIntervalSec=3600
 StartLimitBurst=3
@@ -15,8 +15,8 @@ StartLimitBurst=3
 [Service]
 Type=simple
 WorkingDirectory=%h/deploy/WorldLibraryProject/rag
-ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 enrich_chapters.py \
-    --llm-url http://localhost:8012/v1 --model swarm-director --workers 6 --priority 1
+ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 enrich_works.py \
+    --llm-url http://localhost:8012/v1 --model swarm-director --workers 2 --priority 1
 Restart=on-failure
 RestartSec=60
 Environment=PYTHONUNBUFFERED=1
