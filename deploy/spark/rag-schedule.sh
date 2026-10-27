@@ -5,9 +5,9 @@
 # kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
 # qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   comfy    (07–13)  ComfyUI (~52 GiB) + flux-schnell NIM (17) + TTS (CPU i GPU,
-#                     líné, ≤ 7 GiB), audio jen na vyžádání; žádný
-#                     velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
+#   comfy    (07–13)  ComfyUI (~52 GiB) + TTS (CPU i GPU, líné, ≤ 7 GiB), audio
+#                     jen na vyžádání; žádný velký LLM ani flux-schnell NIM
+#                     (2026-10-27: ComfyUI vedle něj počítalo na CPU). Experimenty uživatele (Ol1nLLM appka, lab),
 #                     StoryTeller, Kirian, Stickers, tributy PromoClowna (12:30).
 #   rag      (13–19)  denní směna directora — stejné dávky jako v noci.
 #   llm      (19–01)  qwen36-agent (36,5) + flux-schnell NIM (17): chat Právníka
@@ -59,10 +59,9 @@ AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
 # a director se vedle něj dvě noci po sobě nevešel. Promo běží jen ve svém
 # okně, přes den ani při obohacení ho nikdo nepotřebuje.
 AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
-# flux-schnell (NIM, ~17 GiB) naběhne s ComfyUI v comfy okně a nikde se
-# nezastavuje — 17.–18. 9. 2026 tak přes noc mlel naprázdno a director se
-# vedle něj (89 GiB < potřebných 92) dvě noci nevešel. Startuje ho něco
-# mimo tenhle skript (spolu s comfyui službou), tady se jen ruší před rag.
+# flux-schnell (NIM, ~17 GiB, tier 0 obrázky přes gen-queue) startuje jen flux_up
+# v llm a gemma; comfy (od 2026-10-27) a rag ho zastavují — 17.–18. 9. 2026 přes
+# noc mlel naprázdno a director se vedle něj (89 GiB < potřebných 92) nevešel.
 FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 # Kontejnery cold projektů (AiSwarmBattle): v žádném profilu, rozvrh je jen
 # zastavuje. Až se AiSwarmBattle odblokuje, vrátit do llm přes swarm compose
@@ -266,8 +265,12 @@ flux_up() {  # tier 0 obrázky (gen-queue /nim/flux-schnell); TensorRT si pamě�
 
 case "$mode" in
   comfy|day)
-    log "režim comfy: LLM i director dole, ComfyUI, audio a flux-schnell nahoru"
+    log "režim comfy: LLM, director a flux-schnell dole, ComfyUI a TTS nahoru"
     stop_director; stop_llm; stop_translate
+    # flux-schnell NIM (17 GiB) do comfy nepatří (uživatel 2026-10-27): ComfyUI má
+    # schnell vlastní a vedle NIM mu nezbylo MemFree — Kirian 1024×2048 jel z části
+    # na CPU, ~100 s na obrázek. Tier 0 obrázky (gen-queue) jedou v llm/gemma.
+    docker stop $FLUX_CONTAINERS >/dev/null 2>&1 || true
     # page cache po vahách directora/qwen36 by ComfyUI ukrojila MemFree → CPU render (2. 10.)
     python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
@@ -277,7 +280,6 @@ case "$mode" in
     #   docker start audio-music audio-sfx   (nebo controller /ctrl/activate?model=audio-music)
     # Zastavují se dál při každém přepnutí z comfy (stop_comfy).
     docker start $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
-    flux_up
     ;;
   llm|promo)
     log "režim llm: ComfyUI, audio a director dole, qwen36 + flux-schnell nahoru"
