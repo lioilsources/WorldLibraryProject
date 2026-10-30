@@ -1,4 +1,4 @@
-# 07:00 comfy (ComfyUI + audio + flux-schnell), 13:00 rag (denní směna directora),
+# 07:00 comfy (ComfyUI + TTS, bez flux-schnell), 13:00 rag (denní směna directora),
 # 19:00 llm (qwen36 + flux-schnell), 01:00 rag (director + noční dávky).
 # Profily a důvody: AiStack/PLAN-spark-scheduler.md (2026-10-01).
 #

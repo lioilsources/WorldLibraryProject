@@ -5,12 +5,11 @@
 # kontejnery jen `docker stop`, nikdy `compose down` (30. 9. tím zmizel
 # qwen36-agent a promo okno zůstalo bez modelu), vLLM chce util × total volných.
 #
-#   comfy    (07–13)  ComfyUI (~52 GiB) + flux-schnell NIM (17) + TTS (CPU i GPU,
-#                     líné, ≤ 7 GiB), audio jen na vyžádání; žádný
-#                     velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
+#   comfy    (07–13)  ComfyUI (~52 GiB) + TTS (CPU i GPU, líné, ≤ 7 GiB), audio
+#                     i flux-schnell NIM jen na vyžádání (broker); žádný velký LLM. Experimenty uživatele (Ol1nLLM appka, lab),
 #                     StoryTeller, Kirian, Stickers, tributy PromoClowna (12:30).
 #   rag      (13–19)  denní směna directora — stejné dávky jako v noci.
-#   llm      (19–01)  qwen36-agent (36,5) + flux-schnell NIM (17): chat Právníka
+#   llm      (19–01)  qwen36-agent (36,5) (+ flux-schnell NIM na vyžádání): chat Právníka
 #                     a Knihovníka, ToyShaders, tier 0 obrázky, PromoClown
 #                     (heartbeat 19:05–00:55). qwen36 tu běží celý večer.
 #   gemma    (ručně / fronta)  jako llm, ale místo qwen36 Gemma-4 (util 0,40):
@@ -59,10 +58,10 @@ AUDIO_CONTAINERS="${AUDIO_CONTAINERS:-audio-music audio-sfx}"
 # a director se vedle něj dvě noci po sobě nevešel. Promo běží jen ve svém
 # okně, přes den ani při obohacení ho nikdo nepotřebuje.
 AGENT_CONTAINERS="${AGENT_CONTAINERS:-qwen36-agent}"
-# flux-schnell (NIM, ~17 GiB) naběhne s ComfyUI v comfy okně a nikde se
-# nezastavuje — 17.–18. 9. 2026 tak přes noc mlel naprázdno a director se
-# vedle něj (89 GiB < potřebných 92) dvě noci nevešel. Startuje ho něco
-# mimo tenhle skript (spolu s comfyui službou), tady se jen ruší před rag.
+# flux-schnell (NIM, ~17 GiB, tier 0 obrázky přes gen-queue) je od 2026-10-28
+# samostatná služba na vyžádání: zapíná ho spark-broker jako doplněk k comfy, llm
+# i gemma (flux_up zůstává pro ruční běh). Tady ho ruší jen rag — 17.–18. 9. 2026
+# přes noc mlel naprázdno a director se vedle něj (89 GiB < potřebných 92) nevešel.
 FLUX_CONTAINERS="${FLUX_CONTAINERS:-flux-schnell}"
 # Kontejnery cold projektů (AiSwarmBattle): v žádném profilu, rozvrh je jen
 # zastavuje. Až se AiSwarmBattle odblokuje, vrátit do llm přes swarm compose
@@ -266,8 +265,10 @@ flux_up() {  # tier 0 obrázky (gen-queue /nim/flux-schnell); TensorRT si pamě�
 
 case "$mode" in
   comfy|day)
-    log "režim comfy: LLM i director dole, ComfyUI, audio a flux-schnell nahoru"
+    log "režim comfy: LLM i director dole, ComfyUI a TTS nahoru"
     stop_director; stop_llm; stop_translate
+    # flux-schnell NIM sem nepatří: je to samostatná služba na vyžádání, zapíná
+    # a vypíná ji spark-broker jako doplněk (uživatel 2026-10-28), tady se nesahá.
     # page cache po vahách directora/qwen36 by ComfyUI ukrojila MemFree → CPU render (2. 10.)
     python3 "$HERE/evict-model-cache.py" || true
     systemctl --user start comfyui
@@ -277,23 +278,21 @@ case "$mode" in
     #   docker start audio-music audio-sfx   (nebo controller /ctrl/activate?model=audio-music)
     # Zastavují se dál při každém přepnutí z comfy (stop_comfy).
     docker start $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
-    flux_up
     ;;
   llm|promo)
-    log "režim llm: ComfyUI, audio a director dole, qwen36 + flux-schnell nahoru"
+    log "režim llm: ComfyUI, audio a director dole, qwen36 nahoru"
     systemctl --user stop comfyui || true
     docker stop $AUDIO_CONTAINERS $LLM_CONTAINERS >/dev/null 2>&1 || true
     stop_director; stop_translate
     docker rm -f $GEMMA_CONTAINERS >/dev/null 2>&1 || true
     sleep 5
     qwen36_up
-    flux_up
     docker start $TTS_CPU_CONTAINERS $TTS_GPU_CONTAINERS >/dev/null 2>&1 || true
     ;;
   gemma)
     # Agent Právníka na vyžádání (uživatel 2026-10-01): místo qwen36 Gemma-4,
     # util 0.40 — při 0.30 měla jen 9k tokenů KV cache a 12k dotaz nepřijala.
-    log "režim gemma: qwen36 dole, Gemma-4 + flux-schnell nahoru (agent Právníka)"
+    log "režim gemma: qwen36 dole, Gemma-4 nahoru (agent Právníka)"
     systemctl --user stop comfyui || true
     docker stop $AUDIO_CONTAINERS $LLM_CONTAINERS $AGENT_CONTAINERS >/dev/null 2>&1 || true
     stop_director; stop_translate
@@ -304,7 +303,6 @@ case "$mode" in
       sleep 15
     done
     docker logs bench-gemma 2>&1 | grep -q "Application startup complete" || fail "Gemma do 15 min nenaběhla"
-    flux_up
     ;;
   rag|night|director)
     log "režim rag: ComfyUI, LLM profil, audio a flux-schnell dole, director nahoru, dávky jedou"
