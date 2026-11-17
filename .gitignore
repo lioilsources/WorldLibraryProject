@@ -23,3 +23,16 @@ deploy/joda/.env
 # virtuální prostředí (M2 i SPARK mají vlastní)
 .venv/
 rag/.venv/
+# devconv:start
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.jks
+key.properties
+.claude/settings.local.json
+CLAUDE.local.md
+# devconv:end
+__pycache__/
+*.pyc

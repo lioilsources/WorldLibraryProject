@@ -7,7 +7,7 @@ kroku, který na :8006 postavil legacy kolekci `books`; ta služba
 (`swarm-chromadb`) je od téhož data zrušená.
 
 Plán pro Claude Code (nebo ruční provedení) na JODA — Ubuntu server
-s Dockerem, `192.168.88.88`. Cíl: ChromaDB v server režimu na portu
+s Dockerem, `$JODA_HOST`. Cíl: ChromaDB v server režimu na portu
 **8006**, dostupná z LAN pro SPARK (embedding, chatbot) a M2.
 
 Kontext: jediná role JODY v knihovním chatbotu. Vektory jde kdykoli
@@ -23,7 +23,7 @@ proto se tenhle plán spouští přímo tady.
 ```bash
 docker --version && docker compose version   # compose v2 plugin
 sudo systemctl enable --now docker           # autostart po rebootu
-ip -4 addr | grep 192.168.88.88              # ověřit, že tohle je JODA
+ip -4 addr | grep $JODA_HOST              # ověřit, že tohle je JODA
 ```
 
 ## Fáze 2 — compose soubor
@@ -64,7 +64,7 @@ curl -sf http://localhost:8006/api/v2/heartbeat && echo OK
 ```
 
 **[ČLOVĚK/SPARK nebo M2]** ověřit dostupnost přes LAN:
-`curl -sf http://192.168.88.88:8006/api/v2/heartbeat`
+`curl -sf http://$JODA_HOST:8006/api/v2/heartbeat`
 Pokud neprojde a lokálně ano → firewall na JODA (`sudo ufw allow 8006/tcp`
 pokud je ufw aktivní).
 

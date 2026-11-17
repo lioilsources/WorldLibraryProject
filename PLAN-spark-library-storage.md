@@ -34,7 +34,7 @@ Kdo drží swap (`/proc/*/status` VmSwap → kontejner):
 ### Co na JODĚ opravdu běží pro knihovnu (opravuje dřívější domněnky)
 
 Živý Knihovník (`library-chat.service` na SPARKu, `rag/.env`) jede **v PG
-režimu**: `CHROMA_URL=http://192.168.88.88:8007`, `COLLECTION=books_v2`,
+režimu**: `CHROMA_URL=http://$JODA_HOST:8007`, `COLLECTION=books_v2`,
 `PG_DSN` → JODA :5433. `curl localhost:8090/status` na SPARKu:
 
 ```
@@ -100,7 +100,7 @@ Na SPARKu (`ssh spark`):
 ```bash
 free -g | sed -n 2,3p            # available ≥ 20 GB (12. 9. bylo 42), swap < 8/15
 ss -ltn | grep -E ':(8006|8007)\b' && echo OBSAZENO || echo "porty volné"
-df -h /home/ol1n | tail -1       # NVMe, 12. 9. 668 GB volných
+df -h ~ | tail -1       # NVMe, 12. 9. 668 GB volných
 docker version --format '{{.Server.Version}} {{.Server.Arch}}'   # 29.x arm64
 cd ~/deploy/WorldLibraryProject && git status --short && git log --oneline -1
 wc -l rag/books.jsonl            # 164344
@@ -157,7 +157,7 @@ services:
     ports:
       - "0.0.0.0:8007:8000"
     volumes:
-      - ${LIBRARY_CHROMA_DATA:-/home/ol1n/deploy/WorldLibraryProject/chroma-data}:/data
+      - ${LIBRARY_CHROMA_DATA:-${HOME}/deploy/WorldLibraryProject/chroma-data}:/data
     mem_limit: 4g
 ```
 
@@ -262,8 +262,8 @@ curl -s -N -X POST localhost:8090/chat/stream -H 'Content-Type: application/json
 Na M2 (`rag/.env` je mimo git):
 
 ```bash
-sed -i '' 's#^CHROMA_URL=.*#CHROMA_URL=http://192.168.88.66:8007#' rag/.env
-curl -sf http://192.168.88.66:8007/api/v2/heartbeat && echo LAN OK
+sed -i '' 's#^CHROMA_URL=.*#CHROMA_URL=http://$SPARK_HOST:8007#' rag/.env
+curl -sf http://$SPARK_HOST:8007/api/v2/heartbeat && echo LAN OK
 ```
 
 Když M2 heartbeat neprojde a na SPARKu lokálně ano → firewall na SPARKu
@@ -296,7 +296,7 @@ free -m | sed -n 2,3p                               # swap má klesnout o ~0,9 G
 ```
 
 `stop` je trvalý i přes `restart: unless-stopped` (to restartuje jen po
-pádu). Data v `/home/oli/deploy/WorldLibraryProject/chroma-data` (3,1 GB)
+pádu). Data v `~/deploy/WorldLibraryProject/chroma-data` (3,1 GB)
 **nechat dva týdny**, pak smazat a službu z `docker-compose.library.yaml`
 odstranit samostatným commitem.
 
@@ -327,14 +327,14 @@ Kolekce `books` jde kdykoli postavit znovu z `books.jsonl`
   `http://127.0.0.1:8007` (na SPARKu) je poctivější než mrtvý :8006; M2 má
   svoje v `.env`.
 - `rag/.env.example`: komentář u `CHROMA_URL` → SPARK :8007 (LAN
-  `192.168.88.66`), zmínku o :8006 smazat.
+  `$SPARK_HOST`), zmínku o :8006 smazat.
 - `server.py:1155`, `embed_books.py:201`, `eval_retrieval.py:209`: výchozí
-  `http://192.168.88.88:8006` → `http://127.0.0.1:8007`. Chování se nemění
+  `http://$JODA_HOST:8006` → `http://127.0.0.1:8007`. Chování se nemění
   (všude to přepisuje `.env`), jen aby default neukazoval na neexistující
   službu.
 - `PLAN-joda-chroma.md`: na začátek řádek „Nahrazeno: Chroma je od 9/2026 na
   SPARKu, viz PLAN-spark-library-storage.md."
-- AiStack `.env` na SPARKu má `CHROMADB_URL=http://192.168.88.88:8006` pro
+- AiStack `.env` na SPARKu má `CHROMADB_URL=http://$JODA_HOST:8006` pro
   SwarmBattle — stack je dole, nechat, jen vědět.
 
 ---
@@ -386,7 +386,7 @@ unaccent) běží při založení db automaticky.
 - [ ] `/status` na SPARKu: `mode=pg`, `documents=231526`, `pg.chunks=164344`
 - [ ] eval `hybrid` / `golden_v2`: work_hit 1.0, group_hit 0.923
 - [ ] Ol1nLLM Knihovník odpovídá s citacemi (SSE test výš)
-- [ ] M2 `rag/.env` míří na `192.168.88.66:8007`, heartbeat z M2 prošel
+- [ ] M2 `rag/.env` míří na `$SPARK_HOST:8007`, heartbeat z M2 prošel
 - [ ] po 24 h: `library_chroma` na JODĚ `stop`, `library_postgres` dál healthy
 - [ ] `swarm-chromadb` down, `/media/storage/chromadb` ponechán
 - [ ] JODA `free -m`: swap klesl o ≥ 1 GB proti 3 577 MB
