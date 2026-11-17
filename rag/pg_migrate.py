@@ -51,7 +51,7 @@ def applied(conn) -> set[str]:
 def main() -> int:
     p = argparse.ArgumentParser(description="Migrace knihovního Postgresu")
     p.add_argument("--dsn", default=default_dsn(),
-                   help="postgresql://library:…@192.168.88.88:5433/library (nebo PG_DSN v rag/.env)")
+                   help="postgresql://library:…@<joda-host>:5433/library (nebo PG_DSN v rag/.env)")
     p.add_argument("--only", help="prefix souboru, který aplikovat (např. 0003) — i odložené indexy")
     p.add_argument("--status", action="store_true", help="jen vypsat, co je a není aplikované")
     p.add_argument("--force", action="store_true", help="aplikovat i už zapsané (IF NOT EXISTS to snese)")

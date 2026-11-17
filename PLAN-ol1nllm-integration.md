@@ -2,7 +2,7 @@
 
 Plán rozšíření RAG chatbota (`rag/server.py` na SPARK :8090) o schopnosti,
 které dnes nemá, a napojení na mobilní appku **Ol1nLLM** (Flutter,
-`/Volumes/YOTTA/Dev/Ol1nLLM`). Navazuje na PLAN-spark-chatbot.md
+`$DEV_ROOT/Ol1nLLM`). Navazuje na PLAN-spark-chatbot.md
 (nasazeno 31. 7. 2026, kolekce `books` = 14 497 chunků z 29 knih).
 
 ---

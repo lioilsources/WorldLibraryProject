@@ -1,6 +1,6 @@
 # PLAN — nasazení knihovního RAG chatbota na SPARK
 
-Plán pro Claude Code běžící na DGX Spark (`/home/ol1n/deploy/AiStack/`).
+Plán pro Claude Code běžící na DGX Spark (`~/deploy/AiStack/`).
 
 > **Stav 2026-10-01:** `translate` (Qwen3-32B) je z rozvrhu SPARKu vyřazený
 > (AiStack `PLAN-spark-scheduler.md`). Chatbot dál volá alias `translate` a LiteLLM
@@ -17,14 +17,14 @@ https://chat.ol1n.com, s LLM z AiStack parku a vektory na JODA.
 | WorldLibraryProject | `claude/personalized-chatbot-edurag-5x5hoz` | `rag/`: ingest → JSONL → embed → chatbot (`server.py`, port **8090**) |
 | AiStack | `claude/chat-tunnel-ingress` | `cloudflared/config.yml`: ingress `chat.ol1n.com` → `host.docker.internal:8090` |
 
-Architektura: M2 dělá ingest (`books.jsonl`), JODA (192.168.88.88) je
+Architektura: M2 dělá ingest (`books.jsonl`), JODA ($JODA_HOST) je
 samostatný Ubuntu server s Dockerem — žádný síťový mount — a drží jen
 ChromaDB :8006 (AiStack `deploy/docker-compose.swarm.nas.yaml`), SPARK
 embeduje a servíruje chatbot. Data mezi stroji tečou přes ssh/rsync. LLM: LiteLLM role **`translate`**
 (Qwen3-32B-AWQ, ~20 GB); eskalace `swarm-director` (on-demand, +60 GB).
 
 Pravidla AiStacku platí (viz `SKILL.md`): pracovat z
-`/home/ol1n/deploy/AiStack/`, před nasazením zkontrolovat paměť
+`~/deploy/AiStack/`, před nasazením zkontrolovat paměť
 (`make ps`, `nvidia-smi`, `free -g`), žádný `--kv-cache-dtype fp8`.
 
 ---
@@ -32,7 +32,7 @@ Pravidla AiStacku platí (viz `SKILL.md`): pracovat z
 ## Fáze 1 — AiStack: merge tunelové větve
 
 ```bash
-cd /home/ol1n/deploy/AiStack
+cd ~/deploy/AiStack
 git fetch origin claude/chat-tunnel-ingress
 git checkout main && git merge origin/claude/chat-tunnel-ingress
 git push origin main   # nebo PR, podle preference
@@ -67,7 +67,7 @@ pořadí dodržet, případně restart cloudflared odložit až za tento krok.
 
 ```bash
 # 3a. Chroma na JODA běží?
-curl -sf http://192.168.88.88:8006/api/v2/heartbeat
+curl -sf http://$JODA_HOST:8006/api/v2/heartbeat
 # [ČLOVĚK/JODA, pokud spadne] SPARK nemá ssh klíč na JODA — na JODA
 # provést PLAN-joda-chroma.md (v kořeni tohoto repa) a pak pokračovat zde.
 
@@ -76,7 +76,7 @@ curl -sf http://localhost:8080/v1/models | grep -q translate   # alias stačí, 
 # paměťová kontrola PŘED startem: free -g, nvidia-smi (translate ~20 GB)
 
 # 3c. WorldLibraryProject na SPARK
-cd /home/ol1n/deploy
+cd ~/deploy
 git clone -b claude/personalized-chatbot-edurag-5x5hoz \
   https://github.com/lioilsources/WorldLibraryProject.git
 cd WorldLibraryProject/rag
@@ -96,11 +96,11 @@ jako pro `dataset.jsonl` v kořenovém README; přes LAN nebo Tailscale):
 ```bash
 # [ČLOVĚK/M2] na M2:
 cd WorldLibraryProject/rag && make ingest-txt
-rsync -avz --progress books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
+rsync -avz --progress books.jsonl spark:~/deploy/WorldLibraryProject/rag/
 
 # pak na SPARKu:
-cd /home/ol1n/deploy/WorldLibraryProject/rag
-make embed   # JSONL default ./books.jsonl, CHROMA_URL default http://192.168.88.88:8006
+cd ~/deploy/WorldLibraryProject/rag
+make embed   # JSONL default ./books.jsonl, CHROMA_URL default http://$JODA_HOST:8006
 # ověřit: výpis "Kolekce má N dokumentů", N > 0
 ```
 
@@ -110,7 +110,7 @@ Idempotentní — při přerušení spustit znovu. Embedding model
 ## Fáze 5 — chatbot server
 
 ```bash
-cd /home/ol1n/deploy/WorldLibraryProject/rag
+cd ~/deploy/WorldLibraryProject/rag
 source .venv/bin/activate
 make serve   # :8090, LLM localhost:4000/v1, model translate
 ```
@@ -124,8 +124,8 @@ Description=Library RAG chatbot
 After=docker.service network-online.target
 [Service]
 User=ol1n
-WorkingDirectory=/home/ol1n/deploy/WorldLibraryProject/rag
-ExecStart=/home/ol1n/deploy/WorldLibraryProject/rag/.venv/bin/python3 server.py
+WorkingDirectory=%h/deploy/WorldLibraryProject/rag
+ExecStart=%h/deploy/WorldLibraryProject/rag/.venv/bin/python3 server.py
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target

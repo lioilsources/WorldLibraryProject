@@ -64,7 +64,7 @@ pointery, PDF čekající na OCR).
 ## Krok 3 — přenos na SPARK
 
 ```bash
-rsync -avz --progress books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
+rsync -avz --progress books.jsonl spark:~/deploy/WorldLibraryProject/rag/
 ```
 
 ## Krok 4 — zbytek řídí SPARK
@@ -82,7 +82,7 @@ Po přidání nových knih (nové URL v `urls.txt`):
 ```bash
 ./run_pipeline.sh                 # stáhne jen nové soubory (resume-friendly)
 cd rag && make ingest             # přegeneruje books.jsonl
-rsync -avz books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
+rsync -avz books.jsonl spark:~/deploy/WorldLibraryProject/rag/
 ssh spark 'cd ~/deploy/WorldLibraryProject/rag && source .venv/bin/activate && make embed'
 ```
 
@@ -102,7 +102,7 @@ make serve LLM_URL=https://llm.ol1n.com/v1
 ## Diagnostika
 
 ```bash
-curl -sf http://192.168.88.88:8006/api/v2/heartbeat        # JODA Chroma
+curl -sf http://$SPARK_HOST:8007/api/v2/heartbeat       # SPARK Chroma (library_chroma)
 curl -sf https://llm.ol1n.com/health \
   -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
   -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET"   # SPARK gateway

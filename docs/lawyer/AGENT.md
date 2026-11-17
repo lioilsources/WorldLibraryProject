@@ -1,5 +1,8 @@
 # Právník jako agent — stav k 2026-10-05
 
+> Pozdější změna: pevná okna (19–01 apod.) už neplatí, profily zapíná
+> spark-broker přes `sparkctl` a `rag-schedule.sh` je jen jeho provisioner.
+
 **Zapojeno do appky** (Ol1nLLM, persona „Právník – smlouvy 📝", `backend:
 "law-agent"`). `/agent/chat` jede na aliasu LiteLLM **`pravnik-agent`**
 (`--agent-model`), který dnes reálně odpovídá **qwen36** (`openclaw-default`,

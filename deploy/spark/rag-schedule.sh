@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# POZOR (2026-11): skript je dnes jen provisioner profilů, volá ho spark-broker.
+# Ručně ho nespouštět; rag-schedule.timer je od 23. 10. 2026 vypnutý a pevná
+# okna níž (07/13/19/01) už neplatí. GPU úlohy jen přes `sparkctl`.
+#
 # Rozvrh SPARKu — profily, v každém okně jen to, co se do 121,7 GiB unified
 # vejde se zachováním pravidel z incidentů (AiStack/PLAN-spark-scheduler.md):
 # ComfyUI render nikdy vedle LLM ≥ 30 GiB (29. 9. 2026 CPU render + přehřátí),

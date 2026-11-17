@@ -24,7 +24,7 @@ Dva režimy spuštění:
    embedder (SPARK mívá při nočním obohacení volné jen 2 GB). Jde i z M2 přes LAN;
    cite cesta potřebuje jen PG. Kanály tímhle nelze přepínat — jsou ty serverové:
 
-       .venv/bin/python3 eval/eval_law.py --service http://192.168.88.66:8098 --top-k 8
+       .venv/bin/python3 eval/eval_law.py --service http://$SPARK_HOST:8098 --top-k 8
 """
 
 from __future__ import annotations

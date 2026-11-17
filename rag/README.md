@@ -64,8 +64,8 @@ SPARKu:
   `CF_ACCESS_CLIENT_ID` a `CF_ACCESS_CLIENT_SECRET` (server je pošle
   jako `CF-Access-Client-Id/Secret` hlavičky).
 
-Pozor: Chroma na SPARKu (`192.168.88.66:8007`) i Postgres na JODĚ
-(`192.168.88.88:5433`) jsou jen v LAN — retrieval tedy vyžaduje, aby server
+Pozor: Chroma na SPARKu (`$SPARK_HOST:8007`) i Postgres na JODĚ
+(`$JODA_HOST:5433`) jsou jen v LAN — retrieval tedy vyžaduje, aby server
 běžel v domácí síti (M2 stačí; embedding jednoho dotazu zvládne i MPS/CPU).
 Přes internet by musely oba porty do tunelu.
 
@@ -191,7 +191,7 @@ docker compose -f deploy/spark/docker-compose.library.yaml up -d   # :8007
 cd rag && pip install pymupdf
 make ingest            # TXT + PDF → books.jsonl
 make ingest-txt        # jen TXT (rychlý start, čistá data)
-rsync -avz --progress books.jsonl spark:/home/ol1n/deploy/WorldLibraryProject/rag/
+rsync -avz --progress books.jsonl spark:~/deploy/WorldLibraryProject/rag/
 ```
 
 Skript hlásí LFS pointery bez obsahu a PDF bez textové vrstvy (skeny
@@ -291,7 +291,7 @@ jen 3,8 GB RAM a index se jí stránkoval ze swapu.
   po autorech; fragmenty se jen sečtou), přehled díla, seznam kapitol, obsah kapitoly, čtení dál.
   Do systémového promptu už nejde celý katalog, jen index tradic (7 551 → 1 805 znaků).
 - **Obohacení** (`enrich_chunks.py`, `enrich_chapters.py`, `enrich_works.py` přímo na
-  swarm-director :8012, jen v okně director — rozvrh v AiStack `PLAN-spark-scheduler.md`): gloss_cs, klíčová slova cs/en/orig, otázky, entity, témata, kvalita;
+  swarm-director :8012, jen v profilu director — o profilu rozhoduje spark-broker přes `sparkctl`, viz globální CLAUDE.md): gloss_cs, klíčová slova cs/en/orig, otázky, entity, témata, kvalita;
   summary kapitol a děl ve 3 délkách. Resume přes `input_sha`, fallback model se zahazuje.
 - **Endpointy navíc**: `GET /works` (filtry group/topic/author/lang/q, `detail`),
   `GET /works/{id}/chapters`, `GET /works/{id}/chunks` (čtení dál), `GET /search` (bez LLM),

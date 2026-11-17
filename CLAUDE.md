@@ -3,6 +3,8 @@
 Multijazyčný korpus filozofických a posvátných textů (download pipeline
 v kořeni, RAG chatbot v `rag/`). Dokumentace a komentáře česky.
 
+Odchylka od lang.md: komentáře česky.
+
 **Knihovna drží originály.** Smysl projektu je zjistit, jak si LLM poradí
 s exotickými jazyky — pálí, sanskrtem, klasickou čínštinou, hebrejštinou —
 takže se do korpusu **nepřidávají české ani anglické překlady děl**.
@@ -15,11 +17,16 @@ výstup: odpověď knihovníka a pole `excerpt_cs` u zdrojů.
 | Jméno | Co to je | Role |
 |---|---|---|
 | **M2** | Mac Mini M2 | orchestrátor: stahování korpusu (`run_pipeline.sh`), ingest (`rag/ingest_books.py` → `books.jsonl`), rsync na SPARK |
-| **JODA** | Ubuntu server s Dockerem, `192.168.88.88` (LAN only, žádné sdílené disky; 3,8 GB RAM, 2 CPU) | **`deploy/joda/`** tohoto repa: jen `library_postgres` :5433 (katalog, kapitoly, fulltext, obohacení; data na /media). Chroma se odsud 2026-09-12 přesunula na SPARK (viz `PLAN-spark-library-storage.md`) — JODĚ na 3,8 GB RAM docházela paměť, index se stránkoval ze swapu |
+| **JODA** | Ubuntu server s Dockerem, `$JODA_HOST` (LAN only, žádné sdílené disky; 3,8 GB RAM, 2 CPU) | **`deploy/joda/`** tohoto repa: jen `library_postgres` :5433 (katalog, kapitoly, fulltext, obohacení; data na /media). Chroma se odsud 2026-09-12 přesunula na SPARK (viz `PLAN-spark-library-storage.md`) — JODĚ na 3,8 GB RAM docházela paměť, index se stránkoval ze swapu |
 | **SPARK** | DGX Spark (GB10 Grace Blackwell, 128 GB UMA, aarch64) | AiStack LLM park za LiteLLM :4000, veřejně https://llm.ol1n.com; embedding + chatbot `rag/server.py` :8090 (chystá se https://chat.ol1n.com); **`deploy/spark/`** tohoto repa: `library_chroma` :8007 (books_v2 + books_gloss, na NVMe) |
 
 Data mezi stroji tečou přes ssh/rsync (ssh alias `spark`, JODA
-dosažitelná jako `joda`).
+dosažitelná jako `joda`). Adresy strojů jsou v `rag/.env` (mimo git), fakta
+o strojích v `~/.claude/shared/infra.md`.
+
+GPU na SPARKu jen přes spark-broker (`sparkctl`, viz globální CLAUDE.md).
+`deploy/spark/rag-schedule.sh` je jen provisioner profilů, který volá broker;
+ručně ho nespouštět, `rag-schedule.timer` nezapínat, pevná okna neplatí.
 
 ## Související repa
 
@@ -37,7 +44,7 @@ dosažitelná jako `joda`).
 - `rag/chapters.py`, `rag/clean_text.py`, `rag/perseus_tei.py` — kapitoly per tradice, čištění, TEI
 - `rag/retriever.py` + `rag/pg_search.py` + `rag/hybrid.py` — hybridní retrieval (vektor + fulltext → RRF)
 - `rag/planner.py` + `rag/catalog.py` — intent dotazu a katalogové odpovědi z Postgresu
-- `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na swarm-director :8012 v okně director, fallback se zahazuje; rozvrh oken v AiStack `PLAN-spark-scheduler.md`)
+- `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na swarm-director :8012 v profilu director, fallback se zahazuje; profil zapíná spark-broker přes `sparkctl`)
 - `rag/sql/` + `rag/pg_migrate.py` — schéma Postgresu; `rag/.env` (mimo git): `PG_DSN`, `CHROMA_URL`, `COLLECTION`
 - `rag/export_bundle.py` — export díla z Postgresu do bundlu pro Kindlify (čtečka); kontrakt hlídá `validate_bundle()`
 - `rag/eval/` — měření retrievalu bez LLM proti zlatému standardu; baseline
@@ -58,7 +65,7 @@ dosažitelná jako `joda`).
   šablony, intake, render, revize, ask_user), intake v Postgresu
   (`lawyer_sessions`), deterministická revize cizích smluv. Model je injektovaný,
   takže `make eval-agent` (22 scénářů) běží bez LLM; `POST /agent/chat` jede na
-  aliasu `pravnik-agent` (`--agent-model`; dnes qwen36, okno 19–01) a jeho kontrakt
+  aliasu `pravnik-agent` (`--agent-model`; dnes qwen36 v profilu llm, který zapíná spark-broker) a jeho kontrakt
   pro appku Ol1nLLM (persona „Právník – smlouvy 📝") je v `rag/agent/klient.py`.
   Stav, kontrakt a nasazení: `docs/lawyer/AGENT.md`
 - `downloads/` — korpus v Git LFS (bez `git lfs pull` jsou to jen pointery!)
