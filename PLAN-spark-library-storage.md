@@ -296,7 +296,7 @@ free -m | sed -n 2,3p                               # swap má klesnout o ~0,9 G
 ```
 
 `stop` je trvalý i přes `restart: unless-stopped` (to restartuje jen po
-pádu). Data v `/home/oli/deploy/WorldLibraryProject/chroma-data` (3,1 GB)
+pádu). Data v `~/deploy/WorldLibraryProject/chroma-data` (3,1 GB)
 **nechat dva týdny**, pak smazat a službu z `docker-compose.library.yaml`
 odstranit samostatným commitem.
 
