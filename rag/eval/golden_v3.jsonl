@@ -24,3 +24,5 @@
 {"q": "Přečti mi další kus.", "intent": "read"}
 {"q": "Ahoj, jak se máš?", "intent": "smalltalk"}
 {"q": "Děkuju, to stačí.", "intent": "smalltalk"}
+{"q": "O čem je Chuaj-nan-c'?", "intent": "work_overview", "expect_work": "zh.huainanzi"}
+{"q": "Vypiš mi kapitoly Čuang-c' v originále.", "intent": "chapters", "expect_work": "zh.zhuangzi_lzh"}

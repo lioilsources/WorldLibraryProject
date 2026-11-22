@@ -22,3 +22,8 @@
 {"q": "Jak německý idealismus pracuje s pojmem ducha?", "expect_group": "european_philosophy"}
 {"q": "Srovnej pojetí duše v buddhismu a v hinduismu.", "expect_group": ["pali", "sanskrit"], "diversity": true}
 {"q": "Jaké knihy máš v knihovně?", "catalog": true}
+{"q": "Co znamená Čuang-c'ovo putování v nezávislosti (逍遙遊)?", "expect_work": "zhuangzi lzh", "expect_group": "chinese"}
+{"q": "Co říká I-ťing o hexagramu Čchien (乾)?", "expect_work": "yijing", "expect_group": "chinese"}
+{"q": "Jak Sün-c' zdůvodňuje, že lidská přirozenost je zlá (性惡)?", "expect_work": "xunzi", "expect_group": "chinese"}
+{"q": "Co učí mohismus o všeobecné lásce (兼愛)?", "expect_work": "mozi", "expect_group": "chinese"}
+{"q": "Jak legisté radí vládci používat tresty a odměny?", "expect_work": "hanfeizi", "expect_group": "chinese"}

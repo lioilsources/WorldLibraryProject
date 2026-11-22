@@ -382,6 +382,12 @@ def adapter_name(entry: dict) -> str | None:
     return (entry.get("source") or {}).get("adapter")
 
 
+def adapter_dirs(works) -> tuple[str, ...]:
+    """Adresáře děl s adaptérem (Kanripo: jeden adresář = jedno dílo) jako
+    prefixy NFC cest — jejich soubory nesmí projít i jako samostatné TXT."""
+    return tuple(nfc(e["path"]).rstrip("/") + "/" for e in works if adapter_name(e))
+
+
 def ingest_adapter(path: Path, rel: Path, entry: dict, writer: Writer, created_at: str, stats: dict):
     """Dílo ze strukturovaného zdroje: kapitoly dodá adaptér, ne detektor.
     Adaptér s CLEAN = False (Tanzil: text se nesmí měnit) dostane jen NFC —
@@ -467,6 +473,7 @@ def main() -> int:
     needs_ocr, unregistered = [], []
 
     suffixes = {".txt"} if args.no_pdf else {".txt", ".pdf"}
+    in_adapter_dir = adapter_dirs(by_path.values())
     files = sorted(f for f in root.rglob("*") if f.is_file() and f.suffix.lower() in suffixes)
     for path in files:
         rel = path.relative_to(root)
@@ -476,6 +483,8 @@ def main() -> int:
             continue
         norm_rel = nfc(str(rel))
         if any(m in norm_rel for m in SKIP_DIR_MARKERS + EXCLUDE_PATH_MARKERS):
+            continue
+        if norm_rel.startswith(in_adapter_dir):
             continue
         if is_lfs_pointer(path):
             stats["lfs_skipped"] += 1
@@ -505,7 +514,7 @@ def main() -> int:
         path = root / rel
         if not path.exists():
             path = root / unicodedata.normalize("NFD", entry["path"])
-        if is_lfs_pointer(path):
+        if (path.is_file() and is_lfs_pointer(path)) or (path.is_dir() and any(map(is_lfs_pointer, path.glob("*.txt")))):
             stats["lfs_skipped"] += 1
             continue
         try:

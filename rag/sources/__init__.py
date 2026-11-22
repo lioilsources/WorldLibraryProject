@@ -37,6 +37,7 @@ class Chapter:
 ADAPTERS = {
     "perseus": "sources.perseus",
     "tanzil": "sources.tanzil",
+    "kanripo": "sources.kanripo",
 }
 
 

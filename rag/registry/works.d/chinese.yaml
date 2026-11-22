@@ -1,0 +1,336 @@
+# Čína z Kanripa (fáze 3; Čuang-c' nahrazuje překlad zh.zhuangzi). Výběr stažený
+# `python3 -m sources.kanripo fetch <repo> <větev> ../downloads/chinese/kanripo`.
+
+zh.zhuangzi_lzh:
+  path: chinese/kanripo/KR5c0126
+  group: chinese
+  work_legacy: zhuangzi lzh
+  title: 莊子
+  name_cs: Čuang-c' (originál)
+  author: Zhuangzi (Zhuang Zhou)
+  author_cs: Čuang-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 4.–3. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR5c0126 větev tls @ abb9cd323dfd — interpunkční text TLS
+    (CHANT), 33 kapitol
+  priority: 1
+  tradition:
+  - chinese
+  - taoism
+  aliases:
+  - zhuangzi
+  - zhuang zi
+  - cuang-c
+  - cuangc
+  - nanhua
+  - nan-chua
+  source:
+    adapter: kanripo
+    repo: KR5c0126
+    branch: tls
+    commit: abb9cd323dfd9520894b56b3b8ba2ec0ea50554f
+zh.yijing:
+  path: chinese/kanripo/KR1a0001
+  group: chinese
+  work_legacy: yijing
+  title: 周易
+  name_cs: I-ťing (Kniha proměn)
+  author: anonym
+  author_cs: anonym
+  lang_original: lzh
+  lang_corpus: lzh
+  form: jine
+  period: 1. tis. př. n. l.
+  edition: 'Kanseki Repository (kanripo), CC BY-SA 4.0, KR1a0001 větev tls @ 8284adbf9e34 — text TLS: 64 hexagramů
+    a Deset křídel'
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - i-ting
+  - iting
+  - yijing
+  - i ching
+  - zhouyi
+  - kniha promen
+  source:
+    adapter: kanripo
+    repo: KR1a0001
+    branch: tls
+    commit: 8284adbf9e3435d713180e24f05bf75f8b7d1d96
+zh.shijing:
+  path: chinese/kanripo/KR1c0001
+  group: chinese
+  work_legacy: shijing
+  title: 毛詩
+  name_cs: Š'-ťing (Kniha písní)
+  author: anonym
+  author_cs: anonym
+  lang_original: lzh
+  lang_corpus: lzh
+  form: hymnus
+  period: 11.–6. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR1c0001 větev tls @ 9d36bf3a055b — text TLS (Mao), bez komentářů
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - si-ting
+  - shijing
+  - kniha pisni
+  - mao shi
+  source:
+    adapter: kanripo
+    repo: KR1c0001
+    branch: tls
+    commit: 9d36bf3a055b7aba01597f0c0581838ef56dc497
+zh.shangshu:
+  path: chinese/kanripo/KR1b0001
+  group: chinese
+  work_legacy: shangshu
+  title: 尚書
+  name_cs: Šu-ťing (Kniha dokumentů)
+  author: anonym
+  author_cs: anonym
+  lang_original: lzh
+  lang_corpus: lzh
+  form: kronika
+  period: 1. tis. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR1b0001 větev tls @ 9fe0bc3d48dd — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - su-ting
+  - shujing
+  - shangshu
+  - sang-su
+  - kniha dokumentu
+  source:
+    adapter: kanripo
+    repo: KR1b0001
+    branch: tls
+    commit: 9fe0bc3d48dd383c54532e7b5b45f8adef56aca5
+zh.liji:
+  path: chinese/kanripo/KR1d0052
+  group: chinese
+  work_legacy: liji
+  title: 禮記
+  name_cs: Li-ťi (Zápisky o obřadech)
+  author: anonym (konfuciánská škola)
+  author_cs: anonym
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 3.–1. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR1d0052 větev tls @ 17289bc01600 — text TLS; obsahuje Velké
+    učení (大學) a Doktrínu středu (中庸)
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - li-ti
+  - liji
+  - zapisky o obradech
+  - velke uceni
+  - doktrina stredu
+  - zhongyong
+  - daxue
+  source:
+    adapter: kanripo
+    repo: KR1d0052
+    branch: tls
+    commit: 17289bc016009d28fbe51f98afd87d510da2b0ec
+zh.zuozhuan:
+  path: chinese/kanripo/KR1e0001
+  group: chinese
+  work_legacy: zuozhuan
+  title: 春秋左傳
+  name_cs: Cuo-čuan (Letopisy jara a podzimu s Cuovým komentářem)
+  author: Zuo Qiuming (připisováno)
+  author_cs: Cuo Čchiou-ming
+  lang_original: lzh
+  lang_corpus: lzh
+  form: kronika
+  period: 4. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR1e0001 větev tls @ dc3dc18e0039 — text TLS, kapitola =
+    vláda vévody
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - cuo-cuan
+  - zuozhuan
+  - zuo zhuan
+  - jaro a podzim
+  - chunqiu
+  source:
+    adapter: kanripo
+    repo: KR1e0001
+    branch: tls
+    commit: dc3dc18e0039e05679d98bc650c2f980f8dcabac
+zh.xunzi:
+  path: chinese/kanripo/KR3a0002
+  group: chinese
+  work_legacy: xunzi
+  title: 荀子
+  name_cs: Sün-c'
+  author: Xun Kuang
+  author_cs: Sün-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 3. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR3a0002 větev tls @ e18a27621ef4 — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  - confucianism
+  aliases:
+  - xunzi
+  - xun zi
+  source:
+    adapter: kanripo
+    repo: KR3a0002
+    branch: tls
+    commit: e18a27621ef434940a368defd29e00eee205dfd2
+zh.hanfeizi:
+  path: chinese/kanripo/KR3c0005
+  group: chinese
+  work_legacy: hanfeizi
+  title: 韓非子
+  name_cs: Chan Fej-c'
+  author: Han Fei
+  author_cs: Chan Fej
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 3. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR3c0005 větev tls @ 55418cf95c05 — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  - legalism
+  aliases:
+  - chan fej
+  - hanfei
+  - han fei
+  source:
+    adapter: kanripo
+    repo: KR3c0005
+    branch: tls
+    commit: 55418cf95c05d3bcc35e26bb568cf0a8da957332
+zh.sunzi:
+  path: chinese/kanripo/KR3b0003
+  group: chinese
+  work_legacy: sunzi
+  title: 孫子
+  name_cs: Sun-c' (Umění války)
+  author: Sun Wu (připisováno)
+  author_cs: Sun-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 5. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR3b0003 větev tls @ 96402eede8bd — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  aliases:
+  - sunzi
+  - sun zi
+  - umeni valky
+  - art of war
+  source:
+    adapter: kanripo
+    repo: KR3b0003
+    branch: tls
+    commit: 96402eede8bde255fef03e02377448bbcf20a248
+zh.huainanzi:
+  path: chinese/kanripo/KR3j0010
+  group: chinese
+  work_legacy: huainanzi
+  title: 淮南子
+  name_cs: Chuaj-nan-c'
+  author: Liu An (a dvůr)
+  author_cs: Liou An
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 2. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR3j0010 větev tls @ cf18225cdf05 — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  - taoism
+  aliases:
+  - chuaj-nan
+  - huainan
+  source:
+    adapter: kanripo
+    repo: KR3j0010
+    branch: tls
+    commit: cf18225cdf0595e7fea49cfc21a37e406661e10f
+zh.liezi:
+  path: chinese/kanripo/KR5c0124
+  group: chinese
+  work_legacy: liezi
+  title: 列子
+  name_cs: Lie-c'
+  author: Lie Yukou (připisováno)
+  author_cs: Lie-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 4. stol. n. l. (redakce)
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR5c0124 větev tls @ 5596213218c7 — text TLS
+  priority: 1
+  tradition:
+  - chinese
+  - taoism
+  aliases:
+  - lie-c
+  - liezi
+  - lie zi
+  source:
+    adapter: kanripo
+    repo: KR5c0124
+    branch: tls
+    commit: 5596213218c7da1449dd65ef78db533d51ccd9bc
+zh.mozi:
+  path: chinese/kanripo/KR3j0002
+  group: chinese
+  work_legacy: mozi
+  title: 墨子
+  name_cs: Mo-c'
+  author: Mo Di
+  author_cs: Mo-c'
+  lang_original: lzh
+  lang_corpus: lzh
+  form: traktat
+  period: 5.–3. stol. př. n. l.
+  edition: Kanseki Repository (kanripo), CC BY-SA 4.0, KR3j0002 větev master @ 375d1c2b3cff — Sï-kchu čchüan-šu
+    (WYG), bez interpunkce; komentáře vypuštěny. Kapitola 備蛾傳 (63) nemá v textu nadpis a je součástí kapitoly 備穴
+    (62)
+  priority: 1
+  tradition:
+  - chinese
+  - mohism
+  aliases:
+  - mo-c
+  - mozi
+  - mo zi
+  source:
+    adapter: kanripo
+    repo: KR3j0002
+    branch: master
+    commit: 375d1c2b3cff0207f4d972e055ef329a57049b04
+    chapter_re: ^　　[^　]+第[一二三四五六七八九十]+$
+    drop_re: ^(欽定四庫全書|　*墨子卷)
