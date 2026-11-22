@@ -6,6 +6,8 @@
 #   dir=<cílový adresář (relativní od BASE_DIR)>
 #   [branch=<větev, default: výchozí větev>]
 #   [depth=<--depth N, default: plný klon>]
+#   [commit=<SHA — připnutí; klon stáhne jen tenhle commit, ingest jde zopakovat>]
+#   [base=upstream — klon do $UPSTREAM_DIR mimo repo; do downloads/ jde jen výběr]
 #
 #   type=wget
 #   url=<URL>
@@ -86,3 +88,4 @@ depth=1
 # === ISLÁM – Korán (arabský text Uthmani) ===
 # tanzil.net poskytuje text přes form na https://tanzil.net/download/
 # Stáhni manuálně a ulož do downloads/islam/quran/
+

@@ -19,8 +19,8 @@ from dataclasses import dataclass, field
 from cite import ref_span
 from embeddings import format_query
 from hybrid import dedup_passages, rrf
-from pg_search import fts_cs, fts_orig, hydrate, known_groups, neighbors, query_terms, sibling_sections
-from retrieval import diversify, looks_tabular, route, route_groups
+from pg_search import fts_cs, fts_orig, hydrate, known_groups, neighbors, query_terms, sibling_sections, work_scope
+from retrieval import diversify, looks_tabular, route, route_traditions, scope_for_traditions
 
 
 @dataclass
@@ -71,6 +71,7 @@ class Retriever:
         self.legacy_to_id = legacy_to_id or {}
         with self.pool.connection() as conn:
             self.known_groups = known_groups(conn)
+            self.work_scope = work_scope(conn)
 
     # --- kanály ---------------------------------------------------------------
 
@@ -98,7 +99,9 @@ class Retriever:
                 works = [self.legacy_to_id[w] for w in term_works if w in self.legacy_to_id]
         groups = plan.groups if works == [] else []
         if not works and not groups and not self.no_routing:
-            groups = [g for g in route_groups(query) if g in self.known_groups]
+            # tradice se řeší per dílo (skupina ≠ tradice); tradice bez děl
+            # v korpusu filtr nedá, jinak by hledání zúžila na prázdno
+            works, groups = scope_for_traditions(route_traditions(query), self.work_scope)
         where = None
         if works:
             where = {"work_id": {"$in": works}}

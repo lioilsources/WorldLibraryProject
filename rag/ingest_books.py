@@ -52,6 +52,7 @@ LFS_POINTER_PREFIX = b"version https://git-lfs.github.com/spec/v1"
 # dělit.
 CHUNK_BY_LANG = {
     "zh": 500, "lzh": 500,
+    "ar": 550,   # plně vokalizovaný uthmání text: 0,83 tok/znak (měřeno na Koránu)
     "pi": 1100,
     "grc": 1200,
     "lat": 1300,
@@ -96,7 +97,8 @@ MIN_PDF_CHARS = 1000
 MAX_LATIN_EXT = 0.35
 
 WORK_FIELDS = ("group", "subgroup", "title", "work_legacy", "name_cs", "author", "author_cs",
-               "lang_original", "lang_corpus", "edition", "form", "period", "urn", "priority", "aliases")
+               "lang_original", "lang_corpus", "edition", "form", "period", "urn", "priority", "aliases",
+               "tradition")
 
 
 def nfc(s: str) -> str:
@@ -179,9 +181,28 @@ def work_title(path: Path, raw_text: str = "") -> str:
 
 # --- registr --------------------------------------------------------------------
 
+def load_works(registry_dir: Path) -> dict[str, dict]:
+    """works.yaml + works.d/*.yaml (po skupinách, abecedně) → {work_id: záznam}.
+
+    Nová díla patří do works.d/<skupina>.yaml: registr upravuje víc strojů
+    najednou a jeden velký soubor dával konflikty při každém rebase.
+    Totéž work_id ve dvou souborech je chyba, ne přepis."""
+    files = [registry_dir / "works.yaml"] + sorted((registry_dir / "works.d").glob("*.yaml"))
+    works: dict[str, dict] = {}
+    for f in files:
+        if not f.exists():
+            continue
+        part = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        dup = sorted(set(part) & set(works))
+        if dup:
+            raise ValueError(f"{f.name}: work_id už je v registru jinde: {', '.join(dup)}")
+        works.update(part)
+    return works
+
+
 def load_registry(registry_dir: Path) -> tuple[dict[str, dict], dict[str, dict]]:
     """(díla podle NFC cesty, Perseus overrides podle work_id)."""
-    works = yaml.safe_load((registry_dir / "works.yaml").read_text(encoding="utf-8")) or {}
+    works = load_works(registry_dir)
     by_path = {}
     for wid, e in works.items():
         e = dict(e)
@@ -357,9 +378,32 @@ def ingest_file(path: Path, rel: Path, entry: dict, writer: Writer, created_at: 
     return emit_work(writer, entry, chapter_texts, created_at, str(rel))
 
 
-def ingest_perseus(root: Path, overrides: dict, writer: Writer, created_at: str, stats: dict, groups: set[str], verbose: bool):
-    import perseus_tei as pt
+def adapter_name(entry: dict) -> str | None:
+    return (entry.get("source") or {}).get("adapter")
 
+
+def ingest_adapter(path: Path, rel: Path, entry: dict, writer: Writer, created_at: str, stats: dict):
+    """Dílo ze strukturovaného zdroje: kapitoly dodá adaptér, ne detektor.
+    Adaptér s CLEAN = False (Tanzil: text se nesmí měnit) dostane jen NFC —
+    kanonicky ekvivalentní podobu, kterou by stejně zapsal load_pg; Tanzil
+    má šaddu před fathou, NFC je prohodí, znaky ani vykreslení se nemění."""
+    import sources
+
+    ad = sources.get(adapter_name(entry))
+    lang = entry.get("lang_corpus") or entry.get("lang_original") or "en"
+    chapter_texts = [
+        {"ordinal": i, "level": c.level, "parent_ordinal": None, "ref": c.ref, "heading": c.heading,
+         "path": c.heading, "text": clean(c.text, lang, "txt") if ad.CLEAN else nfc(c.text)}
+        for i, c in enumerate(ad.extract(path, entry), 1)
+    ]
+    stats["adapter"] += 1
+    return emit_work(writer, entry, chapter_texts, created_at, nfc(str(rel)))
+
+
+def ingest_perseus(root: Path, overrides: dict, writer: Writer, created_at: str, stats: dict, groups: set[str], verbose: bool):
+    import sources
+
+    pt = sources.get("perseus")
     works = pt.scan_works(root)
     if not works:
         print("POZOR: Perseus nenalezen v", root, file=sys.stderr)
@@ -383,7 +427,7 @@ def ingest_perseus(root: Path, overrides: dict, writer: Writer, created_at: str,
         file = w.file
         if ov_work.get("edition_file"):
             file = w.file.parent / ov_work["edition_file"]
-        tei_chapters, _ = pt.extract(file)
+        tei_chapters = pt.extract(file)
         chapter_texts = [
             {"ordinal": i, "level": 1, "parent_ordinal": None, "ref": c.ref, "heading": c.heading,
              "path": c.heading, "text": clean(c.text, w.lang, "txt")}
@@ -418,7 +462,8 @@ def main() -> int:
     out = Path(args.output)
     writer = Writer(out.parent if out.parent != Path("") else Path("."), args.stats_only)
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    stats = {"txt": 0, "pdf": 0, "tei": 0, "lfs_skipped": 0, "ocr_needed": 0, "errors": 0, "unregistered": 0}
+    stats = {"txt": 0, "pdf": 0, "tei": 0, "adapter": 0, "lfs_skipped": 0, "ocr_needed": 0, "errors": 0,
+             "unregistered": 0}
     needs_ocr, unregistered = [], []
 
     suffixes = {".txt"} if args.no_pdf else {".txt", ".pdf"}
@@ -436,6 +481,8 @@ def main() -> int:
             stats["lfs_skipped"] += 1
             continue
         entry = by_path.get(norm_rel)
+        if entry is not None and adapter_name(entry):
+            continue   # strukturovaný zdroj jde přes adaptér níž
         if entry is None:
             stats["unregistered"] += 1
             unregistered.append(norm_rel)
@@ -450,6 +497,27 @@ def main() -> int:
         if st and not args.quiet:
             print(f"  {entry['id']:<28} kap {st['chapters']:>4} chunků {st['chunks']:>5} med {st['median']:>4}  {norm_rel[-50:]}")
 
+    # díla s adaptérem: cestu dává registr, přípona souboru nerozhoduje
+    for entry in sorted((e for e in by_path.values() if adapter_name(e)), key=lambda e: e["id"]):
+        if groups and entry.get("group") not in groups:
+            continue
+        rel = Path(entry["path"])
+        path = root / rel
+        if not path.exists():
+            path = root / unicodedata.normalize("NFD", entry["path"])
+        if is_lfs_pointer(path):
+            stats["lfs_skipped"] += 1
+            continue
+        try:
+            st = ingest_adapter(path, rel, entry, writer, created_at, stats)
+        except Exception as e:  # noqa: BLE001
+            stats["errors"] += 1
+            print(f"CHYBA {rel}: {e}", file=sys.stderr)
+            continue
+        if not args.quiet:
+            print(f"  {entry['id']:<28} kap {st['chapters']:>4} chunků {st['chunks']:>5} med {st['median']:>4}  "
+                  f"{adapter_name(entry)}:{nfc(str(rel))[-40:]}")
+
     if args.perseus and (not groups or "greek_latin" in groups):
         ingest_perseus(root / "greek_latin" / "perseus", overrides, writer, created_at, stats, groups, not args.quiet)
 
@@ -457,7 +525,8 @@ def main() -> int:
     c = writer.counts
     med = statistics.median(writer.chunk_lens) if writer.chunk_lens else 0
     print(f"\n{'DRY-RUN: ' if args.stats_only else ''}{stats['txt']} TXT + {stats['pdf']} PDF + {stats['tei']} TEI"
-          f" → {c['works']} děl, {c['chapters']} kapitol, {c['chunks']} chunků ({c['chars']/1e6:.1f} M znaků, medián {med:.0f})"
+          + (f" + {stats['adapter']} z adaptérů" if stats["adapter"] else "")
+          + f" → {c['works']} děl, {c['chapters']} kapitol, {c['chunks']} chunků ({c['chars']/1e6:.1f} M znaků, medián {med:.0f})"
           + ("" if args.stats_only else f" → {out}"))
     if stats["lfs_skipped"]:
         print(f"POZOR: {stats['lfs_skipped']} souborů jsou Git LFS pointery bez obsahu — git lfs pull.")

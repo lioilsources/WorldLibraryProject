@@ -267,7 +267,18 @@ jen 3,8 GB RAM a index se jí stránkoval ze swapu.
 - **Registr** (`registry/`): `works.yaml` — kurátorská metadata 93 dnešních děl (název_cs, autor,
   `lang_original` vs `lang_corpus` — poctivě, u překladů `en`), `topics.yaml` — 33 témat pro
   constrained labeling, `perseus_overrides.yaml` — české názvy a aliasy kanonických antických děl
-  a autorů. `validate.py` před ingestem.
+  a autorů. `validate.py` před ingestem. Nová díla patří do `works.d/<skupina>.yaml` (načítá se
+  spolu s `works.yaml`, totéž `work_id` dvakrát je chyba) — registr upravuje víc strojů a jeden
+  soubor dával konflikty. Pole `tradition` (seznam z `retrieval.TRADITIONS`) odděluje tradici od
+  skupiny: dotaz na buddhismus míří na díla s tradicí `buddhism` v jakékoli skupině; dílo bez
+  pole dědí `GROUP_TRADITIONS` své skupiny. V Postgresu sloupec `works.tradition`
+  (`sql/0006`, NULL = výchozí).
+- **Adaptéry zdrojů** (`sources/`): strukturovaný originál (TEI, číslované verše) → kapitoly
+  bez detektoru. Dílo ho zapne `source: {adapter: <jméno>}` v registru; adaptér má
+  `extract(file, entry)`, volitelně `scan_works(root)` a příznak `CLEAN` (False = text jde do
+  korpusu doslova, jen NFC). Dnes `perseus` (obal nad `perseus_tei.py`) a `tanzil` (Korán, súra =
+  kapitola, verše se značkou ﴿n﴾). Nový zdroj = modul v `sources/` + řádek v `ADAPTERS` + test
+  na fixtuře v `tests/fixtures/<zdroj>/`.
 - **Kapitoly** (`chapters.py`): detektory per tradice (čínské 第…章, pálijské vagga › sutta,
   Mahábhárata SECTION, Gutenberg CHAPTER s obsahem, Hegel z osnovy PDF, Rgvéd HYMN, PDF bookmarks
   pro Avestu a Texty pyramid). Perseus má kapitoly v TEI (`perseus_tei.py`, jen originály).

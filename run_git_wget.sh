@@ -7,11 +7,15 @@
 #   ./run_git_wget.sh --dry-run
 #   ./run_git_wget.sh --sources=moje_sources.txt
 #   BASE_DIR=/jiná/cesta ./run_git_wget.sh
+#   UPSTREAM_DIR=/kam/klony ./run_git_wget.sh   # záznamy s base=upstream
 
 set -euo pipefail
 
 # ── Konfigurace ────────────────────────────────────────────────────────────────
 BASE_DIR="${BASE_DIR:-$(pwd)/downloads}"
+# Celé klony velkých zdrojů (GRETIL, Kanripo, CBETA…) patří mimo repo:
+# do downloads/ (a do LFS) jde jen vybraný, normalizovaný text.
+UPSTREAM_DIR="${UPSTREAM_DIR:-$HOME/wlp-upstream}"
 SOURCES_FILE="${SOURCES_FILE:-git_wget_sources.txt}"
 DRY_RUN=false
 
@@ -39,6 +43,7 @@ echo "════════════════════════�
 echo "  Git/Wget Pipeline"
 echo "══════════════════════════════════════════════════"
 echo "  Base dir:    $BASE_DIR"
+echo "  Upstream:    $UPSTREAM_DIR"
 echo "  Sources:     $SOURCES_FILE"
 echo "  Dry-run:     $DRY_RUN"
 echo ""
@@ -47,15 +52,29 @@ echo ""
 # Načte git_wget_sources.txt a volá handle_git / handle_wget pro každý záznam.
 
 handle_git() {
-  local url="$1" dir="$2" branch="$3" depth="$4"
-  local dest="$BASE_DIR/$dir"
+  local url="$1" dir="$2" branch="$3" depth="$4" commit="$5" base="$6"
+  local root="$BASE_DIR"
+  [ "$base" = "upstream" ] && root="$UPSTREAM_DIR"
+  local dest="$root/$dir"
 
   if [ "$DRY_RUN" = true ]; then
     local depth_flag=""
     [ -n "$depth" ] && depth_flag="--depth $depth"
     local branch_flag=""
     [ -n "$branch" ] && branch_flag="-b $branch"
-    echo "[DRY] git clone $depth_flag $branch_flag $url $dest"
+    echo "[DRY] git clone $depth_flag $branch_flag $url $dest${commit:+ @ $commit}"
+    return
+  fi
+
+  # připnutý commit: ingest musí jít zopakovat nad stejnými daty
+  if [ -n "$commit" ]; then
+    mkdir -p "$dest"
+    [ -d "$dest/.git" ] || git -C "$dest" init -q
+    git -C "$dest" remote get-url origin &>/dev/null || git -C "$dest" remote add origin "$url"
+    echo "  → $url @ $commit"
+    echo "           → $dest"
+    git -C "$dest" fetch -q --depth 1 origin "$commit"
+    git -C "$dest" checkout -q --detach "$commit"
     return
   fi
 
@@ -104,7 +123,7 @@ handle_wget() {
 
 # ── Hlavní smyčka ──────────────────────────────────────────────────────────────
 parse_and_run() {
-  local type="" url="" dir="" branch="" depth="" accept="" args="" user_agent=""
+  local type="" url="" dir="" branch="" depth="" commit="" base="" accept="" args="" user_agent=""
   local total=0 ok=0 failed=0
 
   flush() {
@@ -114,7 +133,7 @@ parse_and_run() {
     echo "── [$total] $type: $dir ────────────────────────────"
     case "$type" in
       git)
-        if handle_git "$url" "$dir" "$branch" "$depth"; then
+        if handle_git "$url" "$dir" "$branch" "$depth" "$commit" "$base"; then
           ok=$((ok + 1))
         else
           echo "  CHYBA: selhalo"
@@ -135,7 +154,7 @@ parse_and_run() {
         ;;
     esac
     # reset
-    type=""; url=""; dir=""; branch=""; depth=""; accept=""; args=""; user_agent=""
+    type=""; url=""; dir=""; branch=""; depth=""; commit=""; base=""; accept=""; args=""; user_agent=""
   }
 
   while IFS= read -r raw || [ -n "$raw" ]; do
@@ -158,6 +177,8 @@ parse_and_run() {
       dir)    dir="$val" ;;
       branch) branch="$val" ;;
       depth)  depth="$val" ;;
+      commit) commit="$val" ;;
+      base)   base="$val" ;;
       accept)     accept="$val" ;;
       args)       args="$val" ;;
       user_agent) user_agent="$val" ;;

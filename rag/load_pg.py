@@ -82,13 +82,16 @@ def upsert_topics(conn, registry: Path) -> int:
 
 WORK_COLS = ("group", "subgroup", "title", "work_legacy", "name_cs", "author", "author_cs",
              "lang_original", "lang_corpus", "edition", "form", "period", "source_path", "urn",
-             "priority", "aliases", "chunk_count", "chapter_count", "char_count")
+             "priority", "aliases", "tradition", "chunk_count", "chapter_count", "char_count")
 
 
 def upsert_work(cur, w: dict) -> None:
     row = {c: nfc(w.get(c)) for c in WORK_COLS}
     row["id"] = w["id"]
     row["aliases"] = [nfc(a) for a in (w.get("aliases") or [])]
+    # NULL = výchozí tradice skupiny (sql/0006); řetězec z registru → seznam
+    trad = w.get("tradition")
+    row["tradition"] = ([trad] if isinstance(trad, str) else list(trad)) if trad else None
     row["priority"] = int(w.get("priority") or 2)
     for c in ("chunk_count", "chapter_count", "char_count"):
         row[c] = int(w.get(c) or 0)
