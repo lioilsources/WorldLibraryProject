@@ -10,7 +10,8 @@ s exotickými jazyky — pálí, sanskrtem, klasickou čínštinou, hebrejštino
 takže se do korpusu **nepřidávají české ani anglické překlady děl**.
 Nepoužitelné dílo (rozbitá textová vrstva, mojibake) se opravuje lepším
 zdrojem v původním jazyce, nebo se vyhodí. Do češtiny se překládá až
-výstup: odpověď knihovníka a pole `excerpt_cs` u zdrojů.
+výstup: odpověď knihovníka a pole `excerpt_cs` u zdrojů. Česky psané
+originály (Komenský, Hus, Chelčický) do knihovny patří.
 
 ## Infrastruktura — jména strojů
 
@@ -35,6 +36,7 @@ ručně ho nespouštět, `rag-schedule.timer` nezapínat, pevná okna neplatí.
 
 ## Klíčové soubory
 
+- `PLAN-corpus-expansion.md` — co v korpusu chybí, ověřené zdroje originálů, fáze doplnění
 - `PLAN-spark-chatbot.md` — nasazovací plán chatbota (fáze, verifikace, rollback)
 - `rag/README.md` — architektura a zprovoznění chatbota
 - `rag/registry/` — kurátorský registr děl (works.yaml: název_cs, autor, `lang_original` vs
