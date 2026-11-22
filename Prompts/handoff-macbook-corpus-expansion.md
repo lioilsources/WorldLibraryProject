@@ -51,7 +51,8 @@ konflikty tím zmizí.
 | `make ingest-stats`, ingest nových děl | ano |
 | nahrání do Postgresu, katalogové dotazy, mazání děl | ano |
 | export bundlů pro Kindlify (jen SELECT) | ano |
-| embedding do Chromy, obohacení LLM, chatbot | jen přes SPARK a `spark-broker` |
+| embedding do Chromy, chatbot | jen přes SPARK a `spark-broker` |
+| obohacení LLM | SPARK přes `spark-broker`, nebo výplň na L40S (řeší session L40S; klient potřebuje Postgres a tunel na vLLM) |
 
 Když MacBook na SPARK nedosáhne, skonči u nahrání do Postgresu a do PR
 napiš, co zbývá spustit na SPARKu (`make embed`, `make embed-gloss`,

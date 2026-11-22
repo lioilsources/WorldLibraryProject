@@ -187,10 +187,16 @@ bez OCR nepoužitelné — tudy vznikla většina dnešních vyřazených PDF),
 6. Sefaria, OpenITI (výběr), Ganjoor, tibetský kánon.
 7. Mezopotámie, Egypt, koptština, syrština, Ameriky.
 
-Úzké hrdlo není stahování, ale **obohacení LLM na SPARKu**. Nové tradice
-proto přidávej kurátorsky po desítkách děl s `priority: 1`, ne celé korpusy
-najednou. Velké zdroje (781 textů GRETIL, 9 355 Kanripo) zůstanou v klonu
-a do registru jde jen výběr.
+**Obohacení:** stávající korpus je od 2026-11-19 obohacený celý (164 344
+chunků, kapitoly až na jednu). Udělala to výplň na L40S (`rag/l40s_filler.py`,
+plán `PLAN-l40s-enrich.md` je zatím mimo `main`): kolem 120 chunků za minutu,
+SPARK sám asi 7. Dokud sandbox L40S běží, obohacení hrdlem není; bez něj ano.
+Výplň po dokončení skončila, pro nová díla ji musí někdo znovu pustit.
+
+Nové tradice přesto přidávej kurátorsky po desítkách děl s `priority: 1`,
+ne celé korpusy najednou: u nového jazyka nejdřív ověř kvalitu obohacení
+na vzorku (`--benchmark`). Velké zdroje (781 textů GRETIL, 9 355 Kanripo)
+zůstanou v klonu a do registru jde jen výběr.
 
 ## Fáze 0 — adaptéry zdrojů a připravenost registru
 
@@ -338,7 +344,8 @@ a maorské texty spolehlivý strojový zdroj ověřený není; zapiš jako otev�
    `tradition`, `source`), pak `python3 rag/registry/validate.py`
 3. `make ingest-stats` (kontrola počtu kapitol a mediánu chunku), `make ingest`
 4. `make sync-spark`, na SPARKu `make load-pg`, `make embed`, `make embed-gloss`
-5. obohacení (`enrich_chunks`, `enrich_chapters`, `enrich_works`) v okně Directoru
+5. obohacení (`enrich_chunks`, `enrich_chapters`, `enrich_works`) v okně
+   Directoru na SPARKu, nebo výplní na L40S
 6. `make eval` proti baseline, `make kindlify-sync`
 
 Kindlify sync vynechává překlady a jednokapitolová díla, takže dílo bez
@@ -355,8 +362,9 @@ funkčního dělení na kapitoly se do čtečky nedostane.
 - **IAST vs. dévanágarí.** XLM-R viděl sanskrt hlavně v dévanágarí;
   kvalita vektorů nad IAST je neznámá. Porovnej obě varianty na pár dílech,
   než zaindexuješ všech 781.
-- **Fronta obohacení.** Velká díla dnes stojí na stovkách chunků. Sanskrtská
-  Mahábhárata je řádově 10× větší než cokoli priority 1 — dej jí `priority: 2`.
+- **Obohacení bez L40S.** Na samotném SPARKu jde asi 7 chunků za minutu.
+  Sanskrtská Mahábhárata je řádově 10× větší než cokoli priority 1 — dej jí
+  `priority: 2` a počítej s ní, jen dokud běží výplň na L40S.
 - **Duplicity.** Totéž dílo z více zdrojů (Dhammapada pálijsky i v GRETIL,
   NZ v Perseu i jinde). Jedno dílo = jeden záznam, ostatní edice vynechat.
 - **Licence.** Řada rep nemá soubor LICENSE; před commitem dat ověř v README.
