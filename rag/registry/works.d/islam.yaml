@@ -1,0 +1,26 @@
+# Islám. Nová díla po skupinách do works.d/ (viz ingest_books.load_works).
+
+ar.quran:
+  path: islam/quran/quran-uthmani.txt
+  group: islam
+  work_legacy: quran
+  title: القرآن
+  name_cs: Korán
+  author: anonym (zjevení Muhammadovi)
+  author_cs: anonym (zjevení Muhammadovi)
+  lang_original: ar
+  lang_corpus: ar
+  form: jine
+  period: 7. stol.
+  edition: >-
+    Tanzil Quran Text (Uthmani, Version 1.1), Tanzil Project, https://tanzil.net —
+    CC BY 3.0, doslovná kopie (text se nesmí měnit). Názvy súr z quran-data.xml (Tanzil).
+  priority: 1
+  tradition: [islam]
+  aliases:
+  - koran
+  - quran
+  - qur'an
+  - fatih
+  source:
+    adapter: tanzil
