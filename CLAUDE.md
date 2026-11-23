@@ -44,6 +44,8 @@ ručně ho nespouštět, `rag-schedule.timer` nezapínat, pevná okna neplatí.
 - `rag/retrieval.py` — směrování dotazu na dílo/tradici a diverzita výsledků
   (kurátorská tabulka aliasů; `python3 retrieval.py` spustí selftest)
 - `rag/chapters.py`, `rag/clean_text.py`, `rag/perseus_tei.py` — kapitoly per tradice, čištění, TEI
+- `rag/sources/` — adaptéry strukturovaných zdrojů (`perseus`, `tanzil`), zapíná je
+  `source: {adapter: …}` v registru; nová díla do `rag/registry/works.d/<skupina>.yaml`
 - `rag/retriever.py` + `rag/pg_search.py` + `rag/hybrid.py` — hybridní retrieval (vektor + fulltext → RRF)
 - `rag/planner.py` + `rag/catalog.py` — intent dotazu a katalogové odpovědi z Postgresu
 - `rag/enrich_*.py` + `rag/llm_batch.py` — obohacení korpusu LLM (přímo na swarm-director :8012 v profilu director, fallback se zahazuje; profil zapíná spark-broker přes `sparkctl`)

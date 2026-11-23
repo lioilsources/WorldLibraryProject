@@ -227,6 +227,20 @@ def known_groups(conn) -> set[str]:
         return {r[0] for r in cur.fetchall()}
 
 
+def work_scope(conn) -> dict[str, tuple[str, tuple[str, ...]]]:
+    """{work_id: (skupina, tradice)} pro retrieval.scope_for_traditions().
+    Bez sloupce tradition (DB před migrací 0006) jedou všechna díla na
+    výchozích tradicích skupiny."""
+    from retrieval import work_traditions
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT 1 FROM information_schema.columns "
+                    "WHERE table_name = 'works' AND column_name = 'tradition'")
+        has_col = cur.fetchone() is not None
+        cur.execute('SELECT id, "group", tradition FROM works' if has_col else 'SELECT id, "group", NULL FROM works')
+        return {wid: (g, work_traditions(g, t)) for wid, g, t in cur.fetchall()}
+
+
 def status(conn) -> dict:
     with conn.cursor() as cur:
         cur.execute("SELECT * FROM enrichment_status_v")

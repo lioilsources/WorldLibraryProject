@@ -167,56 +167,132 @@ ALIASES: dict[str, tuple[str, ...]] = {
     "zoroastr": ("avesta darmesteter complete",),
 }
 
-# --- tradice (skupiny) ------------------------------------------------------
+# --- tradice ---------------------------------------------------------------
 #
 # Otázka nemusí jmenovat dílo, ale tradici („co učí hinduistické texty").
-# Pak nezbývá než filtr na skupinu — bez něj rozhoduje podíl v korpusu
-# a pálijská Tipitaka (60 z 93 děl) přebije všechno ostatní: měřeno,
-# „hinduistické texty o karmě a dharmě" vrátí pět pálijských Abhidhamm.
+# Pak nezbývá než filtr — bez něj rozhoduje podíl v korpusu a pálijská
+# Tipitaka (60 z 93 děl) přebije všechno ostatní: měřeno, „hinduistické
+# texty o karmě a dharmě" vrátí pět pálijských Abhidhamm.
+#
+# **Skupina ≠ tradice.** Skupina je adresář v downloads/ (pali, sanskrit,
+# chinese), tradice je to, na co se ptá čtenář (buddhismus). Sanskrtská
+# Abhidharmakóša je ve skupině sanskrit, ale patří k buddhismu — dotaz na
+# buddhismus musí sáhnout i na ni, a nesmí přitom vzít Mahábháratu. Proto
+# se tradice drží per dílo (pole `tradition` v registru, sloupec
+# works.tradition); dílo bez něj dědí výchozí tradice své skupiny.
 
-GROUP_ALIASES: dict[str, tuple[str, ...]] = {
-    "buddhis": ("pali",),
-    "buddhov": ("pali",),
-    "theravad": ("pali",),
-    "tipitak": ("pali",),
-    "palijsk": ("pali",),
-    "hinduis": ("sanskrit",),
-    "vedsk": ("sanskrit",),
-    "vedy": ("sanskrit",),
-    "vedach": ("sanskrit",),
-    "indick epos": ("sanskrit",),
-    "cinsk": ("chinese",),
-    "taois": ("chinese",),
-    "daois": ("chinese",),
-    "konfucian": ("chinese",),
-    "seversk": ("european",),
-    "germansk": ("european",),
-    "vikings": ("european",),
-    "staroanglick": ("european",),
-    "nemeck filoso": ("european_philosophy",),
-    "nemeck idealis": ("european_philosophy",),
-    "idealis": ("european_philosophy",),
-    "hegelian": ("european_philosophy",),
-    "egyptsk": ("egypt",),
-    "hebrejsk": ("bible",),
-    "zidovsk": ("bible",),
-    "stary zakon": ("bible",),
-    "zoroastri": ("avesta",),
-    "perssk": ("avesta",),
+TRADITIONS: dict[str, str] = {
+    "buddhism": "buddhismus",
+    "theravada": "théraváda",
+    "hinduism": "hinduismus",
+    "chinese": "čínské myšlení",
+    "taoism": "taoismus",
+    "confucianism": "konfucianismus",
+    "germanic": "germánská a severská tradice",
+    "german_philosophy": "německá filosofie",
+    "egyptian": "starý Egypt",
+    "judaism": "judaismus",
+    "zoroastrianism": "zoroastrismus",
+    "persian": "Persie",
+    "islam": "islám",
+    "greco_roman": "antika",
+    "christianity": "křesťanství",
 }
 
-_GROUP_INDEX = sorted(
-    ((fold(a), g) for a, g in GROUP_ALIASES.items()), key=lambda kv: -len(kv[0])
+# výchozí tradice skupiny — pro díla bez vlastního pole `tradition`
+# (dnes celý korpus, takže se směrování proti dřívějšku nemění)
+GROUP_TRADITIONS: dict[str, tuple[str, ...]] = {
+    "pali": ("buddhism", "theravada"),
+    "sanskrit": ("hinduism",),
+    "chinese": ("chinese", "taoism", "confucianism"),
+    "european": ("germanic",),
+    "european_philosophy": ("german_philosophy",),
+    "egypt": ("egyptian",),
+    "bible": ("judaism",),
+    "avesta": ("zoroastrianism", "persian"),
+    "islam": ("islam",),
+    "greek_latin": ("greco_roman",),
+}
+
+TRADITION_ALIASES: dict[str, tuple[str, ...]] = {
+    "buddhis": ("buddhism",),
+    "buddhov": ("buddhism",),
+    "theravad": ("theravada",),
+    "tipitak": ("theravada",),
+    "palijsk": ("theravada",),
+    "hinduis": ("hinduism",),
+    "vedsk": ("hinduism",),
+    "vedy": ("hinduism",),
+    "vedach": ("hinduism",),
+    "indick epos": ("hinduism",),
+    "cinsk": ("chinese",),
+    "taois": ("taoism",),
+    "daois": ("taoism",),
+    "konfucian": ("confucianism",),
+    "seversk": ("germanic",),
+    "germansk": ("germanic",),
+    "vikings": ("germanic",),
+    "staroanglick": ("germanic",),
+    "nemeck filoso": ("german_philosophy",),
+    "nemeck idealis": ("german_philosophy",),
+    "idealis": ("german_philosophy",),
+    "hegelian": ("german_philosophy",),
+    "egyptsk": ("egyptian",),
+    "hebrejsk": ("judaism",),
+    "zidovsk": ("judaism",),
+    "stary zakon": ("judaism",),
+    "zoroastri": ("zoroastrianism",),
+    "perssk": ("persian",),
+    "islam": ("islam",),
+    "muslim": ("islam",),
+    "sufis": ("islam",),
+}
+
+_TRADITION_INDEX = sorted(
+    ((fold(a), t) for a, t in TRADITION_ALIASES.items()), key=lambda kv: -len(kv[0])
 )
 
 
-def route_groups(query: str) -> list[str]:
+def route_traditions(query: str) -> list[str]:
     """Tradice, na které otázka ukazuje. Na rozdíl od děl se **sjednocuje**:
     „srovnej buddhismus a hinduismus" má sáhnout do obou."""
     folded = fold(query)
-    hit = {g for alias, groups in _GROUP_INDEX
-           if re.search(r"\b" + re.escape(alias), folded) for g in groups}
+    hit = {t for alias, trads in _TRADITION_INDEX
+           if re.search(r"\b" + re.escape(alias), folded) for t in trads}
     return sorted(hit)
+
+
+def work_traditions(group: str | None, tradition=None) -> tuple[str, ...]:
+    """Tradice díla: vlastní pole z registru, jinak výchozí podle skupiny."""
+    if tradition:
+        return tuple([tradition] if isinstance(tradition, str) else tradition)
+    return GROUP_TRADITIONS.get(group or "", ())
+
+
+def route_groups(query: str) -> list[str]:
+    """Skupiny, jejichž výchozí tradice otázka jmenuje. Pro cestu bez
+    katalogu děl (Chroma bez Postgresu, eval_retrieval); s katalogem
+    patří přednost `scope_for_traditions`, které vidí tradici per dílo."""
+    trads = set(route_traditions(query))
+    return sorted(g for g, ts in GROUP_TRADITIONS.items() if trads & set(ts))
+
+
+def scope_for_traditions(traditions, work_scope: dict) -> tuple[list[str], list[str]]:
+    """Tradice → filtr hledání: (work_id, skupiny), vždy jen jedno z nich.
+
+    `work_scope` je {work_id: (skupina, tradice)}. Když vybraná díla tvoří
+    celé skupiny, vrátí skupiny (krátký filtr, stejný jako dřív); když
+    tradice bere jen část skupiny, vrátí výčet děl. Žádné dílo → bez filtru.
+    """
+    wanted = set(traditions)
+    if not wanted:
+        return [], []
+    sel = {wid for wid, (_, ts) in work_scope.items() if wanted & set(ts)}
+    if not sel:
+        return [], []
+    groups = {work_scope[w][0] for w in sel}
+    whole = all(wid in sel for wid, (g, _) in work_scope.items() if g in groups)
+    return ([], sorted(groups)) if whole else (sorted(sel), [])
 
 
 # alias odvozený z názvu díla musí být aspoň takhle dlouhý, jinak by
@@ -434,6 +510,25 @@ def _selftest() -> None:
     assert route_groups("Jak německý idealismus pracuje s duchem?") == ["european_philosophy"]
     assert route_groups("Co říká severská mytologie o ragnaröku?") == ["european"]
     assert route_groups("Vyprávěj mi o motýlovi.") == []
+    assert route_groups("Co učí islám o milosrdenství?") == ["islam"]
+
+    # tradice per dílo: buddhistické dílo ve skupině sanskrit → výčet děl,
+    # celá skupina → filtr na skupinu, nic → bez filtru
+    scope = {
+        "pi.dn": ("pali", work_traditions("pali")),
+        "sa.mbh06": ("sanskrit", work_traditions("sanskrit")),
+        "sa.akosa": ("sanskrit", work_traditions("sanskrit", ["buddhism"])),
+        "zh.daodejing": ("chinese", work_traditions("chinese", ["chinese", "taoism"])),
+        "zh.lunyu": ("chinese", work_traditions("chinese", ["chinese", "confucianism"])),
+    }
+    assert route_traditions("Co učí buddhismus o prázdnotě?") == ["buddhism"]
+    assert scope_for_traditions(["buddhism"], scope) == (["pi.dn", "sa.akosa"], [])
+    assert scope_for_traditions(["hinduism"], scope) == (["sa.mbh06"], [])
+    assert scope_for_traditions(["theravada"], scope) == ([], ["pali"])
+    assert scope_for_traditions(route_traditions("Jak čínská filosofie chápe ctnost?"), scope) == ([], ["chinese"])
+    assert scope_for_traditions(route_traditions("Co říká taoismus o nečinnosti?"), scope) == (["zh.daodejing"], [])
+    assert scope_for_traditions(["islam"], scope) == ([], [])
+    assert scope_for_traditions([], scope) == ([], [])
 
     hits = [{"work": "a", "d": 1}, {"work": "a", "d": 2}, {"work": "a", "d": 3},
             {"work": "b", "d": 4}, {"work": "c", "d": 5}]

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Kontrola registru: každý soubor korpusu má záznam (nebo je vyloučený),
-cesty v registru existují, jazyky jsou z povoleného seznamu, work_id jsou
-unikátní a detektory kapitol existují. Spouští se před ingestem:
+cesty v registru existují, jazyky, skupiny a tradice jsou z povoleného
+seznamu, work_id jsou unikátní (i napříč works.yaml a works.d/*.yaml),
+detektory kapitol i adaptéry zdrojů existují. Spouští se před ingestem:
 
     python3 registry/validate.py --input-dir ../downloads
 """
@@ -14,10 +15,24 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+import sources  # noqa: E402
 from chapters import DETECTORS  # noqa: E402
-from ingest_books import EXCLUDE_NAMES, EXCLUDE_PATH_MARKERS, SKIP_DIR_MARKERS  # noqa: E402
+from ingest_books import EXCLUDE_NAMES, EXCLUDE_PATH_MARKERS, SKIP_DIR_MARKERS, load_works  # noqa: E402
+from retrieval import GROUP_TRADITIONS, TRADITIONS  # noqa: E402
 
-LANGS = {"grc", "lat", "lzh", "zh", "pi", "sa", "ang", "non", "de", "ae", "egy", "en", "he", "ar", "fa"}
+# ISO 639 kódy jazyků korpusu; nové přibývají s fázemi PLAN-corpus-expansion.md
+LANGS = {
+    "grc", "lat", "lzh", "zh", "pi", "sa", "ang", "non", "de", "ae", "egy", "en", "he", "ar", "fa",
+    "bo", "ja", "ta", "pa", "pra",         # Tibet, Japonsko, tamilština, pandžábština (gurmukhí), prákrty
+    "arc", "syc", "cop", "gez",            # aramejština, syrština, koptština, ge'ez
+    "akk", "sux", "peo",                   # akkadština, sumerština, stará perština
+    "quc", "nah", "sga", "cs",             # k'iče', nahuatl, stará irština, čeština
+}
+# skupina = adresář v downloads/; tradice (pole `tradition`) je jiná osa
+GROUPS = set(GROUP_TRADITIONS) | {
+    "judaism", "persian", "tibetan", "japanese", "tamil", "sikh", "jain",
+    "mesopotamia", "coptic", "syriac", "ethiopic", "americas", "celtic", "czech",
+}
 FORMS = {"epos", "hymnus", "dialog", "traktat", "sutta", "vinaya", "abhidhamma", "drama", "dopis",
          "epigram", "aforismy", "kronika", "komentar", "zakonik", "jine"}
 DETECTOR_NAMES = set(DETECTORS) | {"pdf_bookmarks"}
@@ -34,9 +49,13 @@ def main() -> int:
     args = p.parse_args()
     root = Path(args.input_dir).resolve()
     reg = Path(args.registry)
-    works = yaml.safe_load((reg / "works.yaml").read_text(encoding="utf-8")) or {}
-    topics = yaml.safe_load((reg / "topics.yaml").read_text(encoding="utf-8")) or []
     errors, warnings = [], []
+    try:
+        works = load_works(reg)
+    except ValueError as e:   # totéž work_id ve dvou souborech registru
+        print("CHYBA:", e)
+        return 1
+    topics = yaml.safe_load((reg / "topics.yaml").read_text(encoding="utf-8")) or []
 
     ids = list(works)
     if len(ids) != len(set(ids)):
@@ -53,6 +72,17 @@ def main() -> int:
         det = (e.get("chapters") or {}).get("detector", "none")
         if det not in DETECTOR_NAMES:
             errors.append(f"{wid}: neznámý detektor {det}")
+        if e.get("group") and e["group"] not in GROUPS:
+            errors.append(f"{wid}: neznámá skupina {e['group']} (doplň GROUPS ve validate.py)")
+        trad = e.get("tradition")
+        for t in ([trad] if isinstance(trad, str) else (trad or [])):
+            if t not in TRADITIONS:
+                errors.append(f"{wid}: neznámá tradice {t} (doplň TRADITIONS v retrieval.py)")
+        adapter = (e.get("source") or {}).get("adapter")
+        if adapter and adapter not in sources.ADAPTERS:
+            errors.append(f"{wid}: neznámý adaptér {adapter}")
+        if adapter and e.get("chapters"):
+            warnings.append(f"{wid}: kapitoly dává adaptér {adapter}, detektor se ignoruje")
         if not (root / e["path"]).exists() and not (root / unicodedata.normalize("NFD", e["path"])).exists():
             errors.append(f"{wid}: cesta neexistuje: {e['path']}")
         np = nfc(e["path"])
