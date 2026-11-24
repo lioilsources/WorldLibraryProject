@@ -89,3 +89,15 @@ depth=1
 # tanzil.net poskytuje text přes form na https://tanzil.net/download/
 # Stáhni manuálně a ulož do downloads/islam/quran/
 
+# === KORÁN (Tanzil, uthmání text, txt-2 = súra|ája|text) ===
+# CC BY 3.0, text se nesmí měnit — ingest ho bere přes adaptér tanzil bez
+# clean_text. Metadata súr (názvy) zvlášť.
+type=wget
+url=https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true
+dir=islam/quran
+args=--no-directories --content-disposition
+
+type=wget
+url=https://tanzil.net/res/text/metadata/quran-data.xml
+dir=islam/quran
+args=--no-directories

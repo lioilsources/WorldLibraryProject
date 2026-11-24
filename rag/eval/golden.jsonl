@@ -22,3 +22,6 @@
 {"q": "Jak německý idealismus pracuje s pojmem ducha?", "expect_group": "european_philosophy"}
 {"q": "Srovnej pojetí duše v buddhismu a v hinduismu.", "expect_group": ["pali", "sanskrit"], "diversity": true}
 {"q": "Jaké knihy máš v knihovně?", "catalog": true}
+{"q": "Co říká Korán o milosrdenství Boha?", "expect_work": "quran", "expect_group": "islam"}
+{"q": "Jak súra Al-Fátiha oslovuje Boha?", "expect_work": "quran", "expect_group": "islam"}
+{"q": "Co učí islám o soudném dni?", "expect_group": "islam"}

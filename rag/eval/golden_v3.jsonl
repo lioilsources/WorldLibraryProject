@@ -24,3 +24,5 @@
 {"q": "Přečti mi další kus.", "intent": "read"}
 {"q": "Ahoj, jak se máš?", "intent": "smalltalk"}
 {"q": "Děkuju, to stačí.", "intent": "smalltalk"}
+{"q": "O čem je Korán?", "intent": "work_overview", "expect_work": "ar.quran"}
+{"q": "Kolik súr má Korán a o čem je první?", "intent": "chapter_detail", "expect_work": "ar.quran", "expect_chapter_ref": "1"}
