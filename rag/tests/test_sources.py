@@ -86,6 +86,11 @@ def test_works_d_is_merged_and_duplicates_fail(tmp_path):
         ib.load_works(tmp_path)
 
 
+def test_registry_has_quran_via_adapter():
+    works = ib.load_works(Path(__file__).parent.parent / "registry")
+    q = works["ar.quran"]
+    assert q["source"]["adapter"] == "tanzil" and q["lang_corpus"] == "ar"
+
 
 # --- Kanripo ------------------------------------------------------------------
 
