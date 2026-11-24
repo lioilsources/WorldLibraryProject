@@ -90,3 +90,48 @@ def test_registry_has_quran_via_adapter():
     works = ib.load_works(Path(__file__).parent.parent / "registry")
     q = works["ar.quran"]
     assert q["source"]["adapter"] == "tanzil" and q["lang_corpus"] == "ar"
+
+
+# --- Kanripo ------------------------------------------------------------------
+
+from sources import kanripo  # noqa: E402
+
+KR = Path(__file__).parent / "fixtures" / "kanripo"
+
+
+def test_kanripo_tls_chapters_from_org_headings():
+    chs = kanripo.extract(KR / "tls")
+    assert [(c.ref, c.heading) for c in chs] == [("1", "逍遙遊第一"), ("2", "齊物論第二")]
+    first = chs[0].text
+    assert first.startswith("北冥有魚，其名為鯤。鯤之大，不知其幾千里也。")
+    assert "¶" not in first and "<pb:" not in first and "#" not in first
+    # řádky odstavce spojené bez mezer, odstavce na řádek
+    assert " " not in first and "\n" in first
+
+
+def test_kanripo_strips_interlinear_notes():
+    chs = kanripo.extract(KR / "nanhua")            # bez nadpisů → kapitola na svazek
+    assert [c.ref for c in chs] == ["1"]
+    text = chs[0].text
+    assert "北⬤有魚其名爲鯤鯤之大不知其幾千里" in text
+    assert "郭象" in text                           # titulková řádka zůstává, komentář ne
+    assert "(" not in text and "音義曰" not in text and "司馬彪" not in text
+    kept = kanripo.extract(KR / "nanhua", {"source": {"strip_notes": False}})[0].text
+    assert "音義曰" in kept
+
+
+def test_kanripo_chapter_and_drop_regex():
+    src = {"chapter_re": "^　　[^　]+第[一二三四五六七八九十]+$",
+           "drop_re": "^(欽定四庫全書|　*墨子卷)"}
+    chs = kanripo.extract(KR / "mozi", {"source": src})
+    assert [(c.ref, c.heading) for c in chs] == [("1", "親士第一")]
+    assert chs[0].text.startswith("入國而不存其士則亡國矣")
+    assert "四庫" not in chs[0].text
+
+
+def test_adapter_dir_files_are_not_ingested_twice():
+    entries = [{"id": "zh.x", "path": "chinese/kanripo/KR1", "source": {"adapter": "kanripo"}},
+               {"id": "zh.y", "path": "chinese/y.txt"}]
+    prefixes = ib.adapter_dirs(entries)
+    assert "chinese/kanripo/KR1/KR1_001.txt".startswith(prefixes)
+    assert not "chinese/kanripo/KR10/KR10_001.txt".startswith(prefixes)

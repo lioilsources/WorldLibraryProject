@@ -17,7 +17,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import sources  # noqa: E402
 from chapters import DETECTORS  # noqa: E402
-from ingest_books import EXCLUDE_NAMES, EXCLUDE_PATH_MARKERS, SKIP_DIR_MARKERS, load_works  # noqa: E402
+from ingest_books import EXCLUDE_NAMES, EXCLUDE_PATH_MARKERS, SKIP_DIR_MARKERS, adapter_dirs, load_works  # noqa: E402
 from retrieval import GROUP_TRADITIONS, TRADITIONS  # noqa: E402
 
 # ISO 639 kódy jazyků korpusu; nové přibývají s fázemi PLAN-corpus-expansion.md
@@ -94,6 +94,7 @@ def main() -> int:
 
     # soubory korpusu bez záznamu
     missing = []
+    in_adapter_dir = adapter_dirs(works.values())
     for f in sorted(root.rglob("*")):
         if not f.is_file() or f.suffix.lower() not in (".txt", ".pdf"):
             continue
@@ -101,6 +102,8 @@ def main() -> int:
         if f.name in EXCLUDE_NAMES or f.name.startswith("._"):
             continue
         if any(m in rel for m in SKIP_DIR_MARKERS + EXCLUDE_PATH_MARKERS):
+            continue
+        if rel.startswith(in_adapter_dir):
             continue
         if rel not in paths:
             missing.append(rel)
