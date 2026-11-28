@@ -15,6 +15,8 @@ Zásady:
 Použití:
     python3 load_pg.py --input books.jsonl --works works.jsonl --chapters chapters.jsonl --replace-all
     python3 load_pg.py --work zh.daodejing --replace-work      # jen jedno dílo
+    python3 load_pg.py --drop-work zh.zhuangzi --dry-run      # co by se smazalo
+    python3 load_pg.py --drop-work zh.zhuangzi                # překlad pryč, záloha do run/
 """
 
 from __future__ import annotations
@@ -151,6 +153,64 @@ def replace_work(conn, work_id: str, chapters: list[dict], chunks: list[dict]) -
     return len(chapters), len(chunks), len(keep)
 
 
+# co na díle visí (vše odejde přes ON DELETE CASCADE z works)
+DROP_COUNTS = (
+    ("kapitol", "SELECT count(*) FROM chapters WHERE work_id = %s"),
+    ("chunků", "SELECT count(*) FROM chunks WHERE work_id = %s"),
+    ("obohacení", "SELECT count(*) FROM chunk_enrichment e JOIN chunks c ON c.id = e.chunk_id WHERE c.work_id = %s"),
+    ("souhrnů kapitol", "SELECT count(*) FROM chapters WHERE work_id = %s AND summary_medium IS NOT NULL"),
+    ("témat díla", "SELECT count(*) FROM work_topics WHERE work_id = %s"),
+)
+# záloha: z čeho jde obohacení vrátit (chunky samotné vyrobí ingest znovu)
+DROP_BACKUP = (
+    ("works", "SELECT * FROM works WHERE id = %s"),
+    ("chapters", "SELECT * FROM chapters WHERE work_id = %s ORDER BY ordinal"),
+    ("chunk_enrichment", "SELECT e.* FROM chunk_enrichment e JOIN chunks c ON c.id = e.chunk_id "
+                         "WHERE c.work_id = %s ORDER BY c.seq"),
+    ("work_topics", "SELECT * FROM work_topics WHERE work_id = %s"),
+)
+
+
+def _rows(cur, sql: str, params) -> list[dict]:
+    cur.execute(sql, params)
+    cols = [d[0] for d in cur.description]
+    return [dict(zip(cols, r)) for r in cur.fetchall()]
+
+
+def drop_work(conn, work_id: str, registry_ids: set[str], backup_dir: Path,
+              dry_run: bool = True) -> tuple[dict, Path | None]:
+    """Smaže dílo z Postgresu i se vším, co na něm visí; vrátí (počty, záloha).
+
+    Jen pro překlady nahrazené originálem. Dílo musí být nejdřív pryč
+    z registru, jinak by ho příští ingest + load vrátil. Před smazáním se
+    v téže transakci zapíše záloha (dílo, kapitoly se souhrny, obohacení,
+    témata) do backup_dir; když zápis selže, nic se nesmaže. Vektory
+    v Chromě tahle funkce neřeší."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT id FROM works WHERE id = %s", (work_id,))
+        if cur.fetchone() is None:
+            raise LookupError(f"{work_id}: v Postgresu není")
+        counts = {}
+        for name, sql in DROP_COUNTS:
+            cur.execute(sql, (work_id,))
+            counts[name] = cur.fetchone()[0]
+    if dry_run:
+        return counts, None
+    if work_id in registry_ids:
+        raise ValueError(f"{work_id}: je pořád v registru — nejdřív ho odeber z works.yaml / works.d")
+
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    backup = backup_dir / f"drop-{work_id}-{time.strftime('%Y%m%dT%H%M%S')}.jsonl"
+    with conn.transaction():
+        with conn.cursor() as cur:
+            with open(backup, "w", encoding="utf-8") as f:
+                for table, sql in DROP_BACKUP:
+                    for row in _rows(cur, sql, (work_id,)):
+                        f.write(json.dumps({"table": table, "row": row}, ensure_ascii=False, default=str) + "\n")
+            cur.execute("DELETE FROM works WHERE id = %s", (work_id,))
+    return counts, backup
+
+
 def migrate_summaries(conn, summaries_file: Path) -> int:
     """Jednorázově: staré anotace do summary_medium a name_cs jen tam, kde chybí."""
     if not summaries_file.exists():
@@ -173,6 +233,30 @@ def migrate_summaries(conn, summaries_file: Path) -> int:
     return n
 
 
+def main_drop(args) -> int:
+    from ingest_books import load_works   # registr: works.yaml + works.d
+
+    registry_ids = set(load_works(Path(args.registry)))
+    rc = 0
+    with psycopg.connect(args.dsn) as conn:
+        for wid in args.drop_work:
+            try:
+                counts, backup = drop_work(conn, wid, registry_ids, args.backup_dir, dry_run=args.dry_run)
+            except (LookupError, ValueError) as e:
+                print(f"CHYBA: {e}", file=sys.stderr)
+                rc = 1
+                continue
+            what = ", ".join(f"{k} {v}" for k, v in counts.items())
+            if args.dry_run:
+                note = " (pozor: pořád v registru)" if wid in registry_ids else ""
+                print(f"DRY-RUN {wid}: smazalo by se {what}{note}")
+            else:
+                print(f"smazáno {wid}: {what}; záloha {backup}")
+    if not args.dry_run and rc == 0:
+        print("teď: vektory díla z Chromy (books_v2, books_gloss) a make pg-index")
+    return rc
+
+
 def main() -> int:
     load_dotenv(Path(__file__).parent / ".env")
     p = argparse.ArgumentParser(description="Load JSONL do knihovního Postgresu")
@@ -185,10 +269,17 @@ def main() -> int:
     p.add_argument("--work", help="jen tohle work_id")
     p.add_argument("--replace-all", action="store_true")
     p.add_argument("--replace-work", action="store_true")
+    p.add_argument("--drop-work", action="append", metavar="ID",
+                   help="smazat dílo (překlad nahrazený originálem); jde opakovat")
+    p.add_argument("--dry-run", action="store_true", help="s --drop-work: jen vypsat, co by odešlo")
+    p.add_argument("--backup-dir", type=Path, default=Path(__file__).parent / "run",
+                   help="kam --drop-work zapíše zálohu obohacení (mimo git)")
     args = p.parse_args()
     if not args.dsn:
         print("CHYBA: chybí --dsn / PG_DSN", file=sys.stderr)
         return 2
+    if args.drop_work:
+        return main_drop(args)
     if not (args.replace_all or args.replace_work):
         print("CHYBA: zvol --replace-all nebo --replace-work (nic se neděje implicitně)", file=sys.stderr)
         return 2

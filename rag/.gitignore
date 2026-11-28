@@ -12,3 +12,5 @@ tests/fixtures/*.tmp
 # kurátorský tier1.yaml (53 zákonů, aliasy, zkratky) tiše nebyl ve gitu.
 /law/
 build/
+# zálohy obohacení před load_pg.py --drop-work
+run/
