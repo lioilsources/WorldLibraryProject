@@ -33,7 +33,7 @@ PROMPT_VERSION = "chunk-v1"
 
 LANG_NAME = {"pi": "pálí", "sa": "sanskrt", "lzh": "klasická čínština", "zh": "čínština", "grc": "stará řečtina",
              "lat": "latina", "de": "němčina", "en": "angličtina", "ang": "staroangličtina", "non": "staroseverština",
-             "ae": "avestština", "egy": "egyptština"}
+             "ae": "avestština", "egy": "egyptština", "ar": "arabština"}
 
 SYSTEM = (
     "Jsi filolog a knihovník. Dostaneš úryvek z díla ve starém jazyce a vrátíš POUZE JSON "

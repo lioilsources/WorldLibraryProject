@@ -63,6 +63,7 @@ SCRIPT_BY_LANG = {
     "lzh": "han", "zh": "han",
     "sa": "devanagari", "hi": "devanagari",
     "he": "hebrew",
+    "ar": "arabic",
     "grc": "greek", "el": "greek",
     "ae": "avestan", "egy": "egyptian",
     "pi": "latin", "lat": "latin", "en": "latin", "de": "latin",

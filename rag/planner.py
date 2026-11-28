@@ -24,26 +24,26 @@ from dataclasses import dataclass, field
 from llm_batch import THINK_RE, parse_json
 from retrieval import fold
 
-PROMPT_VERSION = "plan-v2"   # v2: + lang (jazyk originálu); změna promptu = nový klíč cache
+PROMPT_VERSION = "plan-v3"   # v2: + lang (jazyk originálu); v3: + arabština; změna promptu = nový klíč cache
 
 INTENTS = ("catalog", "work_overview", "chapters", "chapter_detail", "read", "content", "mixed", "smalltalk")
 
 SYSTEM = (
     "Jsi směrovač dotazů nad knihovnou starých textů v originálních jazycích (pálí, sanskrt, klasická "
-    "čínština, stará řečtina, latina, němčina; některá díla jsou v knihovně jen v anglickém překladu). "
+    "čínština, stará řečtina, latina, arabština, němčina; některá díla jsou v knihovně jen v anglickém překladu). "
     "Nevymýšlej odpověď — jen rozhodni, co uživatel chce, a připrav hledání. Vrať POUZE JSON."
 )
 
 USER = """Tradice v knihovně (kód: počet děl): {groups}
 Témata (slug): {topics}
-Jazyky korpusu: pi=pálí, sa=sanskrt, lzh=klasická čínština, grc=stará řečtina, lat=latina, de=němčina, en=angličtina (překlady)
+Jazyky korpusu: pi=pálí, sa=sanskrt, lzh=klasická čínština, grc=stará řečtina, lat=latina, ar=arabština, de=němčina, en=angličtina (překlady)
 
 Vrať JSON:
 {{
  "intent": "catalog | work_overview | chapters | chapter_detail | read | content | mixed | smalltalk",
  "groups": ["kódy tradic, na které se ptá; [] = všechny"],
  "topics": ["0–3 slugy témat z výčtu, když se ptá tematicky"],
- "lang": "kód jazyka originálu, když se ptá na jazyk (lat, grc, pi, sa, lzh, de), jinak null",
+ "lang": "kód jazyka originálu, když se ptá na jazyk (lat, grc, pi, sa, lzh, ar, de), jinak null",
  "author": "jméno autora, když ho jmenuje, jinak null",
  "work_hint": "název díla, když ho jmenuje (jak ho napsal), jinak null",
  "chapter_hint": "označení kapitoly/knihy/oddílu, když ho jmenuje (např. 'kniha 7', 'kapitola 8'), jinak null",

@@ -343,7 +343,9 @@ a maorské texty spolehlivý strojový zdroj ověřený není; zapiš jako otev�
    `lang_corpus`, `form`, `period`, `edition`, `priority`, `aliases`,
    `tradition`, `source`), pak `python3 rag/registry/validate.py`
 3. `make ingest-stats` (kontrola počtu kapitol a mediánu chunku), `make ingest`
-4. `make sync-spark`, na SPARKu `make load-pg`, `make embed`, `make embed-gloss`
+4. `make sync-spark`, na SPARKu `make load-pg`, `make embed`. Kolekce glos
+   `books_gloss` se schválně nestaví (`PLAN-spark-library-storage.md`), takže
+   `make embed-gloss` do cesty díla nepatří.
 5. obohacení (`enrich_chunks`, `enrich_chapters`, `enrich_works`) v okně
    Directoru na SPARKu, nebo výplní na L40S
 6. `make eval` proti baseline, `make kindlify-sync`
@@ -357,7 +359,9 @@ funkčního dělení na kapitoly se do čtečky nedostane.
   XLM-R; ten zná sanskrt, hebrejštinu, arabštinu, perštinu, čínštinu,
   japonštinu a tamilštinu, ale ne tibetštinu, pálí, koptštinu, syrštinu,
   ge'ez, akkadštinu, sumerštinu ani egyptštinu. U nich ponese retrieval
-  česká glosa (`books_gloss`) a fulltext. Změř to evalem po jazycích,
+  fulltext nad originálem a nad českými glosami (kanály `fts` a `fts_cs`).
+  Vektorová kolekce glos `books_gloss` se zatím schválně nestaví; zapnout
+  ji je samostatná změna s vlastním evalem. Změř to evalem po jazycích,
   je to přesně otázka, kvůli které projekt vznikl.
 - **IAST vs. dévanágarí.** XLM-R viděl sanskrt hlavně v dévanágarí;
   kvalita vektorů nad IAST je neznámá. Porovnej obě varianty na pár dílech,

@@ -1,0 +1,562 @@
+{
+  "ts": "2026-11-28T09:25:52Z",
+  "label": "hybrid po Koránu a Kanripu (13 děl)",
+  "mode": "hybrid",
+  "top_k": 5,
+  "embed_model": "intfloat/multilingual-e5-large",
+  "aggregate": {
+    "questions": 31,
+    "routed": 24,
+    "routed_group": 7,
+    "work_hit_rate": 1.0,
+    "group_hit_rate": 1.0,
+    "mean_distinct": 1.32,
+    "empty": 0,
+    "mean_d1": 0.6122,
+    "mean_spread": 0.056
+  },
+  "rows": [
+    {
+      "q": "Co říká Tao te ťing o nečinnosti (wu-wej)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.daodejing @0.672",
+        "zh.daodejing @0.677",
+        "zh.daodejing @0.682",
+        "zh.daodejing @0.688",
+        "zh.daodejing @0.692"
+      ]
+    },
+    {
+      "q": "Jak Konfucius v Hovorech popisuje ušlechtilého člověka?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.lunyu @0.672",
+        "zh.lunyu @0.677",
+        "zh.lunyu @0.682",
+        "zh.lunyu @0.688",
+        "zh.lunyu @0.692"
+      ]
+    },
+    {
+      "q": "Co soudí Mencius o lidské přirozenosti?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.mengzi @0.672",
+        "zh.mengzi @0.677",
+        "zh.mengzi @0.682",
+        "zh.mengzi @0.688",
+        "zh.mengzi @0.692"
+      ]
+    },
+    {
+      "q": "Vyprávěj mi Zhuangziho sen o motýlovi.",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "zh.zhuangzi @0.672",
+        "zh.zhuangzi @0.677",
+        "zh.zhuangzi @0.682",
+        "zh.zhuangzi @0.688",
+        "zh.zhuangzi @0.692"
+      ]
+    },
+    {
+      "q": "Jaké verše o mysli obsahuje Dhammapada?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4462,
+      "spread": 0.2259,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.dhammapada @0.446",
+        "pi.kn.dhammapada @0.489",
+        "pi.kn.dhammapada @0.538",
+        "pi.kn.dhammapada @0.539",
+        "pi.kn.dhammapada @0.672"
+      ]
+    },
+    {
+      "q": "Na co se ptá král Milinda mnicha Nágasény?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4141,
+      "spread": 0.0748,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.milindapanha @0.414",
+        "pi.kn.milindapanha @0.455",
+        "pi.kn.milindapanha @0.473",
+        "pi.kn.milindapanha @0.477",
+        "pi.kn.milindapanha @0.489"
+      ]
+    },
+    {
+      "q": "Co zpívají mnišky v Therígáthě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "pi.kn.therigatha @0.672",
+        "pi.kn.therigatha @0.677",
+        "pi.kn.therigatha @0.682",
+        "pi.kn.therigatha @0.688",
+        "pi.kn.therigatha @0.692"
+      ]
+    },
+    {
+      "q": "Jak probíhala bitva na Kuruovském poli v Bhíšmaparvě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6213,
+      "spread": 0.0662,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.mbh06 @0.621",
+        "sa.mbh06 @0.672",
+        "sa.mbh06 @0.677",
+        "sa.mbh06 @0.682",
+        "sa.mbh06 @0.688"
+      ]
+    },
+    {
+      "q": "O čem je hra v kostky v Sabháparvě Mahábháraty?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.mbh02 @0.672",
+        "sa.mbh02 @0.677",
+        "sa.mbh02 @0.682",
+        "sa.mbh02 @0.688",
+        "sa.mbh02 @0.692"
+      ]
+    },
+    {
+      "q": "Jak zní hymnus o stvoření světa v Rigvédě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "sa.rigveda_griffith @0.672",
+        "sa.rigveda_griffith @0.677",
+        "sa.rigveda_griffith @0.682",
+        "sa.rigveda_griffith @0.688",
+        "sa.rigveda_griffith @0.692"
+      ]
+    },
+    {
+      "q": "Jak Beowulf porazil Grendela?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.4451,
+      "spread": 0.227,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "ang.beowulf_hall @0.445",
+        "ang.beowulf_hall @0.492",
+        "ang.beowulf_gummere @0.744",
+        "ang.beowulf_hall @0.542",
+        "ang.beowulf_hall @0.672"
+      ]
+    },
+    {
+      "q": "Co předpovídá vědma ve Vědmině písni (Völuspá) v Poetické Eddě?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_poetic @0.672",
+        "non.edda_poetic @0.677",
+        "non.edda_poetic @0.682",
+        "non.edda_poetic @0.688",
+        "non.edda_poetic @0.692"
+      ]
+    },
+    {
+      "q": "Jak Snorriho Edda popisuje stvoření světa z těla obra Ymiho?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4991,
+      "spread": 0.0525,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "non.edda_prose @0.499",
+        "non.edda_prose @0.513",
+        "non.edda_prose @0.525",
+        "non.edda_prose @0.545",
+        "non.edda_prose @0.552"
+      ]
+    },
+    {
+      "q": "Co je dialektika pána a raba ve Fenomenologii ducha?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "de.hegel_werke03 @0.672",
+        "de.hegel_werke03 @0.677",
+        "de.hegel_werke03 @0.682",
+        "de.hegel_werke03 @0.688",
+        "de.hegel_werke03 @0.692"
+      ]
+    },
+    {
+      "q": "Jak Hegel ve Vědě o logice vykládá bytí a nic?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "de.hegel_werke05 @0.672",
+        "de.hegel_werke05 @0.677",
+        "de.hegel_werke05 @0.682",
+        "de.hegel_werke05 @0.688",
+        "de.hegel_werke05 @0.692"
+      ]
+    },
+    {
+      "q": "Co jsou egyptské Texty pyramid a k čemu sloužily?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4141,
+      "spread": 0.1373,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "egy.pyramid_texts_allen @0.414",
+        "egy.pyramid_texts_allen @0.455",
+        "egy.pyramid_texts_allen @0.461",
+        "egy.pyramid_texts_allen @0.490",
+        "egy.pyramid_texts_allen @0.551"
+      ]
+    },
+    {
+      "q": "Co učí Avesta o Ahura Mazdovi?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "ae.avesta_darmesteter @0.672",
+        "ae.avesta_darmesteter @0.677",
+        "ae.avesta_darmesteter @0.682",
+        "ae.avesta_darmesteter @0.688",
+        "ae.avesta_darmesteter @0.692"
+      ]
+    },
+    {
+      "q": "Co učí buddhismus o utrpení a jeho zániku?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 0,
+      "routed_groups": [
+        "pali"
+      ],
+      "top": [
+        "pi.abh.patthana-5 @0.672",
+        "pi.abh.patthana-5 @0.677",
+        "pi.abh.patthana-4 @0.682",
+        "pi.abh.patthana-2 @0.688",
+        "pi.abh.patthana-4 @0.692"
+      ]
+    },
+    {
+      "q": "Jak hinduistické texty vykládají karmu a dharmu?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 0,
+      "routed_groups": [
+        "sanskrit"
+      ],
+      "top": [
+        "sa.rigveda_griffith @0.672",
+        "sa.rigveda_griffith @0.677",
+        "sa.rigveda_griffith @0.682",
+        "sa.rigveda_griffith @0.688",
+        "sa.rigveda_griffith @0.692"
+      ]
+    },
+    {
+      "q": "Jak čínská filosofie chápe ctnost?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 0,
+      "routed_groups": [
+        "chinese"
+      ],
+      "top": [
+        "zh.zhuangzi_lzh @0.672",
+        "zh.zhuangzi_lzh @0.677",
+        "zh.zhuangzi @0.682",
+        "zh.zuozhuan @0.688",
+        "zh.zhuangzi @0.692"
+      ]
+    },
+    {
+      "q": "Co říká severská mytologie o ragnaröku, konci světa?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 2,
+      "d1": 0.6721,
+      "spread": 0.0104,
+      "routed": 0,
+      "routed_groups": [
+        "european"
+      ],
+      "top": [
+        "non.edda_prose @0.672",
+        "non.edda_prose @0.677",
+        "non.edda_poetic @0.697",
+        "non.edda_poetic @0.706",
+        "non.edda_prose @0.682"
+      ]
+    },
+    {
+      "q": "Jak německý idealismus pracuje s pojmem ducha?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.4721,
+      "spread": 0.2656,
+      "routed": 0,
+      "routed_groups": [
+        "european_philosophy"
+      ],
+      "top": [
+        "de.hegel_werke01 @0.472",
+        "de.hegel_werke01 @0.677",
+        "de.hegel_werke03 @0.682",
+        "de.hegel_werke03 @0.692",
+        "de.hegel_werke05 @0.738"
+      ]
+    },
+    {
+      "q": "Srovnej pojetí duše v buddhismu a v hinduismu.",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 3,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 0,
+      "routed_groups": [
+        "pali",
+        "sanskrit"
+      ],
+      "top": [
+        "pi.abh.patthana-5 @0.672",
+        "pi.abh.patthana-4 @0.677",
+        "pi.abh.patthana-3 @0.682",
+        "pi.abh.patthana-3 @0.688",
+        "pi.abh.patthana-4 @0.692"
+      ]
+    },
+    {
+      "q": "Co říká Korán o milosrdenství Boha?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "ar.quran @0.672",
+        "ar.quran @0.677",
+        "ar.quran @0.682",
+        "ar.quran @0.688",
+        "ar.quran @0.692"
+      ]
+    },
+    {
+      "q": "Jak súra Al-Fátiha oslovuje Boha?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "ar.quran @0.672",
+        "ar.quran @0.677",
+        "ar.quran @0.682",
+        "ar.quran @0.688",
+        "ar.quran @0.692"
+      ]
+    },
+    {
+      "q": "Co učí islám o soudném dni?",
+      "work_hit": null,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 0,
+      "routed_groups": [
+        "islam"
+      ],
+      "top": [
+        "ar.quran @0.672",
+        "ar.quran @0.677",
+        "ar.quran @0.682",
+        "ar.quran @0.688",
+        "ar.quran @0.692"
+      ]
+    },
+    {
+      "q": "Co znamená Čuang-c'ovo putování v nezávislosti (逍遙遊)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 2,
+      "routed_groups": [],
+      "top": [
+        "zh.zhuangzi_lzh @0.672",
+        "zh.zhuangzi_lzh @0.677",
+        "zh.zhuangzi_lzh @0.682",
+        "zh.zhuangzi_lzh @0.688",
+        "zh.zhuangzi_lzh @0.692"
+      ]
+    },
+    {
+      "q": "Co říká I-ťing o hexagramu Čchien (乾)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.yijing @0.672",
+        "zh.yijing @0.677",
+        "zh.yijing @0.682",
+        "zh.yijing @0.688",
+        "zh.yijing @0.692"
+      ]
+    },
+    {
+      "q": "Jak Sün-c' zdůvodňuje, že lidská přirozenost je zlá (性惡)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4151,
+      "spread": 0.044,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.xunzi @0.415",
+        "zh.xunzi @0.418",
+        "zh.xunzi @0.432",
+        "zh.xunzi @0.452",
+        "zh.xunzi @0.459"
+      ]
+    },
+    {
+      "q": "Co učí mohismus o všeobecné lásce (兼愛)?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.4651,
+      "spread": 0.207,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.mozi @0.465",
+        "zh.mozi @0.483",
+        "zh.mozi @0.485",
+        "zh.mozi @0.538",
+        "zh.mozi @0.672"
+      ]
+    },
+    {
+      "q": "Jak legisté radí vládci používat tresty a odměny?",
+      "work_hit": true,
+      "group_hit": true,
+      "distinct": 1,
+      "d1": 0.6721,
+      "spread": 0.0202,
+      "routed": 1,
+      "routed_groups": [],
+      "top": [
+        "zh.hanfeizi @0.672",
+        "zh.hanfeizi @0.677",
+        "zh.hanfeizi @0.682",
+        "zh.hanfeizi @0.688",
+        "zh.hanfeizi @0.692"
+      ]
+    }
+  ]
+}

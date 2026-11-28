@@ -22,7 +22,7 @@ GROUP_LABEL = {
 }
 LANG_CS = {"pi": "pálí", "sa": "sanskrt", "lzh": "klasická čínština", "zh": "čínština", "grc": "stará řečtina",
            "lat": "latina", "de": "němčina", "en": "angličtina", "ang": "staroangličtina", "non": "staroseverština",
-           "ae": "avestština", "egy": "egyptština"}
+           "ae": "avestština", "egy": "egyptština", "ar": "arabština"}
 
 MAX_TABLE_ROWS = 120
 AUTHOR_FOLD_THRESHOLD = 60   # nad tolik děl ve skupině se skládá po autorech
