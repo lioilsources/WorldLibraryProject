@@ -84,16 +84,16 @@ nová díla.
 
 ## Mazání z databáze
 
-Schválené je smazání 26 překladů, vždy až po nahrazení originálem; seznam
-a podmínky jsou v plánu (Rozhodnuto č. 3). Nástroj na to neexistuje —
-`load_pg.py` ani `embed_books.py --sync` dílo, které zmizelo ze vstupu,
-nesmažou. Postup:
+Schválené je smazání 26 překladů, vždy až po nahrazení originálem; seznam,
+podmínky a stav jsou v plánu (Rozhodnuto č. 3). Běžný load ani
+`embed_books.py --sync` dílo, které zmizelo ze vstupu, nesmažou. Postup:
 
-1. napiš `--drop-work <id>` s `--dry-run` a testem
-2. obohacení mazaného díla ulož do `rag/run/` (gitignorovat)
-3. dry-run, počty do hlášení, pak ostrý běh
-4. Chroma (`books_v2`) je na SPARKu — bez přístupu tam zapiš
-   seznam `work_id`, které tam zbývá smazat
+1. záznam díla pryč z registru a zdrojový soubor pryč z `downloads/`
+   (soubor bez záznamu by ingest vrátil s odvozenými metadaty)
+2. `load_pg.py --drop-work <id> --dry-run`, počty do hlášení
+3. `load_pg.py --drop-work <id>` — zálohu obohacení zapíše do `rag/run/`
+   (mimo git) a smaže dílo z Postgresu i z Chromy (`books_v2`)
+4. aliasy a zlaté otázky přepojit na originál, chat restartovat
 
 ## První kroky
 

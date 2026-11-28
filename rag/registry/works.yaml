@@ -1713,24 +1713,3 @@ zh.mengzi:
   - mengzi
   chapters:
     detector: zh_juan
-zh.zhuangzi:
-  path: chinese/zhuangzi/zhuangzi.txt
-  group: chinese
-  work_legacy: zhuangzi
-  title: 莊子 (Chuang Tzŭ)
-  name_cs: Čuang-c' (Zhuangzi, překlad H. A. Giles)
-  author: Zhuangzi (Zhuang Zhou)
-  author_cs: Čuang-c'
-  lang_original: lzh
-  lang_corpus: en
-  form: traktat
-  period: 4.–3. stol. př. n. l.
-  edition: překlad Herbert A. Giles, 1889 (Gutenberg)
-  priority: 1
-  aliases:
-  - chuang tzu
-  - cuang-c
-  - cuangc
-  - zhuangzi
-  chapters:
-    detector: en_chapter_roman

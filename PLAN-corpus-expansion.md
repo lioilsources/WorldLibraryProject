@@ -246,12 +246,18 @@ originálu) → `make ingest-stats` → kontrola kapitol → ingest. Překlad se
 vyřadí až poté, co originál projde evalem; smazání je schválené (viz
 Rozhodnuto č. 3).
 
-Nástroj na mazání díla zatím neexistuje: `load_pg.py` maže a nahrazuje jen
-chunky a kapitoly děl, která jsou ve vstupu, a `embed_books.py --sync`
-uklízí jen díla, která ve vstupu vidí. Dílo, které ze vstupu zmizelo,
-zůstane v Postgresu i v Chromě. Napiš `--drop-work <id>` s `--dry-run`
-(počty řádků v `works`, `chapters`, `chunks`, `chunk_enrichment` a počet
-vektorů v obou kolekcích) a s testem.
+Běžný load ani `embed_books.py --sync` dílo, které zmizelo ze vstupu,
+nesmažou — zůstalo by v Postgresu i v Chromě. Maže se výslovně:
+
+1. záznam díla pryč z registru **a zdrojový soubor pryč z `downloads/`** —
+   soubor bez záznamu by ingest vzal s odvozenými metadaty a dílo vrátil
+2. `load_pg.py --drop-work <id> --dry-run` — počty v Postgresu i počet pasáží
+   v Chromě (`books_v2`)
+3. `load_pg.py --drop-work <id>` — záloha díla, kapitol, obohacení a témat do
+   `rag/run/`, pak smazání z Postgresu a z Chromy; když běh spadne mezi nimi,
+   druhé spuštění vektory doklidí
+4. aliasy v `retrieval.ALIASES` a očekávání v `eval/golden.jsonl` přepojit na
+   originál; běžící chat drží rejstřík aliasů od startu, takže ho restartovat
 
 Když originál nejde získat v použitelné kvalitě (hrozí u Avesty a Textů
 pyramid), dílo zůstane v registru jako překlad s poznámkou, proč.
@@ -390,6 +396,9 @@ funkčního dělení na kapitoly se do čtečky nedostane.
    a prošel evalem; obohacení mazaného díla je předem uložené do souboru
    v `run/`; dry-run ukázal počty; výsledek se nahlásí. Kde originál získat
    nejde, překlad zůstává a hlásí se to.
+   **Stav:** `zh.zhuangzi` smazáno 2026-11-28 (34 kapitol, 498 chunků
+   i s obohacením, 532 pasáží v `books_v2`), nahrazuje ho `zh.zhuangzi_lzh`.
+   Zbývá 25 děl.
 4. **České originály do knihovny patří** (Komenský, Hus, Chelčický a další).
    Zásada „žádné české překlady" míří na překlady, ne na česky psaná díla.
 5. **Nepoužitelná PDF z LFS pryč:** schváleno pro hebrejskou Bibli (719 MB,
