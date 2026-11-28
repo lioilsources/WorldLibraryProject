@@ -23,7 +23,9 @@ TXT = [
     ("dao_de_jing.txt", "chinese/laozi/dao_de_jing.txt", None, None),
     ("analects.txt", "chinese/konfucius/analects.txt", None, None),
     ("mengzi.txt", "chinese/mengzi/mengzi.txt", None, None),
-    ("zhuangzi_head.txt", "chinese/zhuangzi/zhuangzi.txt", 0, 1900),
+    # zdroj (anglický překlad H. A. Gilese) je z korpusu vyřazený; fixture zůstává
+    # kvůli detektoru en_chapter_roman a už se nepřegenerovává
+    ("zhuangzi_head.txt", None, 0, 1900),
     ("beowulf_hall_head.txt", "european/beowulf/pg16328.txt", 0, 1300),
     ("maha12_head.txt", "sanskrit/mahabharata/maha12.txt", 0, 3400),
     ("maha08_head.txt", "sanskrit/mahabharata/maha08.txt", 0, 700),

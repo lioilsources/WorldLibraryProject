@@ -15,8 +15,8 @@ Zásady:
 Použití:
     python3 load_pg.py --input books.jsonl --works works.jsonl --chapters chapters.jsonl --replace-all
     python3 load_pg.py --work zh.daodejing --replace-work      # jen jedno dílo
-    python3 load_pg.py --drop-work zh.zhuangzi --dry-run      # co by se smazalo
-    python3 load_pg.py --drop-work zh.zhuangzi                # překlad pryč, záloha do run/
+    python3 load_pg.py --drop-work zh.zhuangzi --dry-run      # co by se smazalo (Postgres i Chroma)
+    python3 load_pg.py --drop-work zh.zhuangzi                # překlad pryč z obou, záloha do run/
 """
 
 from __future__ import annotations
@@ -185,7 +185,10 @@ def drop_work(conn, work_id: str, registry_ids: set[str], backup_dir: Path,
     z registru, jinak by ho příští ingest + load vrátil. Před smazáním se
     v téže transakci zapíše záloha (dílo, kapitoly se souhrny, obohacení,
     témata) do backup_dir; když zápis selže, nic se nesmaže. Vektory
-    v Chromě tahle funkce neřeší."""
+    v Chromě maže drop_work_chroma.
+
+    Registr nestačí: i zdrojový soubor díla musí pryč z downloads/, jinak ho
+    ingest vezme jako soubor bez registru a vrátí pod odvozeným ID."""
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM works WHERE id = %s", (work_id,))
         if cur.fetchone() is None:
@@ -209,6 +212,31 @@ def drop_work(conn, work_id: str, registry_ids: set[str], backup_dir: Path,
                         f.write(json.dumps({"table": table, "row": row}, ensure_ascii=False, default=str) + "\n")
             cur.execute("DELETE FROM works WHERE id = %s", (work_id,))
     return counts, backup
+
+
+CHROMA_BATCH = 2000
+
+
+def chroma_collection(url: str, name: str):
+    """Kolekce v Chromě. chromadb se importuje až tady — loader ho jinak nepotřebuje."""
+    from urllib.parse import urlparse
+
+    import chromadb
+
+    u = urlparse(url)
+    return chromadb.HttpClient(host=u.hostname, port=u.port or 8000).get_collection(name)
+
+
+def drop_work_chroma(collection, work_id: str, dry_run: bool = True, batch: int = CHROMA_BATCH) -> int:
+    """Pasáže díla v kolekci: vrátí jejich počet, bez dry_run je i smaže.
+
+    Hledají se podle metadat `work_id`, ne podle ID chunků — dlouhý chunk se
+    embeduje po částech, takže pasáží je víc než chunků."""
+    ids = collection.get(where={"work_id": work_id}, include=[])["ids"]
+    if not dry_run:
+        for i in range(0, len(ids), batch):
+            collection.delete(ids=ids[i:i + batch])
+    return len(ids)
 
 
 def migrate_summaries(conn, summaries_file: Path) -> int:
@@ -237,23 +265,39 @@ def main_drop(args) -> int:
     from ingest_books import load_works   # registr: works.yaml + works.d
 
     registry_ids = set(load_works(Path(args.registry)))
+    # Chroma napřed: špatná adresa má spadnout dřív, než se v Postgresu něco smaže
+    collection = None if args.no_chroma else chroma_collection(args.chroma_url, args.collection)
+    would = "smazalo by se" if args.dry_run else "smazáno"
     rc = 0
     with psycopg.connect(args.dsn) as conn:
         for wid in args.drop_work:
             try:
                 counts, backup = drop_work(conn, wid, registry_ids, args.backup_dir, dry_run=args.dry_run)
-            except (LookupError, ValueError) as e:
+            except LookupError as e:
+                # V Postgresu není: překlep, nebo minulý běh spadl mezi Postgresem
+                # a Chromou — pak tu zbyly vektory a je potřeba je doklidit.
+                left = (drop_work_chroma(collection, wid, dry_run=args.dry_run)
+                        if collection is not None and wid not in registry_ids else 0)
+                if left:
+                    print(f"{wid}: v Postgresu už není; v {args.collection} {would} {left} pasáží")
+                else:
+                    print(f"CHYBA: {e}", file=sys.stderr)
+                    rc = 1
+                continue
+            except ValueError as e:
                 print(f"CHYBA: {e}", file=sys.stderr)
                 rc = 1
                 continue
             what = ", ".join(f"{k} {v}" for k, v in counts.items())
+            if collection is not None:
+                what += f", pasáží v {args.collection} {drop_work_chroma(collection, wid, dry_run=args.dry_run)}"
             if args.dry_run:
                 note = " (pozor: pořád v registru)" if wid in registry_ids else ""
-                print(f"DRY-RUN {wid}: smazalo by se {what}{note}")
+                print(f"DRY-RUN {wid}: {would} {what}{note}")
             else:
-                print(f"smazáno {wid}: {what}; záloha {backup}")
-    if not args.dry_run and rc == 0:
-        print("teď: vektory díla z Chromy (books_v2, books_gloss) a make pg-index")
+                print(f"{would} {wid}: {what}; záloha {backup}")
+    if collection is None:
+        print("pozor: --no-chroma — vektory díla v Chromě zůstávají")
     return rc
 
 
@@ -274,11 +318,19 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true", help="s --drop-work: jen vypsat, co by odešlo")
     p.add_argument("--backup-dir", type=Path, default=Path(__file__).parent / "run",
                    help="kam --drop-work zapíše zálohu obohacení (mimo git)")
+    p.add_argument("--chroma-url", default=os.getenv("CHROMA_URL"),
+                   help="s --drop-work: Chroma, ze které se smažou pasáže díla")
+    p.add_argument("--collection", default=os.getenv("COLLECTION", "books_v2"),
+                   help="s --drop-work: kolekce pasáží v Chromě")
+    p.add_argument("--no-chroma", action="store_true", help="s --drop-work: jen Postgres, Chromu nechat být")
     args = p.parse_args()
     if not args.dsn:
         print("CHYBA: chybí --dsn / PG_DSN", file=sys.stderr)
         return 2
     if args.drop_work:
+        if not (args.chroma_url or args.no_chroma):
+            print("CHYBA: chybí --chroma-url / CHROMA_URL (nebo --no-chroma)", file=sys.stderr)
+            return 2
         return main_drop(args)
     if not (args.replace_all or args.replace_work):
         print("CHYBA: zvol --replace-all nebo --replace-work (nic se neděje implicitně)", file=sys.stderr)

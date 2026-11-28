@@ -58,10 +58,10 @@ ALIASES: dict[str, tuple[str, ...]] = {
     "menci": ("mengzi",),
     "meng-c": ("mengzi",),
     "mengzi": ("mengzi",),
-    "zhuangzi": ("zhuangzi",),
-    "cuang-c": ("zhuangzi",),
-    "cuangc": ("zhuangzi",),
-    "chuang tzu": ("zhuangzi",),
+    "zhuangzi": ("zhuangzi lzh",),
+    "cuang-c": ("zhuangzi lzh",),
+    "cuangc": ("zhuangzi lzh",),
+    "chuang tzu": ("zhuangzi lzh",),
     # --- pálijský kánon: jednotlivá díla ---
     "dhammapad": ("Dhammapadapāḷi",),
     "milind": ("Milindapañhapāḷi",),
@@ -480,7 +480,7 @@ def _selftest() -> None:
         "Milindapañhapāḷi": "Khuddaka-nikája — Otázky krále Milindy",
         "Dhammapadapāḷi": "Khuddaka-nikája — Dhammapadam",
         "dao de jing": "Tao te ťing — Lao-c'",
-        "zhuangzi": "Čuang-c' (Zhuangzi, překlad H. A. Giles)",
+        "zhuangzi lzh": "Čuang-c' (originál)",
         "The poetic Edda": "Starší (Poetická) Edda (překlad H. A. Bellows)",
         "The Younger Edda; Also called Snorre's Edda, or The Prose Edda":
             "Mladší (Snorriho) Edda",
@@ -499,7 +499,7 @@ def _selftest() -> None:
     # průnik: širší alias + užší → užší
     assert route("Bhagavadgíta z Mahábháraty", idx) == [nfd("Mahábhárata 06 — Bhíšmaparva")]
     # prázdný průnik → sjednocení
-    assert route("Srovnej Tao te ťing a Zhuangziho", idx) == ["dao de jing", "zhuangzi"]
+    assert route("Srovnej Tao te ťing a Zhuangziho", idx) == ["dao de jing", "zhuangzi lzh"]
     # obecná otázka nesměruje nikam
     assert route("Co učí buddhismus o utrpení?", idx) == []
     # „edda" míří na obě, „Poetická Edda" jen na jednu

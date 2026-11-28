@@ -1,7 +1,7 @@
 {"q": "Co říká Tao te ťing o nečinnosti (wu-wej)?", "expect_work": "dao de jing", "expect_group": "chinese"}
 {"q": "Jak Konfucius v Hovorech popisuje ušlechtilého člověka?", "expect_work": "analects", "expect_group": "chinese"}
 {"q": "Co soudí Mencius o lidské přirozenosti?", "expect_work": "mengzi", "expect_group": "chinese"}
-{"q": "Vyprávěj mi Zhuangziho sen o motýlovi.", "expect_work": "zhuangzi", "expect_group": "chinese"}
+{"q": "Vyprávěj mi Zhuangziho sen o motýlovi.", "expect_work": "zhuangzi lzh", "expect_group": "chinese"}
 {"q": "Jaké verše o mysli obsahuje Dhammapada?", "expect_work": "Dhammapadapāḷi", "expect_group": "pali"}
 {"q": "Na co se ptá král Milinda mnicha Nágasény?", "expect_work": "Milindapañhapāḷi", "expect_group": "pali"}
 {"q": "Co zpívají mnišky v Therígáthě?", "expect_work": "Therīgāthāpāḷi", "expect_group": "pali"}
