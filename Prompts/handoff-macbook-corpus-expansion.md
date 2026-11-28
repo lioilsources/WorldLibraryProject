@@ -55,8 +55,8 @@ konflikty tím zmizí.
 | obohacení LLM | SPARK přes `spark-broker`, nebo výplň na L40S (řeší session L40S; klient potřebuje Postgres a tunel na vLLM) |
 
 Když MacBook na SPARK nedosáhne, skonči u nahrání do Postgresu a do PR
-napiš, co zbývá spustit na SPARKu (`make embed`, `make embed-gloss`,
-obohacení).
+napiš, co zbývá spustit na SPARKu (`make embed`, obohacení). Kolekce glos
+`books_gloss` se schválně nestaví (`PLAN-spark-library-storage.md`).
 
 ## Data bez plného korpusu
 
@@ -92,7 +92,7 @@ nesmažou. Postup:
 1. napiš `--drop-work <id>` s `--dry-run` a testem
 2. obohacení mazaného díla ulož do `rag/run/` (gitignorovat)
 3. dry-run, počty do hlášení, pak ostrý běh
-4. Chroma (`books_v2`, `books_gloss`) je na SPARKu — bez přístupu tam zapiš
+4. Chroma (`books_v2`) je na SPARKu — bez přístupu tam zapiš
    seznam `work_id`, které tam zbývá smazat
 
 ## První kroky
